@@ -7,6 +7,7 @@ import type { SupportedLocale } from "@/lib/cart";
 import { addExtraToCart } from "@/lib/cart";
 import type { CatalogItem } from "@/lib/catalog-types";
 import { formatEur } from "@/lib/format";
+import { publicMenuImageSrc } from "@/lib/normalize-menu-image";
 import { useI18n } from "@/components/providers/I18nProvider";
 
 export type MenuGridCategory =
@@ -76,12 +77,13 @@ export function MenuGrid({
     <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 md:gap-4 lg:grid-cols-4">
       {items.map((item) => {
         const label = nameOf(item, locale);
+        const imageSrc = publicMenuImageSrc(item.image);
         const cardInner = (
           <>
             <div className="relative aspect-[4/3] w-full">
-              {item.image ? (
+              {imageSrc ? (
                 <Image
-                  src={item.image}
+                  src={imageSrc}
                   alt=""
                   fill
                   className="object-cover"
@@ -132,9 +134,9 @@ export function MenuGrid({
             >
               <Link href={builderHref} className="block">
                 <div className="relative aspect-[4/3] w-full">
-                  {item.image ? (
+                  {imageSrc ? (
                     <Image
-                      src={item.image}
+                      src={imageSrc}
                       alt=""
                       fill
                       className="object-cover"
@@ -180,6 +182,7 @@ export function MenuGrid({
   );
 
   const pickerLabel = picker ? nameOf(picker, locale) : "";
+  const pickerImageSrc = picker ? publicMenuImageSrc(picker.image) : "";
 
   return (
     <>
@@ -198,9 +201,9 @@ export function MenuGrid({
           />
           <div className="relative z-[1] w-full max-w-md overflow-hidden rounded-2xl border-2 border-[#2e402a] bg-[#111] shadow-2xl">
             <div className="relative aspect-[16/9] w-full">
-              {picker.image ? (
+              {pickerImageSrc ? (
                 <Image
-                  src={picker.image}
+                  src={pickerImageSrc}
                   alt=""
                   fill
                   className="object-cover"

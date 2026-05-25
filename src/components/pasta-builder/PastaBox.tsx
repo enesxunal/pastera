@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
+import { publicMenuImageSrc } from "@/lib/normalize-menu-image";
 
 export type BoxLayer = { id: string; name: string; image?: string };
 
@@ -69,9 +70,9 @@ export function PastaBox({ pastaName, layers }: PastaBoxProps) {
                         className="mb-2 flex items-center gap-2 rounded-xl border border-[#2e402a] bg-black/30 p-2"
                       >
                         <div className="relative h-9 w-9 overflow-hidden rounded-lg border border-[#c49746]/50 bg-[#111]">
-                          {t.image ? (
+                          {publicMenuImageSrc(t.image) ? (
                             <Image
-                              src={t.image}
+                              src={publicMenuImageSrc(t.image)}
                               alt=""
                               fill
                               className="object-cover"

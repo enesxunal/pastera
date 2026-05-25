@@ -5,6 +5,7 @@ import { motion, type Variants } from "framer-motion";
 import type { MenuItem } from "@/lib/menu-data";
 import { formatEur } from "@/lib/format";
 import { fadeUpCard } from "@/lib/motion-variants";
+import { publicMenuImageSrc } from "@/lib/normalize-menu-image";
 
 type Props = {
   item: MenuItem;
@@ -15,6 +16,7 @@ type Props = {
 };
 
 export function MenuPickCard({ item, selected, onSelect, mode, variants = fadeUpCard }: Props) {
+  const imageSrc = publicMenuImageSrc(item.image);
   return (
     <motion.button
       type="button"
@@ -30,9 +32,9 @@ export function MenuPickCard({ item, selected, onSelect, mode, variants = fadeUp
           : "border-[#2e402a] hover:border-[#c49746]/40"
       }`}
     >
-      {item.image ? (
+      {imageSrc ? (
         <Image
-          src={item.image}
+          src={imageSrc}
           alt=""
           fill
           className="object-cover"

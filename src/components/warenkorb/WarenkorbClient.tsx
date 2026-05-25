@@ -27,6 +27,7 @@ import { loadDineInContext } from "@/lib/dine-in-context";
 import { loadPickupContext, savePickupContext, clearPickupContext } from "@/lib/pickup-context";
 import type { PaymentType } from "@/lib/order-types";
 import { formatEur } from "@/lib/format";
+import { publicMenuImageSrc } from "@/lib/normalize-menu-image";
 import { PastaBox } from "@/components/pasta-builder/PastaBox";
 
 type BranchOption = { id: string; slug: string; name: string };
@@ -398,15 +399,17 @@ export function WarenkorbClient() {
                 {t("cart.sectionExtras")}
               </h2>
               <ul className="mt-4 flex flex-col gap-4">
-                {extras.map((line) => (
+                {extras.map((line) => {
+                  const lineImageSrc = publicMenuImageSrc(line.image);
+                  return (
                   <li
                     key={line.id}
                     className="flex gap-4 rounded-2xl border-2 border-[#2e402a] bg-[#111] p-4 shadow-md"
                   >
                     <div className="relative h-24 w-28 shrink-0 overflow-hidden rounded-xl border border-[#2e402a] bg-black">
-                      {line.image ? (
+                      {lineImageSrc ? (
                         <Image
-                          src={line.image}
+                          src={lineImageSrc}
                           alt=""
                           fill
                           className="object-cover"
@@ -463,7 +466,8 @@ export function WarenkorbClient() {
                       </div>
                     </div>
                   </li>
-                ))}
+                  );
+                })}
               </ul>
               <div className="mt-4 flex justify-end border-t border-[#2e402a]/60 pt-4">
                 <p className="text-sm text-white/55">

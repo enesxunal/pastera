@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import type { CatalogItem } from "@/lib/catalog-types";
 import { getCatalogAllFromDb } from "@/lib/catalog-server";
 import { getStaticCatalog } from "@/lib/catalog-static";
+import { normalizeMenuImagePath } from "@/lib/normalize-menu-image";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 
 function isAdmin(req: NextRequest): boolean {
@@ -42,7 +43,7 @@ export async function POST(req: NextRequest) {
     name_tr: body.name_tr ?? "",
     price: Number(body.price ?? 0),
     vegan: Boolean(body.vegan),
-    image: body.image ?? "",
+    image: normalizeMenuImagePath(body.image ?? ""),
     sort_order: Number(body.sort_order ?? 0),
     is_active: body.is_active !== false,
     updated_at: now,
@@ -69,7 +70,7 @@ export async function PATCH(req: NextRequest) {
   if (body.name_tr !== undefined) patch.name_tr = body.name_tr;
   if (body.price !== undefined) patch.price = Number(body.price);
   if (body.vegan !== undefined) patch.vegan = body.vegan;
-  if (body.image !== undefined) patch.image = body.image;
+  if (body.image !== undefined) patch.image = normalizeMenuImagePath(body.image);
   if (body.sort_order !== undefined) patch.sort_order = Number(body.sort_order);
   if (body.is_active !== undefined) patch.is_active = body.is_active;
 

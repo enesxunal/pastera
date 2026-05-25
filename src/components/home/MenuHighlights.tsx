@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { MENU_HIGHLIGHTS } from "@/lib/menu-data";
+import { publicMenuImageSrc } from "@/lib/normalize-menu-image";
 import { formatEur } from "@/lib/format";
 import { useI18n } from "@/components/providers/I18nProvider";
 
@@ -27,16 +28,18 @@ export function MenuHighlights() {
       </div>
 
       <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {MENU_HIGHLIGHTS.map((item) => (
+        {MENU_HIGHLIGHTS.map((item) => {
+          const imageSrc = publicMenuImageSrc(item.image);
+          return (
           <Link
             key={item.id}
             href={item.href ?? "/menu"}
             className="group flex flex-col overflow-hidden rounded-2xl border-2 border-[#2e402a] border-l-4 border-l-[#c49746] bg-[#0f0f0f] shadow-lg transition hover:border-[#c49746]/80 hover:shadow-[0_0_32px_-8px_rgba(196,151,70,0.35)]"
           >
             <div className="relative aspect-[16/10] w-full">
-              {item.image ? (
+              {imageSrc ? (
                 <Image
-                  src={item.image}
+                  src={imageSrc}
                   alt=""
                   fill
                   className="object-cover transition duration-300 group-hover:scale-[1.03]"
@@ -69,7 +72,8 @@ export function MenuHighlights() {
               </p>
             </div>
           </Link>
-        ))}
+          );
+        })}
       </div>
     </section>
   );

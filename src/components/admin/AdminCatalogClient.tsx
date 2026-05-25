@@ -8,6 +8,7 @@ import { AdminNav } from "@/components/admin/AdminNav";
 import { useI18n } from "@/components/providers/I18nProvider";
 import type { CatalogCategory, CatalogItem } from "@/lib/catalog-types";
 import { formatEur } from "@/lib/format";
+import { publicMenuImageSrc } from "@/lib/normalize-menu-image";
 
 const CATEGORIES: CatalogCategory[] = [
   "pasta_base",
@@ -512,9 +513,10 @@ function ProductThumb({
   large?: boolean;
 }) {
   const size = large ? "relative min-h-[200px] w-full" : "relative h-14 w-14 shrink-0";
+  const normalized = publicMenuImageSrc(image);
   const src =
-    image?.startsWith("/") || image?.startsWith("http://") || image?.startsWith("https://")
-      ? image
+    normalized.startsWith("/") || normalized.startsWith("http://") || normalized.startsWith("https://")
+      ? normalized
       : null;
 
   if (src) {
