@@ -1,0 +1,53 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #0a0a0a;
+  --foreground: #ffffff;
+  --forest: #2e402a;
+  --gold: #c49746;
+}
+
+body {
+  color: var(--foreground);
+  background-color: var(--background);
+  min-height: 100vh;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .perspective-box {
+    perspective: 1100px;
+  }
+
+  .preserve-3d {
+    transform-style: preserve-3d;
+  }
+
+  /* Sicher sichtbare Markenstreifen (unabhängig von Tailwind-JIT) */
+  .border-brand-gold {
+    border-color: #c49746;
+  }
+
+  .bg-brand-forest {
+    background-color: #2e402a;
+  }
+
+  .text-brand-gold {
+    color: #c49746;
+  }
+}
+
+/* Garantiert sichtbar – auch wenn Tailwind-Klassen nicht greifen */
+.pastera-brand-bar {
+  position: relative;
+  z-index: 50;
+  height: 4px;
+  width: 100%;
+  flex-shrink: 0;
+  background: linear-gradient(90deg, #2e402a 0%, #c49746 45%, #c49746 55%, #2e402a 100%);
+}

@@ -1,0 +1,69 @@
+"use client";
+
+import Image from "next/image";
+import { motion, type Variants } from "framer-motion";
+import type { MenuItem } from "@/lib/menu-data";
+import { formatEur } from "@/lib/format";
+import { fadeUpCard } from "@/lib/motion-variants";
+
+type Props = {
+  item: MenuItem;
+  selected: boolean;
+  onSelect: () => void;
+  mode: "single" | "multi";
+  variants?: Variants;
+};
+
+export function MenuPickCard({ item, selected, onSelect, mode, variants = fadeUpCard }: Props) {
+  return (
+    <motion.button
+      type="button"
+      layout
+      variants={variants}
+      onClick={onSelect}
+      whileHover={{ scale: 1.02, y: -2 }}
+      whileTap={{ scale: 0.97 }}
+      transition={{ layout: { duration: 0.25 } }}
+      className={`relative aspect-[4/3] w-full overflow-hidden rounded-xl border-2 text-left shadow-md ${
+        selected
+          ? "border-[#c49746] shadow-[0_0_28px_-6px_rgba(196,151,70,0.45)]"
+          : "border-[#2e402a] hover:border-[#c49746]/40"
+      }`}
+    >
+      {item.image ? (
+        <Image
+          src={item.image}
+          alt=""
+          fill
+          className="object-cover"
+          sizes="(max-width: 768px) 50vw, 280px"
+          unoptimized
+        />
+      ) : (
+        <div
+          className="absolute inset-0 bg-gradient-to-br from-[#1a2218] via-[#0f140d] to-[#0a0a0a]"
+          aria-hidden
+        />
+      )}
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black via-black/35 to-transparent" />
+      {selected && (
+        <motion.span
+          layoutId={`pick-${item.id}`}
+          className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold text-[#0a0a0a] shadow-lg"
+          style={{ backgroundColor: "#c49746" }}
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ type: "spring", stiffness: 500, damping: 22 }}
+        >
+          {mode === "single" ? "●" : "✓"}
+        </motion.span>
+      )}
+      <div className="absolute bottom-0 left-0 right-0 p-3">
+        <p className="font-display text-sm font-bold leading-tight text-white">{item.name}</p>
+        <p className="mt-0.5 text-xs font-semibold text-[#c49746]">
+          {mode === "single" ? formatEur(item.price) : `+${formatEur(item.price)}`}
+        </p>
+      </div>
+    </motion.button>
+  );
+}
