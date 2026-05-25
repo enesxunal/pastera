@@ -298,6 +298,7 @@
     "loginTitle": "Giriş yap",
     "loginHint": "E-posta ve şifre ile — puan biriktirmek ve hızlı sipariş için.",
     "loginError": "Giriş başarısız. Lütfen tekrar deneyin.",
+    "configError": "Sunucu ayarı eksik: Vercel’de Supabase ortam değişkenleri tanımlı değil. Projeyi yeniden deploy edin.",
     "registerTitle": "Hesap oluştur",
     "registerHint": "Ücretsiz kayıt ol, sadakat puanı kazan.",
     "accountTitle": "Hesabım",

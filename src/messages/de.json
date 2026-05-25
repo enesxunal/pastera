@@ -298,6 +298,7 @@
     "loginTitle": "Anmelden",
     "loginHint": "Mit E-Mail und Passwort – für Punkte und schnellere Bestellungen.",
     "loginError": "Anmeldung fehlgeschlagen. Bitte erneut versuchen.",
+    "configError": "Server-Konfiguration fehlt: Supabase-Umgebungsvariablen in Vercel fehlen. Bitte neu deployen.",
     "registerTitle": "Konto erstellen",
     "registerHint": "Kostenlos registrieren und Treuepunkte sammeln.",
     "accountTitle": "Mein Konto",

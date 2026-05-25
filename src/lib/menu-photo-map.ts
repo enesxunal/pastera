@@ -1,11 +1,9 @@
 /**
- * `public/web-Pastera-Menü-*.png` dosyaları (diskte NFD: Men + u + birleşik ü).
+ * `public/web-Pastera-Menü-*.png` — Git/Vercel (Linux) dosya adları NFC.
  * Haritada olmayan ürünler: boş string (kartta gri alan).
  */
-const MENUE = "Men\u0075\u0308";
-
 function pathFromSuffix(suffix: string): string {
-  return `/web-Pastera-${MENUE}-${suffix.normalize("NFD")}.png`;
+  return `/web-Pastera-Menü-${suffix.normalize("NFC")}.png`;
 }
 
 const ID_SUFFIX: Partial<Record<string, string>> = {

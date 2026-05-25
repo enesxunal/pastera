@@ -4,10 +4,12 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState, type FormEvent } from "react";
 import { useI18n } from "@/components/providers/I18nProvider";
+import { useAuth } from "@/components/providers/AuthProvider";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 function LoginForm() {
   const { t, locale } = useI18n();
+  const { configured } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
@@ -18,6 +20,10 @@ function LoginForm() {
   async function submit(e: FormEvent) {
     e.preventDefault();
     setErr("");
+    if (!configured) {
+      setErr(t("auth.configError"));
+      return;
+    }
     setBusy(true);
     try {
       const supabase = createSupabaseBrowserClient();
@@ -28,6 +34,8 @@ function LoginForm() {
       }
       router.push("/auth/account");
       router.refresh();
+    } catch {
+      setErr(t("auth.configError"));
     } finally {
       setBusy(false);
     }

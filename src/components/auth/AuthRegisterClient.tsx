@@ -4,10 +4,12 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { useI18n } from "@/components/providers/I18nProvider";
+import { useAuth } from "@/components/providers/AuthProvider";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 export function AuthRegisterClient() {
   const { t } = useI18n();
+  const { configured } = useAuth();
   const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -20,6 +22,10 @@ export function AuthRegisterClient() {
     e.preventDefault();
     setErr("");
     setMsg("");
+    if (!configured) {
+      setErr(t("auth.configError"));
+      return;
+    }
     setBusy(true);
     try {
       const supabase = createSupabaseBrowserClient();
@@ -41,6 +47,8 @@ export function AuthRegisterClient() {
       } else {
         setMsg(t("auth.confirmEmail"));
       }
+    } catch {
+      setErr(t("auth.configError"));
     } finally {
       setBusy(false);
     }
