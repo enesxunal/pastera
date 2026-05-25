@@ -197,6 +197,8 @@
     "loginTitle": "Yönetici girişi",
     "password": "Şifre",
     "submit": "Giriş",
+    "loginWrong": "Şifre yanlış.",
+    "loginServerMissing": "Canlı sitede ADMIN_PASSWORD yok. Vercel → Environment Variables → ekleyip Redeploy yapın.",
     "navDashboard": "Özet ve istatistik",
     "navBranches": "Şubeler",
     "navCatalog": "Katalog",

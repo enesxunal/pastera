@@ -19,7 +19,11 @@ export default function AdminLoginPage() {
       body: JSON.stringify({ password }),
     });
     if (!res.ok) {
-      setErr(locale === "de" ? "Falsches Passwort oder Server." : "Hatalı şifre veya sunucu.");
+      if (res.status === 503) {
+        setErr(t("admin.loginServerMissing"));
+      } else {
+        setErr(t("admin.loginWrong"));
+      }
       return;
     }
     router.push("/admin/dashboard");
@@ -51,8 +55,8 @@ export default function AdminLoginPage() {
       </form>
       <p className="mt-6 text-xs text-white/40">
         {locale === "de"
-          ? "ADMIN_PASSWORD in .env.local setzen."
-          : ".env.local içinde ADMIN_PASSWORD ayarlayın."}
+          ? "Lokal: .env.local · Live: Vercel → ADMIN_PASSWORD"
+          : "Bilgisayar: .env.local · Canlı: Vercel → ADMIN_PASSWORD"}
       </p>
     </div>
   );

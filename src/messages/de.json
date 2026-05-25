@@ -197,6 +197,8 @@
     "loginTitle": "Admin Login",
     "password": "Passwort",
     "submit": "Anmelden",
+    "loginWrong": "Falsches Passwort.",
+    "loginServerMissing": "ADMIN_PASSWORD fehlt auf Vercel. Unter Environment Variables eintragen und Redeploy.",
     "navDashboard": "Übersicht & Statistik",
     "navBranches": "Filialen",
     "navCatalog": "Katalog",

@@ -16,7 +16,7 @@ Giriş ve veritabanı çalışması için bilgisayarınızdaki `.env.local` içe
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase proje URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon (public) key |
 | `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role (gizli) |
-| `ADMIN_PASSWORD` | Admin panel şifresi |
+| `ADMIN_PASSWORD` | Admin panel şifresi (**zorunlu** — yoksa /admin girişi çalışmaz) |
 | `BRANCH_PANEL_PASSWORD` | Şube panel şifresi |
 | `DISPLAY_ACCESS_KEY` | Mutfak ekranı anahtarı |
 | `BRANCH_PANEL_BRANCH_ID` | Varsayılan şube UUID |
