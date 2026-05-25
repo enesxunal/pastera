@@ -4,13 +4,14 @@ import { MenuGrid } from "@/components/menu/MenuGrid";
 import type { SupportedLocale } from "@/lib/cart";
 import { catalogByCategory } from "@/lib/catalog-static";
 import { getCatalogFromDb } from "@/lib/catalog-server";
+import { message } from "@/lib/i18n";
 
 export default async function MenuVorspeisenPage() {
   const catalog = await getCatalogFromDb();
   const locale = (cookies().get("pastera-locale")?.value === "tr" ? "tr" : "de") as SupportedLocale;
   const suppen = catalogByCategory(catalog, "soup");
   const mezeler = catalogByCategory(catalog, "starter");
-  const de = locale === "de";
+  const m = (key: string) => message(locale, key);
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
@@ -18,32 +19,25 @@ export default async function MenuVorspeisenPage() {
         href="/menu"
         className="text-sm font-semibold text-[#c49746] underline-offset-4 hover:underline"
       >
-        {de ? "← Zur Speisekarte" : "← Menüye dön"}
+        {m("common.backToMenu")}
       </Link>
 
-      <h1 className="mt-6 font-display text-4xl font-bold text-white">
-        {de ? "Warm & klein" : "Ara sıcaklar"}
-      </h1>
+      <h1 className="mt-6 font-display text-4xl font-bold text-white">{m("menuPages.warmTitle")}</h1>
       <p className="mt-2 text-sm font-medium text-[#c49746]">
-        {suppen.length} {de ? "Suppe" : "çorba"} · {mezeler.length}{" "}
-        {de ? "Vorspeisen" : "meze"}
+        {suppen.length} {m("menuPages.soupWord")} · {mezeler.length} {m("menuPages.starterWord")}
       </p>
-      <p className="mt-3 max-w-2xl text-white/60">
-        {de
-          ? "Zur Übersicht – mit Button in den Warenkorb legbar."
-          : "Listeleme — sepete ekle düğmesiyle."}
-      </p>
+      <p className="mt-3 max-w-2xl text-white/60">{m("menuPages.listHint")}</p>
 
       <MenuGrid
-        title={de ? "Suppen" : "Çorbalar"}
-        subtitle={de ? "Warm und einladend." : "Sıcak çorbalar."}
+        title={m("menuPages.soupsTitle")}
+        subtitle={m("menuPages.soupsSub")}
         items={suppen}
         category="soup"
         locale={locale}
       />
       <MenuGrid
-        title={de ? "Vorspeisen" : "Mezeler"}
-        subtitle={de ? "Zum Teilen oder als Start." : "Paylaşım veya başlangıç."}
+        title={m("menuPages.startersTitle")}
+        subtitle={m("menuPages.startersSub")}
         items={mezeler}
         category="starter"
         locale={locale}
@@ -54,7 +48,7 @@ export default async function MenuVorspeisenPage() {
           href="/menu"
           className="inline-flex items-center rounded-full border-2 border-[#2e402a] px-6 py-4 text-sm font-medium text-white/80 hover:border-[#c49746]/50"
         >
-          {de ? "← Menü-Übersicht" : "← Menü çeşitleri"}
+          {m("menuPages.menuOverview")}
         </Link>
       </div>
     </div>

@@ -8,7 +8,7 @@ import { clearDeliveryContext, loadDeliveryContext } from "@/lib/delivery-contex
 import { loadDineInContext } from "@/lib/dine-in-context";
 
 export function ErfolgClient() {
-  const { t, locale } = useI18n();
+  const { t } = useI18n();
   const searchParams = useSearchParams();
   const [orderId, setOrderId] = useState<string | null>(null);
   const [mode, setMode] = useState<"dine_in" | "delivery" | "web">("web");
@@ -47,7 +47,7 @@ export function ErfolgClient() {
             ? t("success.bodyDelivery")
             : t("success.bodyWeb")}
       </p>
-      {mode === "web" && locale === "de" ? (
+      {mode === "web" ? (
         <p className="mt-2 text-xs text-white/40">{t("success.demoNote")}</p>
       ) : null}
       <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:justify-center">

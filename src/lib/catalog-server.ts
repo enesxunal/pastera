@@ -1,6 +1,7 @@
 import type { CatalogItem } from "@/lib/catalog-types";
 import { applyBranchPrices, getBranchPriceOverrides } from "@/lib/branch-catalog-prices";
 import { getStaticCatalog } from "@/lib/catalog-static";
+import { catalogNameTr } from "@/lib/catalog-name-tr";
 import { normalizeMenuImagePath } from "@/lib/normalize-menu-image";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
@@ -20,7 +21,7 @@ function mapRow(r: {
     id: r.id,
     category: r.category as CatalogItem["category"],
     name_de: r.name_de,
-    name_tr: r.name_tr,
+    name_tr: catalogNameTr(r.id, r.name_tr?.trim() || r.name_de),
     price: Number(r.price),
     vegan: r.vegan,
     image: normalizeMenuImagePath(r.image ?? ""),

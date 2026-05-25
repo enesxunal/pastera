@@ -9,7 +9,7 @@ import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { useSupabasePublicConfig } from "@/lib/supabase/public-config-context";
 
 function LoginForm() {
-  const { t, locale } = useI18n();
+  const { t } = useI18n();
   const { configured } = useAuth();
   const supabasePublic = useSupabasePublicConfig();
   const router = useRouter();
@@ -31,7 +31,7 @@ function LoginForm() {
       const supabase = createSupabaseBrowserClient(supabasePublic);
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
-        setErr(locale === "de" ? "E-Mail oder Passwort falsch." : "E-posta veya şifre hatalı.");
+        setErr(t("common.wrongEmailPassword"));
         return;
       }
       router.push("/auth/account");

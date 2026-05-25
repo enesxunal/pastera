@@ -68,7 +68,7 @@ export function AccountClient() {
     } finally {
       setDataLoading(false);
     }
-  }, [user]);
+  }, [user, supabasePublic]);
 
   useEffect(() => {
     if (!loading && !user) {

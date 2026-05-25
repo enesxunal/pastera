@@ -7,7 +7,7 @@ import { useI18n } from "@/components/providers/I18nProvider";
 type BranchOption = { id: string; slug: string; name: string };
 
 export function DisplayLoginClient({ defaultBranchId }: { defaultBranchId?: string }) {
-  const { t, locale } = useI18n();
+  const { t } = useI18n();
   const router = useRouter();
   const [branches, setBranches] = useState<BranchOption[]>([]);
   const [key, setKey] = useState("");
@@ -29,7 +29,7 @@ export function DisplayLoginClient({ defaultBranchId }: { defaultBranchId?: stri
     e.preventDefault();
     setErr("");
     if (!branchId) {
-      setErr(locale === "de" ? "Bitte Filiale wählen." : "Lütfen şube seçin.");
+      setErr(t("common.selectBranch"));
       return;
     }
     const res = await fetch("/api/display/session", {
@@ -38,7 +38,7 @@ export function DisplayLoginClient({ defaultBranchId }: { defaultBranchId?: stri
       body: JSON.stringify({ key, branchId }),
     });
     if (!res.ok) {
-      setErr(locale === "de" ? "Zugang verweigert." : "Erişim reddedildi.");
+      setErr(t("common.accessDenied"));
       return;
     }
     router.push("/display");

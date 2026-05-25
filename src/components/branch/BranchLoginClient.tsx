@@ -7,7 +7,7 @@ import { useI18n } from "@/components/providers/I18nProvider";
 type BranchOption = { id: string; slug: string; name: string };
 
 export function BranchLoginClient() {
-  const { t, locale } = useI18n();
+  const { t } = useI18n();
   const router = useRouter();
   const [branches, setBranches] = useState<BranchOption[]>([]);
   const [branchSlug, setBranchSlug] = useState("merkez");
@@ -34,7 +34,7 @@ export function BranchLoginClient() {
       body: JSON.stringify({ password, branchSlug }),
     });
     if (!res.ok) {
-      setErr(locale === "de" ? "Falsches Passwort oder Filiale." : "Hatalı şifre veya şube.");
+      setErr(t("common.wrongPasswordBranch"));
       return;
     }
     router.push("/branch");

@@ -58,10 +58,10 @@ export function BranchPricesClient() {
       body: JSON.stringify({ catalog_item_id: id, price }),
     });
     if (!res.ok) {
-      setMsg(locale === "de" ? "Speichern fehlgeschlagen" : "Kaydedilemedi");
+      setMsg(t("common.saveFailed"));
       return;
     }
-    setMsg(locale === "de" ? "Gespeichert" : "Kaydedildi");
+    setMsg(t("common.saved"));
     await load();
   }
 

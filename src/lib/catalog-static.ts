@@ -11,30 +11,14 @@ import {
   VORSPEISEN,
 } from "@/lib/menu-data";
 
-/** Kısa Türkçe ürün adları (yoksa Almanca ad kullanılır). */
-const NAME_TR: Partial<Record<string, string>> = {
-  "pasta-klassisch": "Klasik makarna",
-  "pasta-vegan": "Vegan makarna",
-  "suppe-aubergine-cremig": "Kremalı patlıcan çorbası",
-  "vorspeise-auberginen-garnelen": "Izgara patlıcan ve karides",
-  "vorspeise-pilzpfanne": "Mantar tavası (vegan)",
-  "vorspeise-carpaccio": "Sığır carpaccio",
-  "vorspeise-rinderfiletstreifen": "Bonfile şeritleri",
-  "vorspeise-city-chick-wings": "Tavuk kanatları",
-  "d-wasser": "Sade su 0,5l",
-  "d-sprudel": "Maden suyu",
-  "d-cola": "Kola 0,33l",
-  "d-limo": "Ev limonatası",
-  "d-espresso": "Espresso",
-  "d-wein": "Kırmızı şarap (kadeh)",
-};
+import { catalogNameTr } from "@/lib/catalog-name-tr";
 
 function mapItems(items: MenuItem[], category: CatalogCategory, start: number): CatalogItem[] {
   return items.map((item, i) => ({
     id: item.id,
     category,
     name_de: item.name,
-    name_tr: NAME_TR[item.id] ?? item.name,
+    name_tr: catalogNameTr(item.id, item.name),
     price: item.price,
     vegan: item.vegan,
     image: item.image,

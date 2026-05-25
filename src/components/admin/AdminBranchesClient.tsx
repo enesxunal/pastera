@@ -8,7 +8,7 @@ import { useI18n } from "@/components/providers/I18nProvider";
 import type { BranchRow } from "@/lib/order-types";
 
 export function AdminBranchesClient() {
-  const { t, locale } = useI18n();
+  const { t } = useI18n();
   const router = useRouter();
   const [branches, setBranches] = useState<BranchRow[]>([]);
   const [msg, setMsg] = useState("");
@@ -50,7 +50,7 @@ export function AdminBranchesClient() {
       setSlug("");
       setName("");
       setCanEdit(false);
-      setMsg(locale === "de" ? "Filiale angelegt" : "Şube eklendi");
+      setMsg(t("common.branchCreated"));
     }
     await load();
   }
