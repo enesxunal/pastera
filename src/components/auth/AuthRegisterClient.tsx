@@ -6,10 +6,12 @@ import { useState, type FormEvent } from "react";
 import { useI18n } from "@/components/providers/I18nProvider";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+import { useSupabasePublicConfig } from "@/lib/supabase/public-config-context";
 
 export function AuthRegisterClient() {
   const { t } = useI18n();
   const { configured } = useAuth();
+  const supabasePublic = useSupabasePublicConfig();
   const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -28,7 +30,7 @@ export function AuthRegisterClient() {
     }
     setBusy(true);
     try {
-      const supabase = createSupabaseBrowserClient();
+      const supabase = createSupabaseBrowserClient(supabasePublic);
       const { data, error } = await supabase.auth.signUp({
         email,
         password,

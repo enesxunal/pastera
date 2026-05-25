@@ -19,6 +19,9 @@ const dmSans = DM_Sans({
   display: "swap",
 });
 
+/** Vercel ortam değişkenleri her istekte okunabilsin (yalnızca build anına bağlı kalmasın). */
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Pastera · Pasta, Suppen & mehr",
   description:
@@ -34,12 +37,17 @@ export default function RootLayout({
   const initialLocale: SupportedLocale =
     cookieStore.get("pastera-locale")?.value === "tr" ? "tr" : "de";
 
+  const supabasePublic = {
+    url: process.env.NEXT_PUBLIC_SUPABASE_URL ?? "",
+    anonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "",
+  };
+
   return (
     <html lang={initialLocale === "tr" ? "tr" : "de"}>
       <body
         className={`${syne.variable} ${dmSans.variable} font-sans antialiased bg-matte text-white`}
       >
-        <AppProviders initialLocale={initialLocale}>
+        <AppProviders initialLocale={initialLocale} supabasePublic={supabasePublic}>
           <div className="pastera-brand-bar" aria-hidden />
           <div className="relative flex min-h-screen flex-col overflow-x-hidden">
             <div

@@ -26,4 +26,20 @@ Giriş ve veritabanı çalışması için bilgisayarınızdaki `.env.local` içe
 
 ## Kontrol
 
-Deploy sonrası site açılıyorsa ve girişte kırmızı “Supabase ortam değişkenleri” uyarısı **yoksa** ayar tamamdır.
+Tarayıcıda açın (kendi Vercel adresiniz):
+
+`https://SİTE-ADINIZ.vercel.app/api/setup-status`
+
+Hepsi `true` olmalı. Örnek:
+
+```json
+{"supabaseUrl":true,"supabaseAnon":true,"serviceRole":true,...}
+```
+
+`false` görürseniz: değişken adını kontrol edin, **Production + Preview** işaretli mi bakın, sonra **Redeploy** (mümkünse “Clear build cache”).
+
+## Sık yapılan hatalar
+
+1. Değişkenleri eklediniz ama **yeniden deploy etmediniz** — Vercel eski sürümü çalıştırır.
+2. Sadece **Production** işaretli; siz **Preview** linkini açıyorsunuz (`…-enesxunals-projects.vercel.app`).
+3. İsimde yazım hatası: `NEXT_PUBLIC_SUPABASE_ANON_KEY` (anon, anonim anahtar).

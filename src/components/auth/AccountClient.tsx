@@ -6,6 +6,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { useI18n } from "@/components/providers/I18nProvider";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+import { useSupabasePublicConfig } from "@/lib/supabase/public-config-context";
 import { ORDER_STATUS_LABELS, type OrderStatus } from "@/lib/order-types";
 import { formatEur } from "@/lib/format";
 import { applyDeliverySession } from "@/lib/apply-delivery-session";
@@ -34,6 +35,7 @@ export function AccountClient() {
   const { t, locale } = useI18n();
   const router = useRouter();
   const { user, loading, configured, signOut } = useAuth();
+  const supabasePublic = useSupabasePublicConfig();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [orders, setOrders] = useState<OrderSummary[]>([]);
   const [activeOrder, setActiveOrder] = useState<OrderSummary | null>(null);
@@ -45,7 +47,7 @@ export function AccountClient() {
     if (!user) return;
     setDataLoading(true);
     try {
-      const supabase = createSupabaseBrowserClient();
+      const supabase = createSupabaseBrowserClient(supabasePublic);
       const [profileRes, ordersRes, addrRes] = await Promise.all([
         supabase.from("profiles").select("full_name, loyalty_points").eq("id", user.id).maybeSingle(),
         fetch("/api/orders/me", { credentials: "include" }),

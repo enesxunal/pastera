@@ -1,7 +1,10 @@
 "use client";
 
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
-import { isSupabaseConfigured } from "@/lib/supabase/is-configured";
+import {
+  isSupabasePublicConfigured,
+  useSupabasePublicConfig,
+} from "@/lib/supabase/public-config-context";
 import type { User } from "@supabase/supabase-js";
 import {
   createContext,
@@ -24,7 +27,8 @@ type AuthCtx = {
 const AuthContext = createContext<AuthCtx | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const configured = isSupabaseConfigured();
+  const supabasePublic = useSupabasePublicConfig();
+  const configured = isSupabasePublicConfigured(supabasePublic);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(configured);
 
@@ -34,7 +38,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
     try {
-      const supabase = createSupabaseBrowserClient();
+      const supabase = createSupabaseBrowserClient(supabasePublic);
       const { data } = await supabase.auth.getUser();
       setUser(data.user ?? null);
     } catch {
@@ -42,24 +46,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } finally {
       setLoading(false);
     }
-  }, [configured]);
+  }, [configured, supabasePublic]);
 
   useEffect(() => {
     void refresh();
     if (!configured) return;
-    const supabase = createSupabaseBrowserClient();
+    const supabase = createSupabaseBrowserClient(supabasePublic);
     const { data: sub } = supabase.auth.onAuthStateChange(() => {
       void refresh();
     });
     return () => sub.subscription.unsubscribe();
-  }, [configured, refresh]);
+  }, [configured, refresh, supabasePublic]);
 
   const signOut = useCallback(async () => {
     if (!configured) return;
-    const supabase = createSupabaseBrowserClient();
+    const supabase = createSupabaseBrowserClient(supabasePublic);
     await supabase.auth.signOut();
     setUser(null);
-  }, [configured]);
+  }, [configured, supabasePublic]);
 
   const value = useMemo(
     () => ({ user, loading, configured, signOut, refresh }),

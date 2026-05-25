@@ -1,12 +1,12 @@
 "use client";
 
 import { createBrowserClient } from "@supabase/ssr";
+import type { SupabasePublicConfig } from "@/lib/supabase/public-config-context";
 
-export function createSupabaseBrowserClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !key) {
-    throw new Error("Supabase env eksik: NEXT_PUBLIC_SUPABASE_URL ve ANON_KEY .env.local içinde olmalı.");
+export function createSupabaseBrowserClient(config: SupabasePublicConfig) {
+  const { url, anonKey } = config;
+  if (!url || !anonKey) {
+    throw new Error("Supabase env eksik: NEXT_PUBLIC_SUPABASE_URL ve ANON_KEY tanımlı olmalı.");
   }
-  return createBrowserClient(url, key);
+  return createBrowserClient(url, anonKey);
 }
