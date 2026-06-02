@@ -147,7 +147,6 @@ export const TOPPINGS_VEGAN: MenuItem[] = [
   { id: "t-mais-v", name: "Mais", price: 0.5, vegan: true, image: img("t-mais") },
   { id: "t-babyspinat-v", name: "Babyspinat", price: 0.7, vegan: true, image: img("t-blattspinat") },
   { id: "t-vegan-parmesan", name: "Extra Veganer Parmesan", price: 0.8, vegan: true, image: "" },
-  { id: "t-walnuesse-v", name: "Walnüsse", price: 1.5, vegan: true, image: "" },
 ];
 
 /** Chef Specials — klassisch */
@@ -206,7 +205,7 @@ export const CHEF_SPECIALS_CLASSIC: MenuItem[] = [
     price: 11.4,
     vegan: false,
     image: img("pasta-klassisch"),
-    description: "Fettuccine Pesto, Pastrima, getrocknete Tomaten, Walnüsse, Parmesan",
+    description: "Fettuccine Pesto, Pastirma, getrocknete Tomaten, Walnüsse, Parmesan",
   },
 ];
 
