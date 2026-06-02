@@ -8,7 +8,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { createClient } from "@supabase/supabase-js";
 import postgres from "postgres";
-import { getStaticCatalog } from "../src/lib/catalog-static";
+import { deactivateLegacyCatalogItems, seedCatalogToDb } from "../src/lib/catalog-seed";
 
 function loadEnvLocal(): void {
   const path = resolve(process.cwd(), ".env.local");
@@ -48,31 +48,6 @@ async function applyCatalogSql(): Promise<boolean> {
   }
 }
 
-async function seedCatalog(): Promise<void> {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) {
-    throw new Error("NEXT_PUBLIC_SUPABASE_URL und SUPABASE_SERVICE_ROLE_KEY in .env.local setzen");
-  }
-
-  const sb = createClient(url, key);
-  const now = new Date().toISOString();
-  const rows = getStaticCatalog().map((r) => ({ ...r, updated_at: now }));
-
-  const { error } = await sb.from("catalog_items").upsert(rows, { onConflict: "id" });
-  if (error) {
-    if (error.code === "PGRST205") {
-      throw new Error(
-        "Tabelle catalog_items fehlt. Bitte supabase/catalog_items.sql im Supabase SQL Editor ausführen " +
-          "(oder SUPABASE_DB_PASSWORD in .env.local setzen und npm run db:catalog erneut starten).",
-      );
-    }
-    throw new Error(error.message);
-  }
-
-  console.log(`✓ ${rows.length} Katalog-Artikel eingespielt`);
-}
-
 async function main(): Promise<void> {
   loadEnvLocal();
 
@@ -88,7 +63,29 @@ async function main(): Promise<void> {
     );
   }
 
-  await seedCatalog();
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+  const sb = createClient(url, key);
+
+  try {
+    const count = await seedCatalogToDb(sb);
+    console.log(`✓ ${count} Katalog-Artikel eingespielt`);
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    if (msg.includes("PGRST205") || msg.includes("catalog_items")) {
+      throw new Error(
+        "Tabelle catalog_items fehlt. Bitte supabase/catalog_items.sql im Supabase SQL Editor ausführen.",
+      );
+    }
+    throw e;
+  }
+
+  const deactivated = await deactivateLegacyCatalogItems(sb);
+  if (deactivated > 0) {
+    console.log(`✓ ${deactivated} veraltete Artikel deaktiviert`);
+  } else {
+    console.log("✓ Keine veralteten Artikel");
+  }
 }
 
 main().catch((e: unknown) => {

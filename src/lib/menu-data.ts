@@ -101,7 +101,7 @@ export const SAUCES_VEGAN: MenuItem[] = [
 export const TOPPINGS_CLASSIC: MenuItem[] = [
   { id: "t-rindfleisch", name: "Rindfleisch", price: 3.5, vegan: false, image: img("sp-rind-mariniert") },
   { id: "t-haehnchen", name: "Hähnchen", price: 2.0, vegan: false, image: img("sp-haehnchen-mariniert") },
-  { id: "t-pastrima", name: "Pastrima (Türkischer Rinderschinken)", price: 2.5, vegan: false, image: "" },
+  { id: "t-pastrima", name: "Pastirma (Türkischer Rinderschinken)", price: 2.5, vegan: false, image: "" },
   { id: "t-garnelen", name: "Gebratene Garnelen", price: 3.5, vegan: false, image: img("sp-schwarze-garnelen") },
   { id: "t-pinienkerne", name: "Pinienkerne", price: 1.5, vegan: true, image: img("t-pinienkerne") },
   { id: "t-mozzarella", name: "Mozzarella", price: 1.0, vegan: false, image: img("t-mini-mozzarella") },

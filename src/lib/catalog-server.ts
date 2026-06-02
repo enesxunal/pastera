@@ -1,5 +1,6 @@
 import type { CatalogItem } from "@/lib/catalog-types";
 import { applyBranchPrices, getBranchPriceOverrides } from "@/lib/branch-catalog-prices";
+import { filterToCurrentMenu } from "@/lib/catalog-sync";
 import { getStaticCatalog } from "@/lib/catalog-static";
 import { catalogNameTr } from "@/lib/catalog-name-tr";
 import { normalizeMenuImagePath } from "@/lib/normalize-menu-image";
@@ -40,7 +41,10 @@ export async function getCatalogFromDb(branchId?: string | null): Promise<Catalo
       .eq("is_active", true)
       .order("sort_order", { ascending: true });
     if (error || !data?.length) return getStaticCatalog();
-    let items = data.map((r) => mapRow(r as Parameters<typeof mapRow>[0]));
+    let items = filterToCurrentMenu(
+      data.map((r) => mapRow(r as Parameters<typeof mapRow>[0])),
+    );
+    if (!items.length) return getStaticCatalog();
     if (branchId) {
       const overrides = await getBranchPriceOverrides(branchId);
       items = applyBranchPrices(items, overrides);

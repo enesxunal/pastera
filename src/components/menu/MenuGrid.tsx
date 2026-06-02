@@ -7,6 +7,7 @@ import type { SupportedLocale } from "@/lib/cart";
 import { addExtraToCart } from "@/lib/cart";
 import type { CatalogItem } from "@/lib/catalog-types";
 import { formatEur } from "@/lib/format";
+import { getMenuItem } from "@/lib/menu-data";
 import { publicMenuImageSrc } from "@/lib/normalize-menu-image";
 import { useI18n } from "@/components/providers/I18nProvider";
 
@@ -82,6 +83,8 @@ export function MenuGrid({
       {items.map((item) => {
         const label = nameOf(item, locale);
         const imageSrc = publicMenuImageSrc(item.image);
+        const chefDesc =
+          category === "chef_special" ? getMenuItem(item.id)?.description : undefined;
         const cardInner = (
           <>
             <div className="relative aspect-[4/3] w-full">
@@ -103,6 +106,9 @@ export function MenuGrid({
             </div>
             <div className="p-3">
               <p className="font-medium text-white">{label}</p>
+              {chefDesc ? (
+                <p className="mt-1 line-clamp-2 text-xs text-white/45">{chefDesc}</p>
+              ) : null}
               <p className="mt-1 text-sm font-semibold text-[#c49746]">{formatEur(item.price)}</p>
               {item.vegan && <p className="mt-1 text-xs text-white/40">vegan</p>}
               {canAddCart && (
