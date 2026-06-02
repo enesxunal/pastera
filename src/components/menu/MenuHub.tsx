@@ -10,22 +10,22 @@ export function MenuHub() {
   const { catalog } = useCatalog();
   const { locale, t } = useI18n();
 
-  const pasta = catalogByCategory(catalog, "pasta_base");
-  const soups = catalogByCategory(catalog, "soup");
-  const starters = catalogByCategory(catalog, "starter");
-  const drinks = catalogByCategory(catalog, "drink");
+  const noodles = catalogByCategory(catalog, "pasta_base");
+  const chefSpecials = catalogByCategory(catalog, "chef_special");
+  const chefClassic = chefSpecials.filter((x) => !x.vegan);
+  const chefVegan = chefSpecials.filter((x) => x.vegan);
 
   return (
     <>
       <h1 className="font-display text-4xl font-bold text-white">{t("menuHub.title")}</h1>
       <p className="mt-3 max-w-2xl text-white/60">{t("menuHub.intro")}</p>
 
-      <section className="mt-14" aria-labelledby="menu-pasta-heading">
-        <h2 id="menu-pasta-heading" className="font-display text-2xl font-bold text-[#c49746]">
-          {t("menu.sectionPasta")}
+      <section className="mt-14" aria-labelledby="menu-noodles-heading">
+        <h2 id="menu-noodles-heading" className="font-display text-2xl font-bold text-[#c49746]">
+          {t("menu.sectionNoodles")}
         </h2>
-        <p className="mt-2 max-w-2xl text-sm text-white/50">{t("menu.sectionPastaHint")}</p>
-        {pasta.length === 0 ? (
+        <p className="mt-2 max-w-2xl text-sm text-white/50">{t("menu.sectionNoodlesHint")}</p>
+        {noodles.length === 0 ? (
           <p className="mt-6 text-sm text-white/45">{t("menu.emptySection")}</p>
         ) : (
           <div className="mt-6">
@@ -33,7 +33,7 @@ export function MenuHub() {
               hideHeading
               title=""
               variant="embedded"
-              items={pasta}
+              items={noodles}
               category="pasta"
               locale={locale}
             />
@@ -41,54 +41,33 @@ export function MenuHub() {
         )}
       </section>
 
-      <section className="mt-16" aria-labelledby="menu-warm-heading">
-        <h2 id="menu-warm-heading" className="font-display text-2xl font-bold text-[#c49746]">
-          {t("menu.sectionWarm")}
+      <section id="chef-specials" className="mt-16 scroll-mt-24" aria-labelledby="menu-chef-heading">
+        <h2 id="menu-chef-heading" className="font-display text-2xl font-bold text-[#c49746]">
+          {t("menu.sectionChefSpecials")}
         </h2>
-        <p className="mt-2 max-w-2xl text-sm text-white/50">{t("menu.sectionWarmHint")}</p>
-        {soups.length === 0 && starters.length === 0 ? (
+        <p className="mt-2 max-w-2xl text-sm text-white/50">{t("menu.sectionChefSpecialsHint")}</p>
+        {chefSpecials.length === 0 ? (
           <p className="mt-6 text-sm text-white/45">{t("menu.emptySection")}</p>
         ) : (
           <div className="mt-6 space-y-10">
-            {soups.length > 0 ? (
+            {chefClassic.length > 0 ? (
               <MenuGrid
                 variant="embedded"
-                title={t("menu.subSoups")}
-                items={soups}
-                category="soup"
+                title={t("menu.subChefClassic")}
+                items={chefClassic}
+                category="chef_special"
                 locale={locale}
               />
             ) : null}
-            {starters.length > 0 ? (
+            {chefVegan.length > 0 ? (
               <MenuGrid
                 variant="embedded"
-                title={t("menu.subStarters")}
-                items={starters}
-                category="starter"
+                title={t("menu.subChefVegan")}
+                items={chefVegan}
+                category="chef_special"
                 locale={locale}
               />
             ) : null}
-          </div>
-        )}
-      </section>
-
-      <section className="mt-16" aria-labelledby="menu-drinks-heading">
-        <h2 id="menu-drinks-heading" className="font-display text-2xl font-bold text-[#c49746]">
-          {t("menu.sectionDrinks")}
-        </h2>
-        <p className="mt-2 max-w-2xl text-sm text-white/50">{t("menu.sectionDrinksHint")}</p>
-        {drinks.length === 0 ? (
-          <p className="mt-6 text-sm text-white/45">{t("menu.emptySection")}</p>
-        ) : (
-          <div className="mt-6">
-            <MenuGrid
-              hideHeading
-              title=""
-              variant="embedded"
-              items={drinks}
-              category="drink"
-              locale={locale}
-            />
           </div>
         )}
       </section>

@@ -26,10 +26,8 @@ export function HomePageClient() {
     return () => window.clearInterval(id);
   }, []);
 
-  const pasta = catalogByCategory(catalog, "pasta_base");
-  const soups = catalogByCategory(catalog, "soup");
-  const starters = catalogByCategory(catalog, "starter");
-  const drinks = catalogByCategory(catalog, "drink");
+  const noodles = catalogByCategory(catalog, "pasta_base");
+  const chefSpecials = catalogByCategory(catalog, "chef_special");
 
   return (
     <div className="mx-auto max-w-6xl px-4 pb-16 pt-6 sm:px-6 sm:pb-20 sm:pt-8">
@@ -120,59 +118,31 @@ export function HomePageClient() {
         <p className="mt-2 max-w-2xl text-sm text-white/55">{t("home.productsSub")}</p>
 
         <div className="mt-10 space-y-14">
-          {pasta.length > 0 ? (
+          {noodles.length > 0 ? (
             <div>
-              <h3 className="font-display text-lg font-bold text-[#c49746]">{t("menu.sectionPasta")}</h3>
-              <p className="mt-1 text-sm text-white/45">{t("menu.sectionPastaHint")}</p>
+              <h3 className="font-display text-lg font-bold text-[#c49746]">{t("menu.sectionNoodles")}</h3>
+              <p className="mt-1 text-sm text-white/45">{t("menu.sectionNoodlesHint")}</p>
               <MenuGrid
                 variant="embedded"
                 hideHeading
                 title=""
-                items={pasta}
+                items={noodles}
                 category="pasta"
                 locale={locale}
               />
             </div>
           ) : null}
 
-          {soups.length > 0 ? (
+          {chefSpecials.length > 0 ? (
             <div>
-              <h3 className="font-display text-lg font-bold text-[#c49746]">{t("menu.subSoups")}</h3>
+              <h3 className="font-display text-lg font-bold text-[#c49746]">{t("menu.sectionChefSpecials")}</h3>
+              <p className="mt-1 text-sm text-white/45">{t("menu.sectionChefSpecialsHint")}</p>
               <MenuGrid
                 variant="embedded"
                 hideHeading
                 title=""
-                items={soups}
-                category="soup"
-                locale={locale}
-              />
-            </div>
-          ) : null}
-
-          {starters.length > 0 ? (
-            <div>
-              <h3 className="font-display text-lg font-bold text-[#c49746]">{t("menu.subStarters")}</h3>
-              <MenuGrid
-                variant="embedded"
-                hideHeading
-                title=""
-                items={starters}
-                category="starter"
-                locale={locale}
-              />
-            </div>
-          ) : null}
-
-          {drinks.length > 0 ? (
-            <div>
-              <h3 className="font-display text-lg font-bold text-[#c49746]">{t("menu.sectionDrinks")}</h3>
-              <p className="mt-1 text-sm text-white/45">{t("menu.sectionDrinksHint")}</p>
-              <MenuGrid
-                variant="embedded"
-                hideHeading
-                title=""
-                items={drinks}
-                category="drink"
+                items={chefSpecials}
+                category="chef_special"
                 locale={locale}
               />
             </div>

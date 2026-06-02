@@ -13,8 +13,9 @@ import { publicMenuImageSrc } from "@/lib/normalize-menu-image";
 const CATEGORIES: CatalogCategory[] = [
   "pasta_base",
   "sauce",
-  "special",
   "topping",
+  "chef_special",
+  "special",
   "soup",
   "starter",
   "drink",
@@ -25,6 +26,7 @@ const CATEGORY_KEYS: Record<CatalogCategory, string> = {
   sauce: "admin.catSauce",
   special: "admin.catSpecial",
   topping: "admin.catTopping",
+  chef_special: "admin.catChefSpecial",
   soup: "admin.catSoup",
   starter: "admin.catStarter",
   drink: "admin.catDrink",

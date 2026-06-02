@@ -1,11 +1,12 @@
 import type { CatalogCategory, CatalogItem } from "@/lib/catalog-types";
 import type { MenuItem } from "@/lib/menu-data";
 import {
+  CHEF_SPECIALS_CLASSIC,
+  CHEF_SPECIALS_VEGAN,
   DRINKS,
   PASTAS,
   SAUCEN_KLASSISCH,
   SAUCEN_VEGAN,
-  SPECIALS,
   SUPPEN,
   TOPPINGS,
   VORSPEISEN,
@@ -35,8 +36,9 @@ export function getStaticCatalog(): CatalogItem[] {
     { items: PASTAS, cat: "pasta_base" },
     { items: SAUCEN_KLASSISCH, cat: "sauce" },
     { items: SAUCEN_VEGAN, cat: "sauce" },
-    { items: SPECIALS, cat: "special" },
     { items: TOPPINGS, cat: "topping" },
+    { items: CHEF_SPECIALS_CLASSIC, cat: "chef_special" },
+    { items: CHEF_SPECIALS_VEGAN, cat: "chef_special" },
     { items: SUPPEN, cat: "soup" },
     { items: VORSPEISEN, cat: "starter" },
     { items: DRINKS, cat: "drink" },

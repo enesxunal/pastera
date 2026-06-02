@@ -3,9 +3,15 @@
 import { motion } from "framer-motion";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import { useI18n } from "@/components/providers/I18nProvider";
 import { loadCartSnapshot, saveCartSnapshot } from "@/lib/cart";
 import { pageIntro, staggerGrid } from "@/lib/motion-variants";
-import { INGREDIENTS, PASTAS, SAUCES, SPECIALS } from "@/lib/menu-data";
+import {
+  normalizePastaId,
+  PASTAS,
+  saucesForPasta,
+  toppingsForPasta,
+} from "@/lib/menu-data";
 import { formatEur } from "@/lib/format";
 import { MenuPickCard } from "@/components/menu/MenuPickCard";
 import { PastaBox } from "./PastaBox";
@@ -17,56 +23,60 @@ function toggleId(ids: string[], id: string): string[] {
 export function PastaBuilder() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { t } = useI18n();
   const [pastaId, setPastaId] = useState(PASTAS[0].id);
   const [sauceIds, setSauceIds] = useState<string[]>([]);
-  const [specialIds, setSpecialIds] = useState<string[]>([]);
   const [ingredientIds, setIngredientIds] = useState<string[]>([]);
 
   const pasta = PASTAS.find((p) => p.id === pastaId) ?? PASTAS[0];
+  const sauces = useMemo(() => saucesForPasta(pasta.vegan), [pasta.vegan]);
+  const toppings = useMemo(() => toppingsForPasta(pasta.vegan), [pasta.vegan]);
 
   useEffect(() => {
     const saved = loadCartSnapshot();
     const urlPasta = searchParams.get("pasta");
-    const urlOk = urlPasta && PASTAS.some((p) => p.id === urlPasta) ? urlPasta : null;
+    const urlOk = urlPasta ? normalizePastaId(urlPasta) : null;
 
     if (!saved && !urlOk) return;
 
-    const pid = urlOk ?? saved!.pastaId;
+    const pid = urlOk ?? normalizePastaId(saved!.pastaId);
     setPastaId(pid);
     if (saved) {
       setSauceIds(saved.sauceIds);
-      setSpecialIds(saved.specialIds);
       setIngredientIds(saved.ingredientIds);
     } else {
       setSauceIds([]);
-      setSpecialIds([]);
       setIngredientIds([]);
     }
   }, [searchParams]);
 
-  const sauces = SAUCES;
-  const specials = SPECIALS;
-  const ingredients = INGREDIENTS;
+  useEffect(() => {
+    const sauceAllow = new Set(sauces.map((s) => s.id));
+    const topAllow = new Set(toppings.map((x) => x.id));
+    setSauceIds((ids) => ids.filter((id) => sauceAllow.has(id)));
+    setIngredientIds((ids) => ids.filter((id) => topAllow.has(id)));
+  }, [pastaId, sauces, toppings]);
 
   const sauceItems = sauces.filter((x) => sauceIds.includes(x.id));
-  const specialItems = specials.filter((x) => specialIds.includes(x.id));
-  const ingredientItems = ingredients.filter((x) => ingredientIds.includes(x.id));
+  const ingredientItems = toppings.filter((x) => ingredientIds.includes(x.id));
 
   const total = useMemo(() => {
     const s = sauceItems.reduce((a, x) => a + x.price, 0);
-    const sp = specialItems.reduce((a, x) => a + x.price, 0);
     const ing = ingredientItems.reduce((a, x) => a + x.price, 0);
-    return pasta.price + s + sp + ing;
-  }, [pasta, sauceItems, specialItems, ingredientItems]);
+    return pasta.price + s + ing;
+  }, [pasta, sauceItems, ingredientItems]);
 
   const boxLayers = useMemo(
     () => [
       ...sauceItems.map((x) => ({ id: x.id, name: x.name, image: x.image })),
-      ...specialItems.map((x) => ({ id: x.id, name: x.name, image: x.image })),
       ...ingredientItems.map((x) => ({ id: x.id, name: x.name, image: x.image })),
     ],
-    [sauceItems, specialItems, ingredientItems],
+    [sauceItems, ingredientItems],
   );
+
+  function selectPasta(id: string) {
+    setPastaId(id);
+  }
 
   function goToWarenkorb() {
     const prev = loadCartSnapshot();
@@ -74,7 +84,7 @@ export function PastaBuilder() {
       veganOnly: pasta.vegan,
       pastaId,
       sauceIds,
-      specialIds,
+      specialIds: [],
       ingredientIds,
       extras: prev?.extras ?? [],
     });
@@ -90,25 +100,23 @@ export function PastaBuilder() {
         animate="show"
       >
         <p className="font-display text-sm font-semibold uppercase tracking-widest text-brand-gold">
-          Menü
+          {t("builder.kicker")}
         </p>
         <h1 className="mt-2 font-display text-3xl font-bold text-white sm:text-4xl">
-          Pasta zusammenstellen
+          {t("builder.title")}
         </h1>
-        <p className="mt-3 text-base text-white/60">
-          Wähle eine <span className="font-semibold text-white/85">Pasta-Basis</span> (klassisch oder
-          vegan) – Saucen, Specials und Toppings sind frei kombinierbar. Der Preis aktualisiert sich
-          live.
-        </p>
+        <p className="mt-3 text-base text-white/60">{t("builder.intro")}</p>
       </motion.div>
 
       <div className="grid gap-10 lg:grid-cols-[1fr_minmax(0,300px)] lg:items-start">
         <div className="space-y-10">
           <section>
-            <h2 className="font-display text-lg font-semibold text-white">Pasta-Basis</h2>
-            <p className="mt-1 text-sm text-white/50">Eine Option: klassisch oder vegan.</p>
+            <h2 className="font-display text-lg font-semibold text-white">
+              {t("builder.step1Title")}
+            </h2>
+            <p className="mt-1 text-sm text-white/50">{t("builder.step1Hint")}</p>
             <motion.div
-              className="mt-4 grid max-w-xl grid-cols-2 gap-3"
+              className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3"
               variants={staggerGrid}
               initial="hidden"
               whileInView="show"
@@ -120,15 +128,17 @@ export function PastaBuilder() {
                   item={item}
                   mode="single"
                   selected={pastaId === item.id}
-                  onSelect={() => setPastaId(item.id)}
+                  onSelect={() => selectPasta(item.id)}
                 />
               ))}
             </motion.div>
           </section>
 
           <section>
-            <h2 className="font-display text-lg font-semibold text-white">Saucen</h2>
-            <p className="mt-1 text-sm text-white/50">Mehrere Saucen möglich.</p>
+            <h2 className="font-display text-lg font-semibold text-white">
+              {t("builder.step2Title")}
+            </h2>
+            <p className="mt-1 text-sm text-white/50">{t("builder.step2Hint")}</p>
             <motion.div
               className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3"
               variants={staggerGrid}
@@ -149,8 +159,10 @@ export function PastaBuilder() {
           </section>
 
           <section>
-            <h2 className="font-display text-lg font-semibold text-white">Specials</h2>
-            <p className="mt-1 text-sm text-white/50">Proteine &amp; Extras – mehrere möglich.</p>
+            <h2 className="font-display text-lg font-semibold text-white">
+              {t("builder.step3Title")}
+            </h2>
+            <p className="mt-1 text-sm text-white/50">{t("builder.step3Hint")}</p>
             <motion.div
               className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3"
               variants={staggerGrid}
@@ -158,29 +170,7 @@ export function PastaBuilder() {
               whileInView="show"
               viewport={{ once: true, amount: 0.12 }}
             >
-              {specials.map((item) => (
-                <MenuPickCard
-                  key={item.id}
-                  item={item}
-                  mode="multi"
-                  selected={specialIds.includes(item.id)}
-                  onSelect={() => setSpecialIds((ids) => toggleId(ids, item.id))}
-                />
-              ))}
-            </motion.div>
-          </section>
-
-          <section>
-            <h2 className="font-display text-lg font-semibold text-white">Toppings</h2>
-            <p className="mt-1 text-sm text-white/50">Was zusätzlich in die Schüssel soll.</p>
-            <motion.div
-              className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3"
-              variants={staggerGrid}
-              initial="hidden"
-              whileInView="show"
-              viewport={{ once: true, amount: 0.12 }}
-            >
-              {ingredients.map((item) => (
+              {toppings.map((item) => (
                 <MenuPickCard
                   key={item.id}
                   item={item}
@@ -201,7 +191,7 @@ export function PastaBuilder() {
           >
             <div className="flex flex-wrap items-end justify-between gap-4">
               <div>
-                <p className="text-xs uppercase tracking-widest text-white/50">Summe</p>
+                <p className="text-xs uppercase tracking-widest text-white/50">{t("builder.total")}</p>
                 <p className="font-display text-3xl font-bold text-white">{formatEur(total)}</p>
               </div>
               <button
@@ -210,12 +200,10 @@ export function PastaBuilder() {
                 className="rounded-full px-6 py-3 font-display text-sm font-bold text-matte transition hover:brightness-110"
                 style={{ backgroundColor: "#c49746" }}
               >
-                Weiter zum Warenkorb
+                {t("builder.toCart")}
               </button>
             </div>
-            <p className="mt-3 text-xs text-white/45">
-              Vorschau-Schüssel: Saucen, Specials und Toppings übereinander.
-            </p>
+            <p className="mt-3 text-xs text-white/45">{t("builder.previewHint")}</p>
           </motion.div>
         </div>
 

@@ -3,6 +3,7 @@ export type CatalogCategory =
   | "sauce"
   | "special"
   | "topping"
+  | "chef_special"
   | "soup"
   | "starter"
   | "drink";

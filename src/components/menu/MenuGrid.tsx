@@ -17,6 +17,7 @@ export type MenuGridCategory =
   | "starter"
   | "special"
   | "topping"
+  | "chef_special"
   | "drink";
 
 type MenuGridProps = {
@@ -58,7 +59,10 @@ export function MenuGrid({
   }, [picker]);
 
   const canAddCart =
-    category === "soup" || category === "starter" || category === "drink";
+    category === "chef_special" ||
+    category === "soup" ||
+    category === "starter" ||
+    category === "drink";
 
   function openPicker(item: CatalogItem) {
     setQty(1);

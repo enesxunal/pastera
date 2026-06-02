@@ -1,13 +1,11 @@
 import { catalogItemById } from "@/lib/catalog-static";
 import type { CatalogItem } from "@/lib/catalog-types";
 import {
-  filterVegan,
   getMenuItem,
-  INGREDIENTS,
   normalizePastaId,
   PASTAS,
-  SAUCES,
-  SPECIALS,
+  saucesForPasta,
+  toppingsForPasta,
   type MenuItem,
 } from "@/lib/menu-data";
 
@@ -129,9 +127,8 @@ export function clearCartSnapshot(): void {
   window.dispatchEvent(new Event("pastera-cart-update"));
 }
 
-function allowedIds(items: MenuItem[], veganOnly: boolean): Set<string> {
-  const list = veganOnly ? filterVegan(items) : items;
-  return new Set(list.map((i) => i.id));
+function allowedIds(items: MenuItem[]): Set<string> {
+  return new Set(items.map((i) => i.id));
 }
 
 function pickMenuItems(
@@ -201,23 +198,16 @@ function buildBowlParts(
       }
     : { ...pastaStatic, name: label(pastaStatic, locale) };
 
-  const aS = allowedIds(SAUCES, false);
-  const aI = allowedIds(INGREDIENTS, false);
-  const aSp = allowedIds(SPECIALS, false);
+  const aS = allowedIds(saucesForPasta(pasta.vegan));
+  const aT = allowedIds(toppingsForPasta(pasta.vegan));
 
   const sauceItems = pickMenuItems(snapshot.sauceIds, aS, catalog, locale);
-  const ingItems = pickMenuItems(snapshot.ingredientIds, aI, catalog, locale);
-  const specialItems = pickMenuItems(snapshot.specialIds, aSp, catalog, locale);
+  const ingItems = pickMenuItems(snapshot.ingredientIds, aT, catalog, locale);
 
   const bowlLines: BowlLine[] = [
     { kind: "pasta", label: pasta.name, amount: pasta.price },
     ...sauceItems.map((i) => ({
       kind: "sauce" as const,
-      label: i.name,
-      amount: i.price,
-    })),
-    ...specialItems.map((i) => ({
-      kind: "special" as const,
       label: i.name,
       amount: i.price,
     })),
@@ -231,12 +221,10 @@ function buildBowlParts(
   const bowlSubtotal =
     pasta.price +
     sauceItems.reduce((s, i) => s + i.price, 0) +
-    specialItems.reduce((s, i) => s + i.price, 0) +
     ingItems.reduce((s, i) => s + i.price, 0);
 
   const boxLayers = [
     ...sauceItems.map((i) => ({ id: i.id, name: i.name, image: i.image })),
-    ...specialItems.map((i) => ({ id: i.id, name: i.name, image: i.image })),
     ...ingItems.map((i) => ({ id: i.id, name: i.name, image: i.image })),
   ];
 

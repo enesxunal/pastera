@@ -66,13 +66,6 @@ export default async function MenuPastaPage() {
           />
           <MenuGrid
             variant="embedded"
-            title={m("menuPages.specials")}
-            items={catalogByCategory(catalog, "special")}
-            category="special"
-            locale={locale}
-          />
-          <MenuGrid
-            variant="embedded"
             title={m("menuPages.toppings")}
             items={catalogByCategory(catalog, "topping")}
             category="topping"
