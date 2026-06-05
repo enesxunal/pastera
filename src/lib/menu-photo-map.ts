@@ -50,7 +50,20 @@ const ID_SUFFIX: Partial<Record<string, string>> = {
   "sp-tofu": "tofu",
 };
 
+/** `public/` — hazır makarna fotoğrafları */
+const STD_PASTA_IMAGES: Partial<Record<string, string>> = {
+  "std-pera-e-miel": "Pera e Miele.png",
+  "std-kremali-tavuk": "Pasta Cremosa.png",
+  "std-domates": "Pasta al Pomodoro.png",
+  "std-pesto-mozzarella": "Pasta al Pesto.png",
+  "std-curry-tavuk": "Pasta Curry.png",
+  "std-bolognese": "Pasta Bolognese.png",
+  "std-manti": "Manti.png",
+};
+
 export function menuPhotoForId(id: string): string {
+  const std = STD_PASTA_IMAGES[id];
+  if (std) return `/${std.normalize("NFC")}`;
   const suf = ID_SUFFIX[id];
   if (!suf) return "";
   return pathFromSuffix(suf);

@@ -148,62 +148,62 @@ export function isChocolateBowl(snapshot: { specialIds: string[] }): boolean {
   return snapshot.specialIds.includes(CHOCOLATE_BOWL_MARKER);
 }
 
-/** Standart makarna (sabit fiyat) */
+/** Standart makarna (sabit fiyat) — görseller: public/ */
 export const STANDARD_PASTAS: MenuItem[] = [
   {
     id: "std-pera-e-miel",
-    name: "Pera E Miel",
+    name: "Pera e Miele",
     price: 9.8,
     vegan: false,
-    image: img("pasta-klassisch"),
+    image: img("std-pera-e-miel"),
     description: "Classic · Birne, Rosmarin, Walnüsse, Sahne, Gorgonzola",
   },
   {
     id: "std-kremali-tavuk",
-    name: "Cremige Hähnchen-Pasta",
+    name: "Pasta Cremosa",
     price: 8.9,
     vegan: false,
-    image: img("sp-haehnchen-mariniert"),
+    image: img("std-kremali-tavuk"),
     description: "Sahnesauce, Hähnchen, Champignons",
   },
   {
     id: "std-domates",
-    name: "Tomatensauce-Pasta",
+    name: "Pasta al Pomodoro",
     price: 6.5,
     vegan: true,
-    image: img("s-tomatensauce"),
+    image: img("std-domates"),
     description: "Tomatensauce",
   },
   {
     id: "std-pesto-mozzarella",
-    name: "Pesto mit Mozzarella",
+    name: "Pasta al Pesto",
     price: 7.5,
     vegan: false,
-    image: img("s-pesto"),
+    image: img("std-pesto-mozzarella"),
     description: "Pesto, Mozzarella",
   },
   {
     id: "std-curry-tavuk",
-    name: "Curry-Hähnchen-Pasta",
+    name: "Pasta Curry",
     price: 8.5,
     vegan: false,
-    image: img("sp-curry-sahne-haehnchen"),
+    image: img("std-curry-tavuk"),
     description: "Curry, Hähnchen",
   },
   {
     id: "std-bolognese",
-    name: "Bolognese-Pasta",
+    name: "Pasta Bolognese",
     price: 8.8,
     vegan: false,
-    image: img("s-bolognese"),
+    image: img("std-bolognese"),
     description: "Bolognese",
   },
   {
     id: "std-manti",
-    name: "Mantı",
+    name: "Manti",
     price: 7.9,
     vegan: false,
-    image: img("pasta-klassisch"),
+    image: img("std-manti"),
     description: "Türkische Teigtaschen",
   },
 ];
