@@ -1,146 +1,126 @@
 "use client";
 
-import type { ReactNode } from "react";
-
-/**
- * SVG viewBox 200×250 ile birebir hizalı iç alan.
- * Ağız: (44,46)→(156,46)→(170,84)→(30,84)
- */
-const INTERIOR = {
-  left: "15%",
-  top: "11.2%",
-  width: "70%",
-  height: "22.4%",
-} as const;
-
-const FOOD_CLIP = "polygon(10% 0%, 90% 0%, 100% 100%, 0% 100%)";
+import { useId, type ReactNode } from "react";
 
 type PasteraIsometricBoxProps = {
   children: ReactNode;
   pourOverlay?: ReactNode;
 };
 
-/** Boş Pastera kutusu — yemek ağzın içinde, ön duvarın arkasında. */
+/**
+ * Tek SVG — yemek foreignObject ile ağzın (44,46)-(156,46)-(170,84)-(30,84) tam içinde.
+ * Ön duvar yemekten sonra çizilir → malzeme kutunun içinde kalır.
+ */
 export function PasteraIsometricBox({ children, pourOverlay }: PasteraIsometricBoxProps) {
+  const uid = useId().replace(/:/g, "");
+
   return (
-    <div
-      className="relative mx-auto w-full"
-      style={{ aspectRatio: "4/5" }}
-    >
-      <div className="absolute bottom-[1%] left-1/2 h-[7%] w-[68%] -translate-x-1/2 rounded-[50%] bg-black/40 blur-lg" />
-
-      {/* Yemek katmanı — SVG ağzının tam altında */}
-      <div className="absolute z-10" style={INTERIOR}>
-        <div
-          className="absolute inset-x-0 bottom-0 overflow-hidden"
-          style={{ height: "64%", clipPath: FOOD_CLIP }}
-        >
-          <div
-            className="absolute inset-0"
-            style={{
-              background:
-                "linear-gradient(180deg, #e0d4bc 0%, #cbb896 55%, #b8a480 100%)",
-            }}
-          />
-          <div className="relative h-full w-full">{children}</div>
-        </div>
-
-        {pourOverlay ? (
-          <div className="pointer-events-none absolute inset-0 z-20 overflow-visible">
-            {pourOverlay}
-          </div>
-        ) : null}
-      </div>
-
-      {/* Kutu kabuğu — ağız bölgesi şeffaf, yemek görünür */}
+    <div className="relative mx-auto w-full" style={{ aspectRatio: "200/250" }}>
       <svg
         viewBox="0 0 200 250"
-        className="relative z-20 h-full w-full drop-shadow-[0_18px_36px_rgba(0,0,0,0.5)]"
+        className="h-full w-full drop-shadow-[0_16px_32px_rgba(0,0,0,0.5)]"
         aria-hidden
       >
         <defs>
-          <linearGradient id="pastera-front" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#2d4a38" />
+          <clipPath id={`mouth-${uid}`}>
+            <polygon points="44,46 156,46 170,84 30,84" />
+          </clipPath>
+          <linearGradient id={`front-${uid}`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#2f4d3a" />
             <stop offset="100%" stopColor="#1a2e22" />
           </linearGradient>
-          <linearGradient id="pastera-side-l" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#1a2e22" />
+          <linearGradient id={`sideL-${uid}`} x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="#162418" />
             <stop offset="100%" stopColor="#243d2e" />
           </linearGradient>
-          <linearGradient id="pastera-side-r" x1="0" y1="0" x2="1" y2="0">
+          <linearGradient id={`sideR-${uid}`} x1="0" y1="0" x2="1" y2="0">
             <stop offset="0%" stopColor="#243d2e" />
-            <stop offset="100%" stopColor="#1a2e22" />
+            <stop offset="100%" stopColor="#162418" />
+          </linearGradient>
+          <linearGradient id={`inner-${uid}`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#ddd0b8" />
+            <stop offset="100%" stopColor="#b8a480" />
           </linearGradient>
         </defs>
 
-        <path d="M12 238 L30 84 L44 46 L6 48 L4 238 Z" fill="url(#pastera-side-l)" />
-        <path d="M188 238 L170 84 L156 46 L194 48 L196 238 Z" fill="url(#pastera-side-r)" />
-        <path d="M30 84 L170 84 L188 238 L12 238 Z" fill="url(#pastera-front)" />
+        {/* Gölge */}
+        <ellipse cx="100" cy="244" rx="72" ry="7" fill="rgba(0,0,0,0.35)" />
 
-        {/* Sadece kenar çizgileri — ağız içi doldurulmaz */}
-        <path
-          d="M44 46 L156 46 L170 84 L30 84 Z"
+        {/* Yan paneller (arkada) */}
+        <path d="M10 240 L28 86 L44 48 L4 50 L2 240 Z" fill={`url(#sideL-${uid})`} />
+        <path d="M190 240 L172 86 L156 48 L196 50 L198 240 Z" fill={`url(#sideR-${uid})`} />
+
+        {/* Yemek — sadece ağız poligonu içinde */}
+        <g clipPath={`url(#mouth-${uid})`}>
+          <polygon points="44,46 156,46 170,84 30,84" fill={`url(#inner-${uid})`} />
+          <foreignObject x="30" y="46" width="140" height="38">
+            <div
+              style={{
+                width: "100%",
+                height: "100%",
+                position: "relative",
+                overflow: "hidden",
+                transform: "perspective(90px) rotateX(52deg)",
+                transformOrigin: "50% 100%",
+              }}
+            >
+              {pourOverlay}
+              {children}
+            </div>
+          </foreignObject>
+        </g>
+
+        {/* Ön duvar — yemeğin üstünü kapatır */}
+        <path d="M30 84 L170 84 L190 240 L10 240 Z" fill={`url(#front-${uid})`} />
+
+        {/* Ağız kenarları */}
+        <polygon
+          points="44,46 156,46 170,84 30,84"
           fill="none"
           stroke="#3d5c44"
           strokeWidth="1.5"
         />
-        <line x1="30" y1="84" x2="170" y2="84" stroke="#4a6e52" strokeWidth="2.5" />
-        <line x1="44" y1="46" x2="30" y2="84" stroke="#2a4030" strokeWidth="1.2" opacity="0.7" />
-        <line x1="156" y1="46" x2="170" y2="84" stroke="#2a4030" strokeWidth="1.2" opacity="0.7" />
+        <line x1="30" y1="84" x2="170" y2="84" stroke="#4a7054" strokeWidth="2.5" />
+        <line x1="44" y1="46" x2="30" y2="84" stroke="#2a4030" strokeWidth="1" opacity="0.6" />
+        <line x1="156" y1="46" x2="170" y2="84" stroke="#2a4030" strokeWidth="1" opacity="0.6" />
 
-        <circle cx="38" cy="130" r="14" fill="none" stroke="#c49746" strokeWidth="0.6" opacity="0.35" />
-        <circle cx="38" cy="130" r="9" fill="none" stroke="#c49746" strokeWidth="0.5" opacity="0.25" />
-        <circle cx="162" cy="118" r="11" fill="none" stroke="#c49746" strokeWidth="0.6" opacity="0.3" />
-        <circle cx="162" cy="118" r="7" fill="none" stroke="#c49746" strokeWidth="0.5" opacity="0.2" />
-        <circle cx="55" cy="195" r="8" fill="none" stroke="#c49746" strokeWidth="0.5" opacity="0.22" />
-        <circle cx="145" cy="205" r="10" fill="none" stroke="#c49746" strokeWidth="0.5" opacity="0.25" />
+        {/* Süslemeler */}
+        <circle cx="36" cy="128" r="13" fill="none" stroke="#c49746" strokeWidth="0.6" opacity="0.3" />
+        <circle cx="164" cy="116" r="10" fill="none" stroke="#c49746" strokeWidth="0.5" opacity="0.25" />
+        <circle cx="52" cy="198" r="7" fill="none" stroke="#c49746" strokeWidth="0.5" opacity="0.2" />
 
-        <path d="M22 108 Q26 102 30 108 Q26 114 22 108" fill="#c49746" opacity="0.45" />
-        <path d="M178 100 Q174 94 170 100 Q174 106 178 100" fill="#c49746" opacity="0.4" />
-        <path d="M48 218 Q52 212 56 218 Q52 224 48 218" fill="#c49746" opacity="0.3" />
-
-        <g transform="translate(100, 118)" opacity="0.9">
-          <rect x="-1.2" y="-10" width="2.4" height="18" rx="0.8" fill="#c49746" />
-          <rect x="-4" y="-10" width="1.5" height="7" rx="0.5" fill="#c49746" />
-          <rect x="-1.2" y="-10" width="1.5" height="7" rx="0.5" fill="#c49746" />
-          <rect x="1.5" y="-10" width="1.5" height="7" rx="0.5" fill="#c49746" />
-          <rect x="4" y="-10" width="1.5" height="7" rx="0.5" fill="#c49746" />
-          <ellipse cx="5" cy="2" rx="7" ry="5" fill="none" stroke="#c49746" strokeWidth="1.2" />
+        <g transform="translate(100, 116)" opacity="0.88">
+          <rect x="-1" y="-9" width="2" height="16" rx="0.6" fill="#c49746" />
+          <rect x="-3.5" y="-9" width="1.2" height="6" rx="0.4" fill="#c49746" />
+          <rect x="2.3" y="-9" width="1.2" height="6" rx="0.4" fill="#c49746" />
+          <ellipse cx="4" cy="1" rx="6" ry="4" fill="none" stroke="#c49746" strokeWidth="1" />
         </g>
 
         <text
           x="100"
-          y="152"
+          y="150"
           textAnchor="middle"
           fill="#c49746"
-          fontSize="17"
-          fontFamily="Georgia, 'Times New Roman', serif"
+          fontSize="16"
+          fontFamily="Georgia, serif"
           fontWeight="bold"
-          letterSpacing="2"
+          letterSpacing="1.5"
         >
           PASTERA
         </text>
         <text
           x="100"
-          y="166"
+          y="163"
           textAnchor="middle"
           fill="#c49746"
-          fontSize="5.5"
+          fontSize="5"
           fontFamily="Arial, sans-serif"
-          letterSpacing="1.2"
-          opacity="0.85"
+          letterSpacing="1"
+          opacity="0.8"
         >
           MODERN PASTA KITCHEN
         </text>
-        <text
-          x="100"
-          y="175"
-          textAnchor="middle"
-          fill="#c49746"
-          fontSize="4.5"
-          fontFamily="Arial, sans-serif"
-          opacity="0.6"
-        >
+        <text x="100" y="171" textAnchor="middle" fill="#c49746" fontSize="4" opacity="0.55">
           EST. 2024
         </text>
       </svg>
