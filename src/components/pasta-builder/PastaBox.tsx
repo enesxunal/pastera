@@ -3,16 +3,8 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { useI18n } from "@/components/providers/I18nProvider";
-import {
-  PastaFill,
-  PastaPourStream,
-  SauceFill,
-  SaucePourStream,
-  ToppingPieces,
-  ToppingPourStream,
-} from "./box-food-layers";
 import { PasteraIsometricBox } from "./PasteraIsometricBox";
-import { layerKind, sauceColor } from "./pasta-box-visual";
+import { layerKind } from "./pasta-box-visual";
 
 export type BoxLayer = { id: string; name: string; image?: string };
 
@@ -60,41 +52,6 @@ function useBoxPouring(pastaId: string | undefined, layers: BoxLayer[]) {
   return pouring;
 }
 
-function BoxInterior({
-  pastaId,
-  layers,
-  pouring,
-}: {
-  pastaId?: string;
-  layers: BoxLayer[];
-  pouring: Pouring;
-}) {
-  const sauces = layers.filter((l) => layerKind(l.id) === "sauce");
-  const toppings = layers.filter((l) => layerKind(l.id) === "topping");
-
-  return (
-    <div className="relative h-full w-full">
-      <PastaFill pastaId={pastaId} pouring={pouring?.kind === "pasta"} />
-      {sauces.map((layer, idx) => (
-        <SauceFill
-          key={layer.id}
-          id={layer.id}
-          index={idx}
-          pouring={pouring?.kind === "sauce" && pouring.id === layer.id}
-        />
-      ))}
-      {toppings.map((layer, idx) => (
-        <ToppingPieces
-          key={layer.id}
-          layerId={layer.id}
-          globalIndex={idx}
-          pouring={pouring?.kind === "topping" && pouring.id === layer.id}
-        />
-      ))}
-    </div>
-  );
-}
-
 type BoxSceneProps = PastaBoxProps & {
   pouring: Pouring;
   showTitle?: boolean;
@@ -118,18 +75,6 @@ function BoxScene({
 }: BoxSceneProps) {
   const { t } = useI18n();
 
-  const showSauceStream = pouring?.kind === "sauce";
-  const showPastaStream = pouring?.kind === "pasta";
-  const showToppingStream = pouring?.kind === "topping";
-
-  const pourOverlay = (
-    <AnimatePresence>
-      {showPastaStream ? <PastaPourStream pastaId={pastaId} /> : null}
-      {showSauceStream ? <SaucePourStream color={sauceColor(pouring.id)} /> : null}
-      {showToppingStream ? <ToppingPourStream layerId={pouring.id} /> : null}
-    </AnimatePresence>
-  );
-
   return (
     <div className="flex w-full flex-col items-center">
       {showTitle ? (
@@ -152,9 +97,7 @@ function BoxScene({
       ) : null}
 
       <div className={`relative ${boxWidth}`}>
-        <PasteraIsometricBox pourOverlay={pourOverlay}>
-          <BoxInterior pastaId={pastaId} layers={layers} pouring={pouring} />
-        </PasteraIsometricBox>
+        <PasteraIsometricBox pastaId={pastaId} layers={layers} pouring={pouring} />
       </div>
 
       {showEmptyHint && layers.length === 0 ? (

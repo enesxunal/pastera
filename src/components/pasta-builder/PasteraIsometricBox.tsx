@@ -1,17 +1,22 @@
 "use client";
 
-import { useId, type ReactNode } from "react";
+import { useId } from "react";
+import { BoxFoodSvg } from "./box-food-layers";
+
+type Pouring =
+  | { kind: "pasta" }
+  | { kind: "sauce"; id: string }
+  | { kind: "topping"; id: string }
+  | null;
 
 type PasteraIsometricBoxProps = {
-  children: ReactNode;
-  pourOverlay?: ReactNode;
+  pastaId?: string;
+  layers: { id: string }[];
+  pouring: Pouring;
 };
 
-/**
- * Tek SVG — yemek foreignObject ile ağzın (44,46)-(156,46)-(170,84)-(30,84) tam içinde.
- * Ön duvar yemekten sonra çizilir → malzeme kutunun içinde kalır.
- */
-export function PasteraIsometricBox({ children, pourOverlay }: PasteraIsometricBoxProps) {
+/** Boş Pastera kutusu + saf SVG yemek (mobil = web). */
+export function PasteraIsometricBox({ pastaId, layers, pouring }: PasteraIsometricBoxProps) {
   const uid = useId().replace(/:/g, "");
 
   return (
@@ -43,37 +48,18 @@ export function PasteraIsometricBox({ children, pourOverlay }: PasteraIsometricB
           </linearGradient>
         </defs>
 
-        {/* Gölge */}
         <ellipse cx="100" cy="244" rx="72" ry="7" fill="rgba(0,0,0,0.35)" />
 
-        {/* Yan paneller (arkada) */}
         <path d="M10 240 L28 86 L44 48 L4 50 L2 240 Z" fill={`url(#sideL-${uid})`} />
         <path d="M190 240 L172 86 L156 48 L196 50 L198 240 Z" fill={`url(#sideR-${uid})`} />
 
-        {/* Yemek — sadece ağız poligonu içinde */}
         <g clipPath={`url(#mouth-${uid})`}>
           <polygon points="44,46 156,46 170,84 30,84" fill={`url(#inner-${uid})`} />
-          <foreignObject x="30" y="46" width="140" height="38">
-            <div
-              style={{
-                width: "100%",
-                height: "100%",
-                position: "relative",
-                overflow: "hidden",
-                transform: "perspective(90px) rotateX(52deg)",
-                transformOrigin: "50% 100%",
-              }}
-            >
-              {pourOverlay}
-              {children}
-            </div>
-          </foreignObject>
+          <BoxFoodSvg pastaId={pastaId} layers={layers} pouring={pouring} />
         </g>
 
-        {/* Ön duvar — yemeğin üstünü kapatır */}
         <path d="M30 84 L170 84 L190 240 L10 240 Z" fill={`url(#front-${uid})`} />
 
-        {/* Ağız kenarları */}
         <polygon
           points="44,46 156,46 170,84 30,84"
           fill="none"
@@ -84,7 +70,6 @@ export function PasteraIsometricBox({ children, pourOverlay }: PasteraIsometricB
         <line x1="44" y1="46" x2="30" y2="84" stroke="#2a4030" strokeWidth="1" opacity="0.6" />
         <line x1="156" y1="46" x2="170" y2="84" stroke="#2a4030" strokeWidth="1" opacity="0.6" />
 
-        {/* Süslemeler */}
         <circle cx="36" cy="128" r="13" fill="none" stroke="#c49746" strokeWidth="0.6" opacity="0.3" />
         <circle cx="164" cy="116" r="10" fill="none" stroke="#c49746" strokeWidth="0.5" opacity="0.25" />
         <circle cx="52" cy="198" r="7" fill="none" stroke="#c49746" strokeWidth="0.5" opacity="0.2" />
