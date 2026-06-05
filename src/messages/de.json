@@ -214,8 +214,8 @@
     }
   },
   "pastaBox": {
-    "preview": "Vorschau",
-    "empty": "Saucen und Zutaten erscheinen hier nach der Auswahl.",
+    "preview": "Dein Teller",
+    "empty": "Sauce und Toppings werden auf den Teller geschüttet.",
     "selected": "Ausgewählt"
   },
   "dineIn": {

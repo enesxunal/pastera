@@ -154,6 +154,7 @@ export function PastaBuilder() {
           transition={{ type: "spring", stiffness: 180, damping: 22 }}
         >
           <PastaBox
+            pastaId={pastaId}
             pastaName={menuItemLabel(pasta.id, locale, pasta.name)}
             layers={boxLayers}
           />

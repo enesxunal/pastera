@@ -214,8 +214,8 @@
     }
   },
   "pastaBox": {
-    "preview": "Önizleme",
-    "empty": "Sos ve malzeme seçince burada görünecek.",
+    "preview": "Tabağın",
+    "empty": "Sos ve malzeme seçince tabağa dökülecek.",
     "selected": "Seçildi"
   },
   "dineIn": {

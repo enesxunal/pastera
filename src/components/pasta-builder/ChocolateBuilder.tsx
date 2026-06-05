@@ -146,7 +146,11 @@ export function ChocolateBuilder() {
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true, amount: 0.2 }}
         >
-          <PastaBox pastaName={pastaItem.name} layers={boxLayers} />
+          <PastaBox
+            pastaId={CHOCOLATE_PASTA.id}
+            pastaName={pastaItem.name}
+            layers={boxLayers}
+          />
         </motion.aside>
 
         <div className="order-2 space-y-10 lg:order-1">
