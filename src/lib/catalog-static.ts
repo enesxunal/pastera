@@ -33,7 +33,8 @@ export function getStaticCatalog(): CatalogItem[] {
     { items: SAUCES, cat: "sauce" },
     { items: TOPPINGS, cat: "topping" },
     { items: STANDARD_PASTAS, cat: "chef_special" },
-    { items: DESSERTS, cat: "dessert" },
+    // dessert kategorisi yoksa starter ile uyumlu (id: d-*)
+    { items: DESSERTS, cat: "starter" },
   ];
   for (const { items, cat } of blocks) {
     out.push(...mapItems(items, cat, o));
@@ -48,4 +49,15 @@ export function catalogItemById(catalog: CatalogItem[], id: string): CatalogItem
 
 export function catalogByCategory(catalog: CatalogItem[], category: CatalogCategory): CatalogItem[] {
   return catalog.filter((x) => x.category === category && x.is_active).sort((a, b) => a.sort_order - b.sort_order);
+}
+
+/** Tatlılar — dessert veya starter içinde d-* id'li ürünler */
+export function catalogDesserts(catalog: CatalogItem[]): CatalogItem[] {
+  return catalog
+    .filter(
+      (x) =>
+        x.is_active &&
+        (x.category === "dessert" || (x.category === "starter" && x.id.startsWith("d-"))),
+    )
+    .sort((a, b) => a.sort_order - b.sort_order);
 }

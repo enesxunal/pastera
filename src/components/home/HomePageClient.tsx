@@ -8,7 +8,7 @@ import { MenuGrid } from "@/components/menu/MenuGrid";
 import { MenuHighlights } from "@/components/home/MenuHighlights";
 import { useCatalog } from "@/components/providers/CatalogProvider";
 import { useI18n } from "@/components/providers/I18nProvider";
-import { catalogByCategory } from "@/lib/catalog-static";
+import { catalogByCategory, catalogDesserts } from "@/lib/catalog-static";
 import { pageIntro } from "@/lib/motion-variants";
 
 const BANNER_IMAGES = ["/pastera.jpg", "/pastera-vegan.jpg"] as const;
@@ -27,7 +27,7 @@ export function HomePageClient() {
   }, []);
 
   const standardPastas = catalogByCategory(catalog, "chef_special");
-  const desserts = catalogByCategory(catalog, "dessert");
+  const desserts = catalogDesserts(catalog);
 
   return (
     <div className="mx-auto max-w-6xl px-4 pb-16 pt-6 sm:px-6 sm:pb-20 sm:pt-8">

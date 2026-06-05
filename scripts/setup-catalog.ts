@@ -4,7 +4,7 @@
  *
  * Ausführen: npm run db:catalog
  */
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { resolve } from "node:path";
 import { createClient } from "@supabase/supabase-js";
 import postgres from "postgres";
@@ -28,7 +28,15 @@ async function applyCatalogSql(): Promise<boolean> {
   const ref = url.match(/https:\/\/([^.]+)\.supabase\.co/)?.[1];
   if (!ref) throw new Error("NEXT_PUBLIC_SUPABASE_URL ungültig");
 
-  const ddl = readFileSync(resolve(process.cwd(), "supabase/catalog_items.sql"), "utf8");
+  const migrationDir = resolve(process.cwd(), "supabase/migrations");
+  const migrationFiles = existsSync(migrationDir)
+    ? readdirSync(migrationDir)
+        .filter((f) => f.endsWith(".sql"))
+        .sort()
+    : [];
+  const ddl =
+    readFileSync(resolve(process.cwd(), "supabase/catalog_items.sql"), "utf8") +
+    migrationFiles.map((f) => readFileSync(resolve(migrationDir, f), "utf8")).join("\n");
   const sql = postgres({
     host: "aws-0-eu-west-1.pooler.supabase.com",
     port: 6543,

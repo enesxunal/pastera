@@ -4,7 +4,7 @@ import Link from "next/link";
 import { MenuGrid } from "@/components/menu/MenuGrid";
 import { useCatalog } from "@/components/providers/CatalogProvider";
 import { useI18n } from "@/components/providers/I18nProvider";
-import { catalogByCategory } from "@/lib/catalog-static";
+import { catalogByCategory, catalogDesserts } from "@/lib/catalog-static";
 import { formatEur } from "@/lib/format";
 
 function MenuActionCard({
@@ -52,7 +52,7 @@ export function MenuHub() {
   const { locale, t } = useI18n();
 
   const standardPastas = catalogByCategory(catalog, "chef_special");
-  const desserts = catalogByCategory(catalog, "dessert");
+  const desserts = catalogDesserts(catalog);
 
   return (
     <>
