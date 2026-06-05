@@ -6,6 +6,8 @@ import type { MenuItem } from "@/lib/menu-data";
 import { formatEur } from "@/lib/format";
 import { fadeUpCard } from "@/lib/motion-variants";
 import { publicMenuImageSrc } from "@/lib/normalize-menu-image";
+import { VeganBadge } from "@/components/menu/VeganBadge";
+import { useI18n } from "@/components/providers/I18nProvider";
 
 type Props = {
   item: MenuItem;
@@ -16,6 +18,7 @@ type Props = {
 };
 
 export function MenuPickCard({ item, selected, onSelect, mode, variants = fadeUpCard }: Props) {
+  const { t } = useI18n();
   const imageSrc = publicMenuImageSrc(item.image);
   return (
     <motion.button
@@ -48,6 +51,13 @@ export function MenuPickCard({ item, selected, onSelect, mode, variants = fadeUp
         />
       )}
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black via-black/35 to-transparent" />
+      {item.vegan ? (
+        <VeganBadge
+          size="sm"
+          label={t("menu.veganBadge")}
+          className="absolute left-2 top-2 shadow-md"
+        />
+      ) : null}
       {selected && (
         <motion.span
           layoutId={`pick-${item.id}`}

@@ -16,6 +16,7 @@ import {
 import { getMenuItem } from "@/lib/menu-data";
 import { publicMenuImageSrc } from "@/lib/normalize-menu-image";
 import { useI18n } from "@/components/providers/I18nProvider";
+import { VeganBadge } from "@/components/menu/VeganBadge";
 
 export type MenuGridCategory =
   | "pasta"
@@ -136,12 +137,14 @@ export function MenuGrid({
                 )}
               </div>
               <div className="p-3">
-                <p className="font-medium text-white">{label}</p>
+                <div className="flex items-center gap-1.5">
+                  <p className="font-medium text-white">{label}</p>
+                  {item.vegan ? <VeganBadge size="xs" label={t("menu.veganBadge")} /> : null}
+                </div>
                 {chefDesc ? (
                   <p className="mt-1 line-clamp-2 text-xs text-white/45">{chefDesc}</p>
                 ) : null}
                 <p className="mt-1 text-sm font-semibold text-[#c49746]">{priceText}</p>
-                {item.vegan && <p className="mt-1 text-xs text-white/40">vegan</p>}
                 <button
                   type="button"
                   onClick={() => openPicker(item)}
@@ -183,9 +186,11 @@ export function MenuGrid({
                   )}
                 </div>
                 <div className="p-3">
-                  <p className="font-medium text-white">{label}</p>
+                  <div className="flex items-center gap-1.5">
+                    <p className="font-medium text-white">{label}</p>
+                    {item.vegan ? <VeganBadge size="xs" label={t("menu.veganBadge")} /> : null}
+                  </div>
                   <p className="mt-1 text-sm font-semibold text-[#c49746]">{priceText}</p>
-                  {item.vegan && <p className="mt-1 text-xs text-white/40">vegan</p>}
                 </div>
               </Link>
               <div className="px-3 pb-3">
