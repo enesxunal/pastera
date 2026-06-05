@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { useI18n } from "@/components/providers/I18nProvider";
 
@@ -27,6 +28,11 @@ export function SiteHeader() {
   const { locale, setLocale, t } = useI18n();
   const { user, loading } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [portalReady, setPortalReady] = useState(false);
+
+  useEffect(() => {
+    setPortalReady(true);
+  }, []);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -92,7 +98,53 @@ export function SiteHeader() {
     </>
   ) : null;
 
+  const mobileMenu =
+    menuOpen && portalReady
+      ? createPortal(
+          <div className="fixed inset-0 z-[200] md:hidden" role="presentation">
+            <button
+              type="button"
+              className="absolute inset-0 bg-[#050505]/92"
+              aria-label={t("nav.menuClose")}
+              onClick={closeMenu}
+            />
+            <nav
+              className="relative z-[1] max-h-[85dvh] overflow-y-auto border-b-2 border-[#2e402a] bg-[#0a0a0a] px-4 py-5 shadow-2xl"
+              style={{
+                marginTop: "4rem",
+                paddingBottom: "max(1.25rem, env(safe-area-inset-bottom))",
+              }}
+              aria-label={t("nav.menuOpen")}
+            >
+              <ul className="flex flex-col gap-2">
+                {paths.map((item) => (
+                  <li key={item.href}>
+                    <Link
+                      href={item.href}
+                      onClick={closeMenu}
+                      className="flex min-h-12 items-center rounded-xl bg-[#141414] px-4 text-base font-semibold text-white transition active:bg-[#1c1c1c]"
+                    >
+                      {t(`nav.${item.key}`)}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+              {authLinks ? (
+                <div className="mt-5 flex flex-col gap-2 rounded-xl border border-[#2e402a] bg-[#111] p-3">
+                  <p className="px-1 text-xs font-semibold uppercase tracking-widest text-[#c49746]">
+                    {t("footer.account")}
+                  </p>
+                  {authLinks}
+                </div>
+              ) : null}
+            </nav>
+          </div>,
+          document.body,
+        )
+      : null;
+
   return (
+    <>
     <header className="relative z-20 border-b border-[#2e402a] bg-matte/90 backdrop-blur-md">
       <div
         className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-[#c49746]/40 to-transparent"
@@ -165,39 +217,8 @@ export function SiteHeader() {
           </button>
         </div>
       </div>
-
-      {/* Mobil menü paneli */}
-      {menuOpen ? (
-        <div className="fixed inset-0 top-16 z-30 md:hidden">
-          <button
-            type="button"
-            className="absolute inset-0 bg-black/60"
-            aria-label={t("nav.menuClose")}
-            onClick={closeMenu}
-          />
-          <nav
-            className="relative border-b border-[#2e402a] bg-matte/98 px-4 py-4 shadow-2xl backdrop-blur-md"
-            style={{ paddingBottom: "max(1rem, env(safe-area-inset-bottom))" }}
-          >
-            <ul className="flex flex-col gap-1">
-              {paths.map((item) => (
-                <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    onClick={closeMenu}
-                    className="flex min-h-12 items-center rounded-xl px-4 text-base font-medium text-white/90 transition hover:bg-forest/40"
-                  >
-                    {t(`nav.${item.key}`)}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-            <div className="mt-4 flex flex-col gap-2 border-t border-[#2e402a]/60 pt-4">
-              {authLinks}
-            </div>
-          </nav>
-        </div>
-      ) : null}
     </header>
+    {mobileMenu}
+    </>
   );
 }
