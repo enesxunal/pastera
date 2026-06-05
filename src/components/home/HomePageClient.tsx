@@ -26,7 +26,6 @@ export function HomePageClient() {
     return () => window.clearInterval(id);
   }, []);
 
-  const noodles = catalogByCategory(catalog, "pasta_base").filter((x) => x.id !== "noodle-chocolate");
   const standardPastas = catalogByCategory(catalog, "chef_special");
   const desserts = catalogByCategory(catalog, "dessert");
 
@@ -119,20 +118,21 @@ export function HomePageClient() {
         <p className="mt-2 max-w-2xl text-sm text-white/55">{t("home.productsSub")}</p>
 
         <div className="mt-10 space-y-14">
-          {noodles.length > 0 ? (
-            <div>
-              <h3 className="font-display text-lg font-bold text-[#c49746]">{t("menu.sectionNoodles")}</h3>
-              <p className="mt-1 text-sm text-white/45">{t("menu.sectionNoodlesHint")}</p>
-              <MenuGrid
-                variant="embedded"
-                hideHeading
-                title=""
-                items={noodles}
-                category="pasta"
-                locale={locale}
-              />
-            </div>
-          ) : null}
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href="/builder"
+              className="inline-flex rounded-full px-6 py-3 text-sm font-bold text-[#0a0a0a]"
+              style={{ backgroundColor: "#c49746" }}
+            >
+              {t("menu.buildYourOwn")}
+            </Link>
+            <Link
+              href="/menu#makarnalar"
+              className="inline-flex rounded-full border border-[#2e402a] px-6 py-3 text-sm font-semibold text-white/80 hover:border-[#c49746]/50"
+            >
+              {t("menu.readyPastas")}
+            </Link>
+          </div>
 
           {standardPastas.length > 0 ? (
             <div>

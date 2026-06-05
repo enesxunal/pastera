@@ -7,9 +7,8 @@ import { useI18n } from "@/components/providers/I18nProvider";
 import { loadCartSnapshot, saveCartSnapshot } from "@/lib/cart";
 import { pageIntro, staggerGrid } from "@/lib/motion-variants";
 import {
-  isChocolatePasta,
-  normalizePastaId,
-  PASTAS,
+  BUILDER_PASTAS,
+  normalizeBuilderPastaId,
   saucesForPasta,
   toppingGroupsForPasta,
   type MenuItem,
@@ -56,30 +55,26 @@ export function PastaBuilder() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { t } = useI18n();
-  const [pastaId, setPastaId] = useState(PASTAS[0].id);
+  const [pastaId, setPastaId] = useState(BUILDER_PASTAS[0].id);
   const [sauceIds, setSauceIds] = useState<string[]>([]);
   const [ingredientIds, setIngredientIds] = useState<string[]>([]);
 
-  const pasta = PASTAS.find((p) => p.id === pastaId) ?? PASTAS[0];
-  const chocolate = isChocolatePasta(pastaId);
+  const pasta = BUILDER_PASTAS.find((p) => p.id === pastaId) ?? BUILDER_PASTAS[0];
   const sauces = useMemo(() => saucesForPasta(pastaId), [pastaId]);
   const toppingGroups = useMemo(() => toppingGroupsForPasta(pastaId), [pastaId]);
   const allToppings = useMemo(
-    () =>
-      chocolate
-        ? toppingGroups.chocolate
-        : [...toppingGroups.main, ...toppingGroups.extra],
-    [chocolate, toppingGroups],
+    () => [...toppingGroups.main, ...toppingGroups.extra],
+    [toppingGroups],
   );
 
   useEffect(() => {
     const saved = loadCartSnapshot();
     const urlPasta = searchParams.get("pasta");
-    const urlOk = urlPasta ? normalizePastaId(urlPasta) : null;
+    const urlOk = urlPasta ? normalizeBuilderPastaId(urlPasta) : null;
 
     if (!saved && !urlOk) return;
 
-    const pid = urlOk ?? normalizePastaId(saved!.pastaId);
+    const pid = urlOk ?? normalizeBuilderPastaId(saved!.pastaId);
     setPastaId(pid);
     if (saved) {
       setSauceIds(saved.sauceIds);
@@ -156,13 +151,13 @@ export function PastaBuilder() {
             </h2>
             <p className="mt-1 text-sm text-white/50">{t("builder.step1Hint")}</p>
             <motion.div
-              className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4"
+              className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3"
               variants={staggerGrid}
               initial="hidden"
               whileInView="show"
               viewport={{ once: true, amount: 0.12 }}
             >
-              {PASTAS.map((item) => (
+              {BUILDER_PASTAS.map((item) => (
                 <MenuPickCard
                   key={item.id}
                   item={item}
@@ -174,7 +169,7 @@ export function PastaBuilder() {
             </motion.div>
           </section>
 
-          {!chocolate && sauces.length > 0 ? (
+          {sauces.length > 0 ? (
             <section>
               <h2 className="font-display text-lg font-semibold text-white">
                 {t("builder.step2Title")}
@@ -202,41 +197,31 @@ export function PastaBuilder() {
 
           <section>
             <h2 className="font-display text-lg font-semibold text-white">
-              {chocolate ? t("builder.stepChocolateTitle") : t("builder.step3Title")}
+              {t("builder.step3Title")}
             </h2>
-            <p className="mt-1 text-sm text-white/50">
-              {chocolate ? t("builder.stepChocolateHint") : t("builder.step3Hint")}
-            </p>
-            {chocolate ? (
-              <ToppingGrid
-                items={toppingGroups.chocolate}
-                ingredientIds={ingredientIds}
-                setIngredientIds={setIngredientIds}
-              />
-            ) : (
-              <div className="space-y-8">
-                {toppingGroups.main.length > 0 ? (
-                  <div>
-                    <h3 className="text-sm font-semibold text-[#c49746]">{t("builder.toppingsMain")}</h3>
-                    <ToppingGrid
-                      items={toppingGroups.main}
-                      ingredientIds={ingredientIds}
-                      setIngredientIds={setIngredientIds}
-                    />
-                  </div>
-                ) : null}
-                {toppingGroups.extra.length > 0 ? (
-                  <div>
-                    <h3 className="text-sm font-semibold text-[#c49746]">{t("builder.toppingsExtra")}</h3>
-                    <ToppingGrid
-                      items={toppingGroups.extra}
-                      ingredientIds={ingredientIds}
-                      setIngredientIds={setIngredientIds}
-                    />
-                  </div>
-                ) : null}
-              </div>
-            )}
+            <p className="mt-1 text-sm text-white/50">{t("builder.step3Hint")}</p>
+            <div className="space-y-8">
+              {toppingGroups.main.length > 0 ? (
+                <div>
+                  <h3 className="text-sm font-semibold text-[#c49746]">{t("builder.toppingsMain")}</h3>
+                  <ToppingGrid
+                    items={toppingGroups.main}
+                    ingredientIds={ingredientIds}
+                    setIngredientIds={setIngredientIds}
+                  />
+                </div>
+              ) : null}
+              {toppingGroups.extra.length > 0 ? (
+                <div>
+                  <h3 className="text-sm font-semibold text-[#c49746]">{t("builder.toppingsExtra")}</h3>
+                  <ToppingGrid
+                    items={toppingGroups.extra}
+                    ingredientIds={ingredientIds}
+                    setIngredientIds={setIngredientIds}
+                  />
+                </div>
+              ) : null}
+            </div>
           </section>
 
           <motion.div

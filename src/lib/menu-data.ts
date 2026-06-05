@@ -13,8 +13,8 @@ const img = (id: string): string => menuPhotoForId(id);
 
 const PASTA_BASE = 6.9;
 
-/** 1 — Makarna çeşidi */
-export const PASTAS: MenuItem[] = [
+/** Kendin yap — 3 makarna çeşidi (oluşturucu) */
+export const BUILDER_PASTAS: MenuItem[] = [
   {
     id: "noodle-classic",
     name: "Classic",
@@ -37,14 +37,18 @@ export const PASTAS: MenuItem[] = [
     image: img("pasta-klassisch"),
     description: "Tintenfisch-Nudeln",
   },
-  {
-    id: "noodle-chocolate",
-    name: "Schokoladen-Pasta",
-    price: PASTA_BASE,
-    vegan: false,
-    image: img("pasta-klassisch"),
-  },
 ];
+
+/** Çikolatalı makarna — ayrı oluşturucu */
+export const CHOCOLATE_PASTA: MenuItem = {
+  id: "noodle-chocolate",
+  name: "Schokoladen-Pasta",
+  price: PASTA_BASE,
+  vegan: false,
+  image: img("pasta-klassisch"),
+};
+
+export const PASTAS: MenuItem[] = [...BUILDER_PASTAS, CHOCOLATE_PASTA];
 
 const LEGACY_PASTA_MAP: Record<string, string> = {
   "pasta-klassisch": "noodle-classic",
@@ -60,10 +64,15 @@ export function isChocolatePasta(pastaId: string): boolean {
   return normalizePastaId(pastaId) === "noodle-chocolate";
 }
 
-export function normalizePastaId(raw: string): string {
-  if (PASTAS.some((p) => p.id === raw)) return raw;
+export function normalizeBuilderPastaId(raw: string): string {
+  if (BUILDER_PASTAS.some((p) => p.id === raw)) return raw;
   if (LEGACY_PASTA_MAP[raw]) return LEGACY_PASTA_MAP[raw];
-  return PASTAS[0].id;
+  return BUILDER_PASTAS[0].id;
+}
+
+export function normalizePastaId(raw: string): string {
+  if (raw === CHOCOLATE_PASTA.id) return raw;
+  return normalizeBuilderPastaId(raw);
 }
 
 /** 2 — Soslar */
@@ -281,7 +290,7 @@ export const MENU_HIGHLIGHTS: MenuHighlight[] = [
     priceFrom: 6.5,
     badge: "Favorit",
     image: img("sp-curry-sahne-haehnchen"),
-    href: "/menu#standart-makarna",
+    href: "/menu#makarnalar",
   },
   {
     id: "highlight-dessert",
@@ -290,6 +299,6 @@ export const MENU_HIGHLIGHTS: MenuHighlight[] = [
     priceFrom: 6.5,
     badge: "Süß",
     image: img("pasta-klassisch"),
-    href: "/menu#tatli",
+    href: "/builder/chocolate",
   },
 ];

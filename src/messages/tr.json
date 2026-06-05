@@ -75,7 +75,7 @@
   "menuHub": {
     "title": "Menü",
     "badge": "Menü",
-    "intro": "Makarna çeşidi 6,90 € — sos ve topping ekle. Standart tabaklar ve tatlılar sabit fiyatlı.",
+    "intro": "Kendin yap veya hazır makarna seç. Tatlılar ve çikolatalı makarna ayrı bölümde.",
     "open": "Listeyi aç →"
   },
   "builder": {
@@ -95,6 +95,14 @@
     "total": "Toplam",
     "toCart": "Sepete devam",
     "previewHint": "Önizleme: seçilen sos ve toppingler kasede."
+  },
+  "chocolateBuilder": {
+    "kicker": "Tatlı",
+    "title": "Çikolatalı makarna",
+    "intro": "6,90 € taban — meyve ve çikolata toppingleri ekle.",
+    "base": "Taban",
+    "toppingsTitle": "Meyve & çikolata",
+    "toppingsHint": "İstediğin kadar ekle."
   },
   "menuPages": {
     "pastaTitle": "Makarna",
@@ -139,7 +147,15 @@
     "sectionChefSpecialsHint": "Hazır tabaklar — sabit fiyat.",
     "subChefClassic": "Chef Specials (klasik)",
     "subChefVegan": "Chef Specials (vegan)",
-    "sectionPasta": "Makarna",
+    "sectionPasta": "Makarnalar",
+    "sectionPastaChoiceHint": "Kendin yap veya hazır tabaklardan birini seç.",
+    "buildYourOwn": "Kendin yap",
+    "buildYourOwnBadge": "3 adım",
+    "buildYourOwnHint": "Classic, Vegan veya Siyah makarna — sos ve topping seç.",
+    "readyPastas": "Hazır makarnalar",
+    "readyPastasBadge": "Sabit fiyat",
+    "readyPastasHint": "İsimli tabaklar — doğrudan sepete ekle.",
+    "chocolateBadge": "Tatlı",
     "sectionPastaHint": "Klasik veya vegan taban — ardından sos ve toppingleri oluşturucuda seçersin.",
     "sectionWarm": "Ara sıcaklar",
     "sectionWarmHint": "Çorbalar ve mezeler; adet seçerek sepete eklenir.",

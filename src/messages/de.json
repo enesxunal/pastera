@@ -96,6 +96,14 @@
     "toCart": "Weiter zum Warenkorb",
     "previewHint": "Vorschau: gewählte Saucen und Toppings in der Schüssel."
   },
+  "chocolateBuilder": {
+    "kicker": "Dessert",
+    "title": "Schokoladen-Pasta",
+    "intro": "6,90 € Basis — Früchte und Schokolade als Topping.",
+    "base": "Basis",
+    "toppingsTitle": "Früchte & Schokolade",
+    "toppingsHint": "Beliebig viele Toppings."
+  },
   "menuPages": {
     "pastaTitle": "Pasta",
     "pastaIntro": "Nudeln, Saucen und Toppings — alles für deine Schüssel im Konfigurator (3 Schritte).",
@@ -140,6 +148,14 @@
     "subChefClassic": "Chef Specials (klassisch)",
     "subChefVegan": "Chef Specials (vegan)",
     "sectionPasta": "Pasta",
+    "sectionPastaChoiceHint": "Selbst zusammenstellen oder fertiges Gericht wählen.",
+    "buildYourOwn": "Selbst zusammenstellen",
+    "buildYourOwnBadge": "3 Schritte",
+    "buildYourOwnHint": "Classic, Vegan oder Schwarz — Sauce & Topping wählen.",
+    "readyPastas": "Fertige Gerichte",
+    "readyPastasBadge": "Festpreis",
+    "readyPastasHint": "Benannte Gerichte — direkt in den Warenkorb.",
+    "chocolateBadge": "Dessert",
     "sectionPastaHint": "Klassisch oder vegan wählen – danach Saucen und Toppings im Konfigurator.",
     "sectionWarm": "Warm & klein",
     "sectionWarmHint": "Suppen und Vorspeisen – mit Mengenwahl in den Warenkorb.",
