@@ -216,7 +216,10 @@
   "pastaBox": {
     "preview": "Deine Pastera-Box",
     "empty": "Zuerst Pasta, dann Sauce und Toppings in die Box.",
-    "selected": "Ausgewählt"
+    "selected": "Ausgewählt",
+    "open": "Box-Vorschau öffnen",
+    "close": "Box-Vorschau schließen",
+    "tapHint": "Deine Box"
   },
   "dineIn": {
     "banner": "Bestellung am Tisch",

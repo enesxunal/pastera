@@ -140,7 +140,7 @@ export function ChocolateBuilder() {
       </motion.div>
 
       <div className="grid gap-10 lg:grid-cols-[1fr_minmax(0,300px)] lg:items-start">
-        <div className="space-y-10 pt-[11.5rem] lg:order-1 lg:pt-0">
+        <div className="space-y-10 lg:order-1">
           <section>
             <h2 className="font-display text-lg font-semibold text-white">
               {t("chocolateBuilder.pastaTitle")}

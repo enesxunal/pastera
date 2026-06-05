@@ -216,7 +216,10 @@
   "pastaBox": {
     "preview": "Pastera kutun",
     "empty": "Önce makarna, sonra sos ve malzemeler kutuya dökülür.",
-    "selected": "Seçildi"
+    "selected": "Seçildi",
+    "open": "Kutu önizlemesini aç",
+    "close": "Kutu önizlemesini kapat",
+    "tapHint": "Kutunu gör"
   },
   "dineIn": {
     "banner": "Masadan sipariş",
