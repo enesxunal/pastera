@@ -97,58 +97,84 @@ export function MenuGrid({
     setTimeout(() => setFlash(null), 1200);
   }
 
+  function cardImage(imageSrc: string | undefined) {
+    return (
+      <div className="relative aspect-[4/3] w-full shrink-0">
+        {imageSrc ? (
+          <Image
+            src={imageSrc}
+            alt=""
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 45vw, 220px"
+            unoptimized
+          />
+        ) : (
+          <div
+            className="absolute inset-0 bg-gradient-to-br from-[#1a2218] via-[#0f140d] to-[#0a0a0a]"
+            aria-hidden
+          />
+        )}
+      </div>
+    );
+  }
+
+  function cardMeta({
+    label,
+    vegan,
+    desc,
+    priceText,
+  }: {
+    label: string;
+    vegan: boolean;
+    desc?: string;
+    priceText: string;
+  }) {
+    return (
+      <>
+        <div className="flex items-start gap-1.5">
+          <p className="font-medium leading-snug text-white">{label}</p>
+          {vegan ? <VeganBadge size="xs" label={t("menu.veganBadge")} className="shrink-0" /> : null}
+        </div>
+        <p className="mt-1 min-h-[2.5rem] line-clamp-2 text-xs leading-snug text-white/45">
+          {desc || "\u00A0"}
+        </p>
+        <p className="mt-1 text-sm font-semibold text-[#c49746]">{priceText}</p>
+      </>
+    );
+  }
+
   const innerGrid = (
-    <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 md:gap-4 lg:grid-cols-4">
+    <div className="mt-4 grid grid-cols-2 items-stretch gap-3 sm:grid-cols-3 md:gap-4 lg:grid-cols-4">
       {items.map((item) => {
         const label = nameOf(item, locale);
         const imageSrc = publicMenuImageSrc(item.image);
         const chefDesc =
           category === "chef_special" || item.id.startsWith("std-")
             ? getMenuItem(item.id)?.description
-            : undefined;
+            : item.id === MENU_KENDIN_YAP_ID
+              ? t("menu.buildYourOwnHint")
+              : item.id === "noodle-chocolate"
+                ? t("menu.subChocolatePastaHint")
+                : undefined;
         const showAdd = itemCanAddCart(item);
         const showBuilder = itemIsBuilder(item);
         const priceText =
           item.id === MENU_KENDIN_YAP_ID
             ? `${t("home.priceFrom")} ${formatEur(item.price)}`
             : formatEur(item.price);
+        const cardShell = "flex h-full flex-col overflow-hidden rounded-xl border-2 border-[#2e402a] bg-[#0f0f0f] shadow-md";
 
         if (showAdd) {
           return (
-            <div
-              key={item.id}
-              className="overflow-hidden rounded-xl border-2 border-[#2e402a] bg-[#0f0f0f] shadow-md"
-            >
-              <div className="relative aspect-[4/3] w-full">
-                {imageSrc ? (
-                  <Image
-                    src={imageSrc}
-                    alt=""
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 45vw, 220px"
-                    unoptimized
-                  />
-                ) : (
-                  <div
-                    className="absolute inset-0 bg-gradient-to-br from-[#1a2218] via-[#0f140d] to-[#0a0a0a]"
-                    aria-hidden
-                  />
-                )}
-              </div>
-              <div className="p-3">
-                <div className="flex items-center gap-1.5">
-                  <p className="font-medium text-white">{label}</p>
-                  {item.vegan ? <VeganBadge size="xs" label={t("menu.veganBadge")} /> : null}
-                </div>
-                {chefDesc ? (
-                  <p className="mt-1 line-clamp-2 text-xs text-white/45">{chefDesc}</p>
-                ) : null}
-                <p className="mt-1 text-sm font-semibold text-[#c49746]">{priceText}</p>
+            <div key={item.id} className={cardShell}>
+              {cardImage(imageSrc)}
+              <div className="flex flex-1 flex-col p-3">
+                {cardMeta({ label, vegan: item.vegan, desc: chefDesc, priceText })}
                 <button
                   type="button"
                   onClick={() => openPicker(item)}
-                  className="mt-3 w-full rounded-lg border border-[#c49746]/50 bg-[#2e402a]/40 py-2 text-xs font-semibold text-[#c49746] hover:bg-[#2e402a]/70"
+                  className="mt-auto w-full rounded-lg border border-[#c49746]/50 bg-[#2e402a]/40 py-2 pt-3 text-xs font-semibold text-[#c49746] hover:bg-[#2e402a]/70"
                 >
                   {flash === item.id ? t("cart.added") : t("cart.add")}
                 </button>
@@ -165,38 +191,16 @@ export function MenuGrid({
           return (
             <div
               key={item.id}
-              className="overflow-hidden rounded-xl border-2 border-[#2e402a] bg-[#0f0f0f] shadow-md transition hover:border-[#c49746]/50"
+              className={`${cardShell} transition hover:border-[#c49746]/50`}
             >
-              <Link href={builderHref} className="block">
-                <div className="relative aspect-[4/3] w-full">
-                  {imageSrc ? (
-                    <Image
-                      src={imageSrc}
-                      alt=""
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 768px) 45vw, 220px"
-                      unoptimized
-                    />
-                  ) : (
-                    <div
-                      className="absolute inset-0 bg-gradient-to-br from-[#1a2218] via-[#0f140d] to-[#0a0a0a]"
-                      aria-hidden
-                    />
-                  )}
-                </div>
-                <div className="p-3">
-                  <div className="flex items-center gap-1.5">
-                    <p className="font-medium text-white">{label}</p>
-                    {item.vegan ? <VeganBadge size="xs" label={t("menu.veganBadge")} /> : null}
-                  </div>
-                  <p className="mt-1 text-sm font-semibold text-[#c49746]">{priceText}</p>
-                </div>
+              <Link href={builderHref} className="block shrink-0">
+                {cardImage(imageSrc)}
               </Link>
-              <div className="px-3 pb-3">
+              <div className="flex flex-1 flex-col p-3">
+                {cardMeta({ label, vegan: item.vegan, desc: chefDesc, priceText })}
                 <Link
                   href={builderHref}
-                  className="flex w-full items-center justify-center rounded-lg border border-[#c49746]/50 bg-[#2e402a]/40 py-2 text-xs font-semibold text-[#c49746] hover:bg-[#2e402a]/70"
+                  className="mt-auto flex w-full items-center justify-center rounded-lg border border-[#c49746]/50 bg-[#2e402a]/40 py-2 pt-3 text-xs font-semibold text-[#c49746] hover:bg-[#2e402a]/70"
                 >
                   {t("menu.configure")}
                 </Link>
@@ -209,28 +213,11 @@ export function MenuGrid({
           <Link
             key={item.id}
             href="/builder"
-            className="overflow-hidden rounded-xl border-2 border-[#2e402a] bg-[#0f0f0f] shadow-md transition hover:border-[#c49746]/60"
+            className={`${cardShell} transition hover:border-[#c49746]/60`}
           >
-            <div className="relative aspect-[4/3] w-full">
-              {imageSrc ? (
-                <Image
-                  src={imageSrc}
-                  alt=""
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 768px) 45vw, 220px"
-                  unoptimized
-                />
-              ) : (
-                <div
-                  className="absolute inset-0 bg-gradient-to-br from-[#1a2218] via-[#0f140d] to-[#0a0a0a]"
-                  aria-hidden
-                />
-              )}
-            </div>
-            <div className="p-3">
-              <p className="font-medium text-white">{label}</p>
-              <p className="mt-1 text-sm font-semibold text-[#c49746]">{priceText}</p>
+            {cardImage(imageSrc)}
+            <div className="flex flex-1 flex-col p-3">
+              {cardMeta({ label, vegan: item.vegan, desc: chefDesc, priceText })}
             </div>
           </Link>
         );
