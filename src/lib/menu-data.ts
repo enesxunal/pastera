@@ -96,10 +96,10 @@ export const TOPPINGS_MAIN: MenuItem[] = [
   { id: "t-julienne-rind", name: "Julienne Rind", price: 2.0, vegan: false, image: img("sp-rind-mariniert") },
   { id: "t-julienne-haehnchen", name: "Julienne Hähnchen", price: 1.5, vegan: false, image: img("sp-haehnchen-mariniert") },
   { id: "t-jumbo-garnelen", name: "Jumbo-Garnelen", price: 2.5, vegan: false, image: img("sp-schwarze-garnelen") },
-  { id: "t-tenders", name: "Chicken Tenders", price: 1.5, vegan: false, image: img("sp-haehnchen-mariniert") },
-  { id: "t-falafel", name: "Falafel", price: 1.0, vegan: true, image: "" },
+  { id: "t-tenders", name: "Chicken Tenders", price: 1.5, vegan: false, image: img("t-tenders") },
+  { id: "t-falafel", name: "Falafel", price: 1.0, vegan: true, image: img("t-falafel") },
   { id: "t-tofu", name: "Tofu", price: 2.0, vegan: true, image: img("sp-tofu") },
-  { id: "t-seitan", name: "Seitan", price: 2.0, vegan: true, image: img("sp-seitan") },
+  { id: "t-seitan", name: "Seitan", price: 2.0, vegan: true, image: img("t-seitan") },
 ];
 
 /** 3 — Ekstra toppingler */
@@ -108,21 +108,21 @@ export const TOPPINGS_EXTRA: MenuItem[] = [
   { id: "t-babyspinat", name: "Babyspinat", price: 1.0, vegan: true, image: img("t-blattspinat") },
   { id: "t-mantar", name: "Champignons", price: 1.0, vegan: true, image: img("t-champignons") },
   { id: "t-rucola", name: "Rucola", price: 1.0, vegan: true, image: img("t-rucola") },
-  { id: "t-birne", name: "Birne", price: 1.0, vegan: true, image: "" },
+  { id: "t-birne", name: "Birne", price: 1.0, vegan: true, image: img("t-birne") },
   { id: "t-brokkoli", name: "Brokkoli", price: 1.0, vegan: true, image: img("t-brokkoli") },
-  { id: "t-ceviz", name: "Walnüsse", price: 1.0, vegan: true, image: "" },
+  { id: "t-ceviz", name: "Walnüsse", price: 1.0, vegan: true, image: img("t-ceviz") },
   { id: "t-mais", name: "Mais", price: 1.0, vegan: true, image: img("t-mais") },
-  { id: "t-gorgonzola", name: "Gorgonzola", price: 1.5, vegan: false, image: "" },
+  { id: "t-gorgonzola", name: "Gorgonzola", price: 1.5, vegan: false, image: img("t-gorgonzola") },
   { id: "t-siyah-zeytin", name: "Schwarze Oliven", price: 1.0, vegan: true, image: img("t-gruene-oliven") },
-  { id: "t-rosmarin", name: "Rosmarin", price: 0.5, vegan: true, image: "" },
+  { id: "t-rosmarin", name: "Rosmarin", price: 0.5, vegan: true, image: img("t-rosmarin") },
   { id: "t-yesil-zeytin", name: "Grüne Oliven", price: 1.0, vegan: true, image: img("t-gruene-oliven") },
-  { id: "t-passion-fruit", name: "Passionsfrucht", price: 2.0, vegan: true, image: "" },
+  { id: "t-passion-fruit", name: "Passionsfrucht", price: 2.0, vegan: true, image: img("t-passion-fruit") },
   { id: "t-kurutulmus-sogan", name: "Röstzwiebeln", price: 0.5, vegan: true, image: img("t-roestzwiebeln") },
   { id: "t-jalapeno", name: "Jalapeño", price: 1.0, vegan: true, image: img("t-jalapenos") },
-  { id: "t-sarimsak", name: "Knoblauch", price: 0.5, vegan: true, image: "" },
+  { id: "t-sarimsak", name: "Knoblauch", price: 0.5, vegan: true, image: img("t-sarimsak") },
   { id: "t-mozzarella", name: "Mozzarella in Lake", price: 1.0, vegan: false, image: img("t-mini-mozzarella") },
   { id: "t-taze-sogan", name: "Frühlingszwiebeln", price: 1.0, vegan: true, image: img("t-fruehlingszwiebeln") },
-  { id: "t-kaju", name: "Cashewkerne", price: 1.0, vegan: true, image: "" },
+  { id: "t-kaju", name: "Cashewkerne", price: 1.0, vegan: true, image: img("t-kaju") },
 ];
 
 /** Çikolatalı makarna — soslar */
@@ -136,8 +136,8 @@ export const TOPPINGS_CHOCOLATE_FRUITS: MenuItem[] = [
   { id: "t-choc-muz", name: "Banane", price: 1.0, vegan: true, image: "" },
   { id: "t-choc-cilek", name: "Erdbeeren", price: 1.0, vegan: true, image: "" },
   { id: "t-choc-kiwi", name: "Kiwi", price: 1.0, vegan: true, image: "" },
-  { id: "t-choc-birne", name: "Birne", price: 1.0, vegan: true, image: "" },
-  { id: "t-choc-passion", name: "Passionsfrucht", price: 2.0, vegan: true, image: "" },
+  { id: "t-choc-birne", name: "Birne", price: 1.0, vegan: true, image: img("t-choc-birne") },
+  { id: "t-choc-passion", name: "Passionsfrucht", price: 2.0, vegan: true, image: img("t-choc-passion") },
 ];
 
 export const TOPPINGS_CHOCOLATE = [...SAUCES_CHOCOLATE, ...TOPPINGS_CHOCOLATE_FRUITS];

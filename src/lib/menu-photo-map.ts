@@ -61,9 +61,27 @@ const STD_PASTA_IMAGES: Partial<Record<string, string>> = {
   "std-manti": "Manti.png",
 };
 
+/** `public/` — topping / malzeme fotoğrafları */
+const PUBLIC_IMAGES: Partial<Record<string, string>> = {
+  "t-tenders": "tenders.png",
+  "t-falafel": "falafel.png",
+  "t-seitan": "seitan.png",
+  "t-birne": "armut.png",
+  "t-choc-birne": "armut.png",
+  "t-ceviz": "ceviz.png",
+  "t-gorgonzola": "gorgonzola.png",
+  "t-rosmarin": "rozmarin.png",
+  "t-passion-fruit": "passion.png",
+  "t-choc-passion": "passion.png",
+  "t-sarimsak": "sarımsak.png",
+  "t-kaju": "kaju.png",
+};
+
 export function menuPhotoForId(id: string): string {
   const std = STD_PASTA_IMAGES[id];
   if (std) return `/${std.normalize("NFC")}`;
+  const pub = PUBLIC_IMAGES[id];
+  if (pub) return `/${pub.normalize("NFC")}`;
   const suf = ID_SUFFIX[id];
   if (!suf) return "";
   return pathFromSuffix(suf);
