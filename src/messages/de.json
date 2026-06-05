@@ -97,9 +97,9 @@
     "previewHint": "Vorschau: gewählte Saucen und Toppings in der Schüssel."
   },
   "chocolateBuilder": {
-    "kicker": "Dessert",
-    "title": "Schokoladen-Pasta",
-    "intro": "6,90 € Basis — Früchte und Schokolade als Topping.",
+    "kicker": "Dessert · Selbst zusammenstellen",
+    "title": "Schokoladen-Pasta erstellen",
+    "intro": "6,90 € Schoko-Basis — Banane, Erdbeere, Schokolade und mehr wählen.",
     "base": "Basis",
     "toppingsTitle": "Früchte & Schokolade",
     "toppingsHint": "Beliebig viele Toppings."
@@ -140,7 +140,7 @@
     "sectionStandard": "Standard-Pasta",
     "sectionStandardHint": "Fertige Gerichte — Festpreis, in den Warenkorb.",
     "sectionDessert": "Dessert",
-    "sectionDessertHint": "Tiramisu, Crème brûlée & Schokoladen-Pasta.",
+    "sectionDessertHint": "Fertige Desserts in den Warenkorb; Schoko-Pasta separat selbst zusammenstellen.",
     "subChocolatePasta": "Schokoladen-Pasta",
     "subChocolatePastaHint": "6,90 € + Toppings im Konfigurator.",
     "sectionChefSpecials": "Standard-Pasta",
@@ -152,6 +152,8 @@
     "buildYourOwn": "Selbst zusammenstellen",
     "buildYourOwnBadge": "3 Schritte",
     "buildYourOwnHint": "Classic, Vegan oder Schwarz — Sauce & Topping wählen.",
+    "chocolateSectionHint": "Fertige Desserts oder Schoko-Pasta selbst zusammenstellen.",
+    "chocolateBuildYourOwnHint": "Schokoladen-Basis + Früchte und Schokolade als Topping.",
     "readyPastas": "Fertige Gerichte",
     "readyPastasBadge": "Festpreis",
     "readyPastasHint": "Benannte Gerichte — direkt in den Warenkorb.",

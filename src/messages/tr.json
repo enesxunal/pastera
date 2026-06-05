@@ -97,9 +97,9 @@
     "previewHint": "Önizleme: seçilen sos ve toppingler kasede."
   },
   "chocolateBuilder": {
-    "kicker": "Tatlı",
-    "title": "Çikolatalı makarna",
-    "intro": "6,90 € taban — meyve ve çikolata toppingleri ekle.",
+    "kicker": "Tatlı · Kendin yap",
+    "title": "Çikolatalı makarna oluştur",
+    "intro": "6,90 € çikolatalı taban — muz, çilek, çikolata ve diğer toppingleri seç.",
     "base": "Taban",
     "toppingsTitle": "Meyve & çikolata",
     "toppingsHint": "İstediğin kadar ekle."
@@ -140,7 +140,7 @@
     "sectionStandard": "Standart makarna",
     "sectionStandardHint": "Hazır isimli tabaklar — sabit fiyat, sepete ekle.",
     "sectionDessert": "Tatlı",
-    "sectionDessertHint": "Tiramisu, Crème brûlée ve çikolatalı makarna.",
+    "sectionDessertHint": "Hazır tatlılar sepete eklenir; çikolatalı makarna için ayrı kendin yap.",
     "subChocolatePasta": "Çikolatalı makarna",
     "subChocolatePastaHint": "6,90 € + meyve/çikolata topping — oluşturucuda.",
     "sectionChefSpecials": "Standart makarna",
@@ -151,7 +151,9 @@
     "sectionPastaChoiceHint": "Kendin yap veya hazır tabaklardan birini seç.",
     "buildYourOwn": "Kendin yap",
     "buildYourOwnBadge": "3 adım",
-    "buildYourOwnHint": "Classic, Vegan veya Siyah makarna — sos ve topping seç.",
+    "buildYourOwnHint": "Classic, Vegan veya Siyah — sos ve topping seç.",
+    "chocolateSectionHint": "Hazır tatlılar veya çikolatalı makarnanı kendin oluştur.",
+    "chocolateBuildYourOwnHint": "Çikolatalı makarna tabanı + meyve ve çikolata toppingleri.",
     "readyPastas": "Hazır makarnalar",
     "readyPastasBadge": "Sabit fiyat",
     "readyPastasHint": "İsimli tabaklar — doğrudan sepete ekle.",

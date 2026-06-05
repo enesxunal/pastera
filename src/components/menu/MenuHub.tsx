@@ -123,18 +123,21 @@ export function MenuHub() {
           ) : null}
 
           <div>
-            <MenuActionCard
-              href="/builder/chocolate"
-              badge={t("menu.chocolateBadge")}
-              title={t("menu.subChocolatePasta")}
-              description={t("menu.subChocolatePastaHint")}
-              priceLabel={`${t("home.priceFrom")} ${formatEur(BASE_PRICE)}`}
-            />
+            <h3 className="font-display text-lg font-bold text-[#c49746]">
+              {t("menu.subChocolatePasta")}
+            </h3>
+            <p className="mt-1 text-sm text-white/50">{t("menu.chocolateSectionHint")}</p>
+            <div className="mt-4">
+              <MenuActionCard
+                href="/builder/chocolate"
+                badge={t("menu.buildYourOwnBadge")}
+                title={t("menu.buildYourOwn")}
+                description={t("menu.chocolateBuildYourOwnHint")}
+                priceLabel={`${t("home.priceFrom")} ${formatEur(BASE_PRICE)}`}
+              />
+            </div>
           </div>
 
-          {desserts.length === 0 ? (
-            <p className="text-sm text-white/45">{t("menu.emptySection")}</p>
-          ) : null}
         </div>
       </section>
 

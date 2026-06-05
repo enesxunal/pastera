@@ -13,7 +13,7 @@ const img = (id: string): string => menuPhotoForId(id);
 
 const PASTA_BASE = 6.9;
 
-/** Kendin yap — 3 makarna çeşidi (oluşturucu) */
+/** Kendin yap — tuzlu makarna (oluşturucu) */
 export const BUILDER_PASTAS: MenuItem[] = [
   {
     id: "noodle-classic",
@@ -39,7 +39,7 @@ export const BUILDER_PASTAS: MenuItem[] = [
   },
 ];
 
-/** Çikolatalı makarna — ayrı oluşturucu */
+/** Tatlı — çikolatalı makarna (ayrı kendin yap) */
 export const CHOCOLATE_PASTA: MenuItem = {
   id: "noodle-chocolate",
   name: "Schokoladen-Pasta",
