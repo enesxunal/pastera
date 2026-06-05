@@ -3,7 +3,10 @@
     "start": "Start",
     "menu": "Menü",
     "pasta": "Pasta",
-    "cart": "Warenkorb"
+    "cart": "Warenkorb",
+    "menuOpen": "Menü öffnen",
+    "menuClose": "Menü schließen",
+    "cartAria": "Zum Warenkorb"
   },
   "lang": { "de": "DE", "tr": "TR", "aria": "Sprache" },
   "cart": {

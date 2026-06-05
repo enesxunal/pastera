@@ -17,6 +17,7 @@ import {
 } from "@/lib/menu-data";
 import { formatEur } from "@/lib/format";
 import { menuItemLabel } from "@/lib/menu-i18n";
+import { MobileActionBar } from "@/components/layout/MobileActionBar";
 import { MenuPickCard } from "@/components/menu/MenuPickCard";
 import { PastaBox } from "./PastaBox";
 
@@ -128,7 +129,7 @@ export function PastaBuilder() {
   }
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:py-14">
+    <div className="mx-auto max-w-6xl px-4 py-10 pb-28 sm:px-6 lg:py-14 lg:pb-14">
       <motion.div
         className="mb-10 max-w-2xl"
         variants={pageIntro}
@@ -145,7 +146,20 @@ export function PastaBuilder() {
       </motion.div>
 
       <div className="grid gap-10 lg:grid-cols-[1fr_minmax(0,300px)] lg:items-start">
-        <div className="space-y-10">
+        <motion.aside
+          className="order-1 lg:order-2 lg:sticky lg:top-24"
+          initial={{ opacity: 0, x: 28 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ type: "spring", stiffness: 180, damping: 22 }}
+        >
+          <PastaBox
+            pastaName={menuItemLabel(pasta.id, locale, pasta.name)}
+            layers={boxLayers}
+          />
+        </motion.aside>
+
+        <div className="order-2 space-y-10 lg:order-1">
           <section>
             <h2 className="font-display text-lg font-semibold text-white">
               {t("builder.step1Title")}
@@ -226,7 +240,7 @@ export function PastaBuilder() {
           </section>
 
           <motion.div
-            className="rounded-2xl border-2 border-[#2e402a] bg-brand-forest/35 p-5 shadow-box"
+            className="hidden rounded-2xl border-2 border-[#2e402a] bg-brand-forest/35 p-5 shadow-box lg:block"
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -249,20 +263,14 @@ export function PastaBuilder() {
             <p className="mt-3 text-xs text-white/45">{t("builder.previewHint")}</p>
           </motion.div>
         </div>
-
-        <motion.aside
-          className="lg:sticky lg:top-24"
-          initial={{ opacity: 0, x: 28 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true, amount: 0.2 }}
-          transition={{ type: "spring", stiffness: 180, damping: 22 }}
-        >
-          <PastaBox
-            pastaName={menuItemLabel(pasta.id, locale, pasta.name)}
-            layers={boxLayers}
-          />
-        </motion.aside>
       </div>
+
+      <MobileActionBar
+        totalLabel={t("builder.total")}
+        total={formatEur(total)}
+        buttonLabel={t("builder.toCart")}
+        onAction={goToWarenkorb}
+      />
     </div>
   );
 }

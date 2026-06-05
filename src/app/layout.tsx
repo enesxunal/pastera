@@ -28,6 +28,13 @@ export const metadata: Metadata = {
     "Pasta-Basis mit Saucen, Specials und Toppings konfigurieren. Speisekarte mit Suppen, Vorspeisen und Getränken – Warenkorb inklusive.",
 };
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover" as const,
+  themeColor: "#0a0a0a",
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -49,7 +56,7 @@ export default function RootLayout({
       >
         <AppProviders initialLocale={initialLocale} supabasePublic={supabasePublic}>
           <div className="pastera-brand-bar" aria-hidden />
-          <div className="relative flex min-h-screen flex-col overflow-x-hidden">
+          <div className="relative flex min-h-dvh flex-col overflow-x-hidden">
             <div
               className="pointer-events-none fixed inset-0"
               style={{

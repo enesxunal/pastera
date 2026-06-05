@@ -137,7 +137,7 @@ export function MenuGrid({
           <p className="font-medium leading-snug text-white">{label}</p>
           {vegan ? <VeganBadge size="xs" label={t("menu.veganBadge")} className="shrink-0" /> : null}
         </div>
-        <p className="mt-1 min-h-[2.5rem] line-clamp-2 text-xs leading-snug text-white/45">
+        <p className="mt-1 min-h-[2.5rem] line-clamp-2 text-sm leading-snug text-white/45">
           {desc || "\u00A0"}
         </p>
         <p className="mt-1 text-sm font-semibold text-[#c49746]">{priceText}</p>
@@ -176,7 +176,7 @@ export function MenuGrid({
                 <button
                   type="button"
                   onClick={() => openPicker(item)}
-                  className="mt-auto w-full rounded-lg border border-[#c49746]/50 bg-[#2e402a]/40 py-2 pt-3 text-xs font-semibold text-[#c49746] hover:bg-[#2e402a]/70"
+                  className="mt-auto min-h-11 w-full rounded-lg border border-[#c49746]/50 bg-[#2e402a]/40 py-3 text-sm font-semibold text-[#c49746] hover:bg-[#2e402a]/70"
                 >
                   {flash === item.id ? t("cart.added") : t("cart.add")}
                 </button>
@@ -202,7 +202,7 @@ export function MenuGrid({
                 {cardMeta({ label, vegan: item.vegan, desc: chefDesc, priceText })}
                 <Link
                   href={builderHref}
-                  className="mt-auto flex w-full items-center justify-center rounded-lg border border-[#c49746]/50 bg-[#2e402a]/40 py-2 pt-3 text-xs font-semibold text-[#c49746] hover:bg-[#2e402a]/70"
+                  className="mt-auto flex min-h-11 w-full items-center justify-center rounded-lg border border-[#c49746]/50 bg-[#2e402a]/40 py-3 text-sm font-semibold text-[#c49746] hover:bg-[#2e402a]/70"
                 >
                   {t("menu.configure")}
                 </Link>
@@ -245,7 +245,11 @@ export function MenuGrid({
             aria-label={t("cart.cancel")}
             onClick={() => setPicker(null)}
           />
-          <div className="relative z-[1] w-full max-w-md overflow-hidden rounded-2xl border-2 border-[#2e402a] bg-[#111] shadow-2xl">
+          <div
+            className="relative z-[1] w-full max-w-md overflow-hidden rounded-t-2xl border-2 border-[#2e402a] bg-[#111] shadow-2xl sm:rounded-2xl"
+            style={{ paddingBottom: "max(0px, env(safe-area-inset-bottom))" }}
+          >
+            <div className="mx-auto mt-2 h-1 w-10 rounded-full bg-white/20 sm:hidden" aria-hidden />
             <div className="relative aspect-[16/9] w-full">
               {pickerImageSrc ? (
                 <Image

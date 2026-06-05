@@ -31,19 +31,19 @@ export function SiteFooter() {
               <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-[#c49746]">
                 {t("footer.explore")}
               </p>
-              <ul className="space-y-1.5 text-white/60">
+              <ul className="space-y-0.5 text-white/60">
                 <li>
-                  <Link href="/menu" className="hover:text-white">
+                  <Link href="/menu" className="flex min-h-11 items-center hover:text-white">
                     {t("nav.menu")}
                   </Link>
                 </li>
                 <li>
-                  <Link href="/menu#icecekler" className="hover:text-white">
+                  <Link href="/menu#icecekler" className="flex min-h-11 items-center hover:text-white">
                     {t("menu.sectionDrinks")}
                   </Link>
                 </li>
                 <li>
-                  <Link href="/lieferung" className="hover:text-white">
+                  <Link href="/lieferung" className="flex min-h-11 items-center hover:text-white">
                     {t("footer.delivery")}
                   </Link>
                 </li>
@@ -53,19 +53,19 @@ export function SiteFooter() {
               <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-[#c49746]">
                 {t("footer.account")}
               </p>
-              <ul className="space-y-1.5 text-white/60">
+              <ul className="space-y-0.5 text-white/60">
                 <li>
-                  <Link href="/auth/login" className="hover:text-white">
+                  <Link href="/auth/login" className="flex min-h-11 items-center hover:text-white">
                     {t("auth.loginLink")}
                   </Link>
                 </li>
                 <li>
-                  <Link href="/auth/register" className="hover:text-white">
+                  <Link href="/auth/register" className="flex min-h-11 items-center hover:text-white">
                     {t("auth.registerLink")}
                   </Link>
                 </li>
                 <li>
-                  <Link href="/auth/account" className="hover:text-white">
+                  <Link href="/auth/account" className="flex min-h-11 items-center hover:text-white">
                     {t("footer.myAccount")}
                   </Link>
                 </li>

@@ -3,7 +3,10 @@
     "start": "Ana sayfa",
     "menu": "Menü",
     "pasta": "Makarna",
-    "cart": "Sepet"
+    "cart": "Sepet",
+    "menuOpen": "Menüyü aç",
+    "menuClose": "Menüyü kapat",
+    "cartAria": "Sepete git"
   },
   "lang": { "de": "DE", "tr": "TR", "aria": "Dil" },
   "cart": {

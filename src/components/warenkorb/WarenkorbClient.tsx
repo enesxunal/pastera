@@ -28,6 +28,7 @@ import { loadPickupContext, savePickupContext, clearPickupContext } from "@/lib/
 import type { PaymentType } from "@/lib/order-types";
 import { formatEur } from "@/lib/format";
 import { publicMenuImageSrc } from "@/lib/normalize-menu-image";
+import { MobileActionBar } from "@/components/layout/MobileActionBar";
 import { PastaBox } from "@/components/pasta-builder/PastaBox";
 
 type BranchOption = { id: string; slug: string; name: string };
@@ -320,9 +321,14 @@ export function WarenkorbClient() {
   const canCheckout = !!(dineIn || delivery || pickup);
 
   const bowlDetailLines = bowlLines.slice(1);
+  const checkoutLabel = dineIn
+    ? t("cart.checkoutDineIn")
+    : pickup
+      ? t("cart.checkoutPickup")
+      : t("cart.checkoutDelivery");
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:py-14">
+    <div className="mx-auto max-w-6xl px-4 py-10 pb-28 sm:px-6 lg:py-14 lg:pb-14">
       <p className="font-display text-sm font-semibold uppercase tracking-widest text-[#c49746]">
         {t("cart.pageKicker")}
       </p>
@@ -332,7 +338,7 @@ export function WarenkorbClient() {
       <p className="mt-2 max-w-xl text-white/55">{t("cart.pageSubtitle")}</p>
 
       <div className="mt-10 grid gap-8 lg:grid-cols-[1fr_320px] lg:items-start">
-        <div className="flex flex-col gap-8">
+        <div className="order-2 flex flex-col gap-8 lg:order-1">
           <motion.section
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
@@ -438,7 +444,7 @@ export function WarenkorbClient() {
                           <button
                             type="button"
                             onClick={() => setExtraQtyInCart(line.id, line.qty - 1)}
-                            className="flex h-10 w-10 items-center justify-center rounded-lg text-lg font-bold text-white transition hover:bg-white/10"
+                            className="flex h-11 w-11 items-center justify-center rounded-lg text-lg font-bold text-white transition hover:bg-white/10"
                             aria-label={t("cart.ariaDecrease")}
                           >
                             −
@@ -450,7 +456,7 @@ export function WarenkorbClient() {
                             type="button"
                             disabled={line.qty >= 99}
                             onClick={() => setExtraQtyInCart(line.id, line.qty + 1)}
-                            className="flex h-10 w-10 items-center justify-center rounded-lg text-lg font-bold text-white transition hover:bg-white/10 disabled:opacity-35"
+                            className="flex h-11 w-11 items-center justify-center rounded-lg text-lg font-bold text-white transition hover:bg-white/10 disabled:opacity-35"
                             aria-label={t("cart.ariaIncrease")}
                           >
                             +
@@ -459,7 +465,7 @@ export function WarenkorbClient() {
                         <button
                           type="button"
                           onClick={() => removeExtraFromCart(line.id)}
-                          className="rounded-lg border border-red-500/35 px-3 py-2 text-xs font-semibold text-red-300/90 hover:bg-red-500/10"
+                          className="min-h-11 rounded-lg border border-red-500/35 px-4 py-2 text-sm font-semibold text-red-300/90 hover:bg-red-500/10"
                         >
                           {t("cart.remove")}
                         </button>
@@ -494,7 +500,7 @@ export function WarenkorbClient() {
                   <button
                     type="button"
                     onClick={() => switchToDeliveryTab()}
-                    className={`rounded-full px-4 py-2 text-xs font-bold ${
+                    className={`min-h-11 rounded-full px-5 py-2.5 text-sm font-bold ${
                       modeTab === "delivery"
                         ? "bg-[#c49746] text-[#0a0a0a]"
                         : "border border-[#2e402a] text-white/60 hover:border-[#c49746]/40"
@@ -505,7 +511,7 @@ export function WarenkorbClient() {
                   <button
                     type="button"
                     onClick={() => switchToPickupTab()}
-                    className={`rounded-full px-4 py-2 text-xs font-bold ${
+                    className={`min-h-11 rounded-full px-5 py-2.5 text-sm font-bold ${
                       modeTab === "pickup"
                         ? "bg-[#c49746] text-[#0a0a0a]"
                         : "border border-[#2e402a] text-white/60 hover:border-[#c49746]/40"
@@ -543,7 +549,7 @@ export function WarenkorbClient() {
                                   type="button"
                                   disabled={activateBusy}
                                   onClick={() => void applySavedAddress(addr)}
-                                  className="shrink-0 rounded-full px-4 py-2 text-xs font-bold text-[#0a0a0a] disabled:opacity-50"
+                                  className="min-h-11 shrink-0 rounded-full px-5 py-2.5 text-sm font-bold text-[#0a0a0a] disabled:opacity-50"
                                   style={{ backgroundColor: "#c49746" }}
                                 >
                                   {t("cart.useThisAddress")}
@@ -641,7 +647,7 @@ export function WarenkorbClient() {
                   <button
                     type="button"
                     onClick={() => setPaymentType("cash")}
-                    className={`rounded-full px-4 py-2 text-sm font-semibold ${
+                    className={`min-h-11 rounded-full px-5 py-2.5 text-sm font-semibold ${
                       paymentType === "cash"
                         ? "bg-[#c49746] text-[#0a0a0a]"
                         : "border border-[#2e402a] text-white/60"
@@ -652,7 +658,7 @@ export function WarenkorbClient() {
                   <button
                     type="button"
                     onClick={() => setPaymentType("card")}
-                    className={`rounded-full px-4 py-2 text-sm font-semibold ${
+                    className={`min-h-11 rounded-full px-5 py-2.5 text-sm font-semibold ${
                       paymentType === "card"
                         ? "bg-[#c49746] text-[#0a0a0a]"
                         : "border border-[#2e402a] text-white/60"
@@ -676,23 +682,28 @@ export function WarenkorbClient() {
                 type="button"
                 onClick={completeDemoOrder}
                 disabled={!canCheckout}
-                className="inline-flex items-center justify-center rounded-full px-8 py-3 font-display text-sm font-bold text-[#0a0a0a] transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-45"
+                className="hidden items-center justify-center rounded-full px-8 py-3 font-display text-sm font-bold text-[#0a0a0a] transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-45 lg:inline-flex"
                 style={{ backgroundColor: "#c49746" }}
               >
-                {dineIn
-                  ? t("cart.checkoutDineIn")
-                  : pickup
-                    ? t("cart.checkoutPickup")
-                    : t("cart.checkoutDelivery")}
+                {checkoutLabel}
               </button>
             </div>
           </div>
         </div>
 
-        <div className="flex flex-col items-center gap-4 lg:sticky lg:top-24">
+        <div className="order-1 flex flex-col items-center gap-4 lg:order-2 lg:sticky lg:top-24">
           <PastaBox pastaName={pastaName} layers={boxLayers} />
         </div>
       </div>
+
+      {canCheckout ? (
+        <MobileActionBar
+          totalLabel={t("cart.total")}
+          total={formatEur(total)}
+          buttonLabel={checkoutLabel}
+          onAction={completeDemoOrder}
+        />
+      ) : null}
     </div>
   );
 }

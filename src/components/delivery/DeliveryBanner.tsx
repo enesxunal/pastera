@@ -23,7 +23,7 @@ export function DeliveryBanner() {
   return (
     <div className="border-b border-[#c49746]/30 bg-[#1a2418]/95">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-4 py-2.5 text-sm sm:px-6">
-        <p className="font-medium text-[#c49746]">
+        <p className="min-w-0 break-words font-medium text-[#c49746]">
           {t("delivery.banner")}{" "}
           <span className="text-white">{address}</span>
           <span className="ml-2 text-white/45">

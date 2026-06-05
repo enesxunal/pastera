@@ -76,7 +76,7 @@ export function MenuPickCard({ item, selected, onSelect, mode, variants = fadeUp
       <div className="absolute bottom-0 left-0 right-0 p-3">
         <p className="font-display text-sm font-bold leading-tight text-white">{label}</p>
         {desc ? (
-          <p className="mt-0.5 line-clamp-2 text-[10px] leading-snug text-white/55">{desc}</p>
+          <p className="mt-0.5 line-clamp-2 text-xs leading-snug text-white/55 sm:text-sm">{desc}</p>
         ) : null}
         <p className="mt-0.5 text-xs font-semibold text-[#c49746]">
           {mode === "single" ? formatEur(item.price) : `+${formatEur(item.price)}`}
