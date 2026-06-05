@@ -227,7 +227,23 @@ export const TOPPINGS: MenuItem[] = [
 export const INGREDIENTS = TOPPINGS;
 export const SUPPEN: MenuItem[] = [];
 export const VORSPEISEN: MenuItem[] = [];
-export const DRINKS: MenuItem[] = [];
+/** İçecekler — Almanya'da yaygın seçenekler (fiyatlar sonra güncellenebilir) */
+export const DRINKS: MenuItem[] = [
+  { id: "dr-wasser-still", name: "Mineralwasser still", price: 2.9, vegan: true, image: "" },
+  { id: "dr-wasser-sprudel", name: "Mineralwasser medium", price: 2.9, vegan: true, image: "" },
+  { id: "dr-cola", name: "Cola", price: 3.5, vegan: true, image: "" },
+  { id: "dr-fanta", name: "Fanta", price: 3.5, vegan: true, image: "" },
+  { id: "dr-sprite", name: "Sprite", price: 3.5, vegan: true, image: "" },
+  { id: "dr-spezi", name: "Spezi", price: 3.5, vegan: true, image: "" },
+  { id: "dr-apfelschorle", name: "Apfelschorle", price: 3.9, vegan: true, image: "" },
+  { id: "dr-ice-tea", name: "Eistee Pfirsich", price: 3.5, vegan: true, image: "" },
+  { id: "dr-bier", name: "Pils 0,33 l", price: 3.9, vegan: true, image: "" },
+  { id: "dr-weisswein", name: "Weißwein 0,2 l", price: 4.9, vegan: true, image: "" },
+  { id: "dr-rotwein", name: "Rotwein 0,2 l", price: 4.9, vegan: true, image: "" },
+  { id: "dr-espresso", name: "Espresso", price: 2.5, vegan: true, image: "" },
+  { id: "dr-cappuccino", name: "Cappuccino", price: 3.5, vegan: false, image: "" },
+  { id: "dr-latte", name: "Latte Macchiato", price: 3.9, vegan: false, image: "" },
+];
 
 /** Kendin yap — soslar makarna çeşidine göre değişmez */
 export function saucesForBuilder(): MenuItem[] {
@@ -288,6 +304,7 @@ const ALL: MenuItem[] = [
   ...TOPPINGS,
   ...STANDARD_PASTAS,
   ...DESSERTS,
+  ...DRINKS,
 ];
 
 export function getMenuItem(id: string): MenuItem | undefined {

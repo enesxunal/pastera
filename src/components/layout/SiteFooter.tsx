@@ -38,8 +38,8 @@ export function SiteFooter() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/builder" className="hover:text-white">
-                    {t("nav.pasta")}
+                  <Link href="/menu#icecekler" className="hover:text-white">
+                    {t("menu.sectionDrinks")}
                   </Link>
                 </li>
                 <li>

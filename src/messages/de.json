@@ -99,8 +99,10 @@
   "chocolateBuilder": {
     "kicker": "Dessert · Selbst zusammenstellen",
     "title": "Schokoladen-Pasta erstellen",
-    "intro": "Pastasorte wählen, Schokosauce, dann Früchte — in 3 Schritten.",
+    "intro": "Schoko-Basis ist fest — Sauce und Früchte wählen.",
     "base": "Basis",
+    "pastaTitle": "Schokoladen-Pasta",
+    "pastaHint": "Feste Basis — kein Classic/Vegan, nur Schoko-Pasta.",
     "saucesTitle": "Schokosauce",
     "saucesHint": "Schokolade und/oder weiße Schokolade wählen.",
     "toppingsTitle": "Früchte",
@@ -168,7 +170,7 @@
     "subSoups": "Suppen",
     "subStarters": "Vorspeisen",
     "sectionDrinks": "Getränke",
-    "sectionDrinksHint": "Wasser, Softdrinks, Kaffee, Wein.",
+    "sectionDrinksHint": "Wasser, Softdrinks, Bier, Wein und Kaffee — direkt in den Warenkorb.",
     "emptySection": "Hier gibt es noch keine aktiven Artikel."
   },
   "home": {

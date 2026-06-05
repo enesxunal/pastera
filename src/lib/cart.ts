@@ -2,11 +2,9 @@ import { catalogItemById } from "@/lib/catalog-static";
 import type { CatalogItem } from "@/lib/catalog-types";
 import { catalogNameTr } from "@/lib/catalog-name-tr";
 import {
-  BUILDER_PASTAS,
   CHOCOLATE_PASTA,
   getMenuItem,
   isChocolateBowl,
-  normalizeBuilderPastaId,
   normalizePastaId,
   PASTAS,
   saucesForBuilder,
@@ -195,19 +193,12 @@ function buildBowlParts(
   const chocolate = isChocolateBowl(snapshot);
 
   if (chocolate) {
-    const doughId = normalizeBuilderPastaId(snapshot.pastaId);
-    const dough = BUILDER_PASTAS.find((p) => p.id === doughId) ?? BUILDER_PASTAS[0];
-    const doughCat = catalogItemById(catalog, doughId);
-    const doughLabel = doughCat
-      ? label(doughCat, locale)
+    const pastaCat = catalogItemById(catalog, CHOCOLATE_PASTA.id);
+    const pastaName = pastaCat
+      ? label(pastaCat, locale)
       : locale === "tr"
-        ? catalogNameTr(dough.id, dough.name)
-        : dough.name;
-    const baseLabel =
-      locale === "tr"
         ? catalogNameTr(CHOCOLATE_PASTA.id, CHOCOLATE_PASTA.name)
         : CHOCOLATE_PASTA.name;
-    const pastaName = `${baseLabel} · ${doughLabel}`;
     const pastaPrice = CHOCOLATE_PASTA.price;
 
     const aS = allowedIds(saucesForChocolateBowl());

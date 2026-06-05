@@ -7,11 +7,9 @@ import { useI18n } from "@/components/providers/I18nProvider";
 import { loadCartSnapshot, saveCartSnapshot } from "@/lib/cart";
 import { pageIntro, staggerGrid } from "@/lib/motion-variants";
 import {
-  BUILDER_PASTAS,
   CHOCOLATE_BOWL_MARKER,
   CHOCOLATE_PASTA,
   isChocolateBowl,
-  normalizeBuilderPastaId,
   saucesForChocolateBowl,
   toppingsForChocolateBowl,
   type MenuItem,
@@ -57,11 +55,17 @@ function ToppingGrid({
 export function ChocolateBuilder() {
   const router = useRouter();
   const { t, locale } = useI18n();
-  const [pastaId, setPastaId] = useState(BUILDER_PASTAS[0].id);
   const [sauceIds, setSauceIds] = useState<string[]>([]);
   const [ingredientIds, setIngredientIds] = useState<string[]>([]);
 
-  const pasta = BUILDER_PASTAS.find((p) => p.id === pastaId) ?? BUILDER_PASTAS[0];
+  const pastaItem = useMemo(
+    () => ({
+      ...CHOCOLATE_PASTA,
+      name: locale === "tr" ? "Çikolatalı makarna" : CHOCOLATE_PASTA.name,
+    }),
+    [locale],
+  );
+
   const sauces = useMemo(() => saucesForChocolateBowl(), []);
   const toppings = useMemo(() => toppingsForChocolateBowl(), []);
 
@@ -69,15 +73,7 @@ export function ChocolateBuilder() {
     const saved = loadCartSnapshot();
     if (!saved) return;
 
-    if (isChocolateBowl(saved)) {
-      setPastaId(normalizeBuilderPastaId(saved.pastaId));
-      setSauceIds(saved.sauceIds);
-      setIngredientIds(saved.ingredientIds);
-      return;
-    }
-
-    if (saved.pastaId === CHOCOLATE_PASTA.id) {
-      setPastaId(BUILDER_PASTAS[0].id);
+    if (isChocolateBowl(saved) || saved.pastaId === CHOCOLATE_PASTA.id) {
       setSauceIds(saved.sauceIds);
       setIngredientIds(saved.ingredientIds);
     }
@@ -103,8 +99,8 @@ export function ChocolateBuilder() {
   function goToWarenkorb() {
     const prev = loadCartSnapshot();
     saveCartSnapshot({
-      veganOnly: pasta.vegan,
-      pastaId,
+      veganOnly: false,
+      pastaId: CHOCOLATE_PASTA.id,
       sauceIds,
       specialIds: [CHOCOLATE_BOWL_MARKER],
       ingredientIds,
@@ -112,8 +108,6 @@ export function ChocolateBuilder() {
     });
     router.push("/warenkorb");
   }
-
-  const displayName = locale === "tr" ? "Çikolatalı makarna" : CHOCOLATE_PASTA.name;
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:py-14">
@@ -139,25 +133,22 @@ export function ChocolateBuilder() {
         <div className="space-y-10">
           <section>
             <h2 className="font-display text-lg font-semibold text-white">
-              {t("builder.step1Title")}
+              {t("chocolateBuilder.pastaTitle")}
             </h2>
-            <p className="mt-1 text-sm text-white/50">{t("builder.step1Hint")}</p>
+            <p className="mt-1 text-sm text-white/50">{t("chocolateBuilder.pastaHint")}</p>
             <motion.div
-              className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3"
+              className="mt-4 max-w-xs"
               variants={staggerGrid}
               initial="hidden"
               whileInView="show"
               viewport={{ once: true, amount: 0.12 }}
             >
-              {BUILDER_PASTAS.map((item) => (
-                <MenuPickCard
-                  key={item.id}
-                  item={item}
-                  mode="single"
-                  selected={pastaId === item.id}
-                  onSelect={() => setPastaId(item.id)}
-                />
-              ))}
+              <MenuPickCard
+                item={pastaItem}
+                mode="single"
+                selected
+                onSelect={() => {}}
+              />
             </motion.div>
           </section>
 
@@ -226,7 +217,7 @@ export function ChocolateBuilder() {
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true, amount: 0.2 }}
         >
-          <PastaBox pastaName={`${displayName} · ${pasta.name}`} layers={boxLayers} />
+          <PastaBox pastaName={pastaItem.name} layers={boxLayers} />
         </motion.aside>
       </div>
     </div>

@@ -2,6 +2,7 @@ import type { CatalogCategory, CatalogItem } from "@/lib/catalog-types";
 import type { MenuItem } from "@/lib/menu-data";
 import {
   DESSERTS,
+  DRINKS,
   PASTAS,
   SAUCES,
   SAUCES_CHOCOLATE,
@@ -36,6 +37,7 @@ export function getStaticCatalog(): CatalogItem[] {
     { items: STANDARD_PASTAS, cat: "chef_special" },
     // dessert kategorisi yoksa starter ile uyumlu (id: d-*)
     { items: DESSERTS, cat: "starter" },
+    { items: DRINKS, cat: "drink" },
   ];
   for (const { items, cat } of blocks) {
     out.push(...mapItems(items, cat, o));

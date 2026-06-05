@@ -8,7 +8,6 @@ import { useI18n } from "@/components/providers/I18nProvider";
 const paths = [
   { href: "/", key: "start" as const },
   { href: "/menu", key: "menu" as const },
-  { href: "/builder", key: "pasta" as const },
   { href: "/warenkorb", key: "cart" as const },
 ];
 

@@ -99,8 +99,10 @@
   "chocolateBuilder": {
     "kicker": "Tatlı · Kendin yap",
     "title": "Çikolatalı makarna oluştur",
-    "intro": "Hamur seç, çikolata sosu ekle, üzerine meyve koy — 3 adımda.",
+    "intro": "Çikolatalı taban sabit — sos ve meyve seç.",
     "base": "Taban",
+    "pastaTitle": "Çikolatalı makarna",
+    "pastaHint": "Tek taban — Classic/Vegan yok, sadece çikolatalı makarna.",
     "saucesTitle": "Çikolata sosu",
     "saucesHint": "Çikolata ve/veya beyaz çikolata seç.",
     "toppingsTitle": "Meyveler",
@@ -168,7 +170,7 @@
     "subSoups": "Çorbalar",
     "subStarters": "Mezeler",
     "sectionDrinks": "İçecekler",
-    "sectionDrinksHint": "Su, gazlı içecek, kahve, şarap.",
+    "sectionDrinksHint": "Su, gazlı, bira, şarap ve kahve — sepete ekle ile sipariş.",
     "emptySection": "Bu bölümde henüz aktif ürün yok."
   },
   "home": {

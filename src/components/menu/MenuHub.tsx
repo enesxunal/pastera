@@ -4,6 +4,7 @@ import Link from "next/link";
 import { MenuGrid } from "@/components/menu/MenuGrid";
 import { useCatalog } from "@/components/providers/CatalogProvider";
 import { useI18n } from "@/components/providers/I18nProvider";
+import { catalogByCategory } from "@/lib/catalog-static";
 import { makarnaMenuItems, tatliMenuItems } from "@/lib/menu-hub-items";
 
 export function MenuHub() {
@@ -12,6 +13,7 @@ export function MenuHub() {
 
   const makarnalar = makarnaMenuItems(catalog);
   const tatlilar = tatliMenuItems(catalog);
+  const icecekler = catalogByCategory(catalog, "drink");
 
   return (
     <>
@@ -60,6 +62,28 @@ export function MenuHub() {
               variant="embedded"
               items={tatlilar}
               category="menu_mixed"
+              locale={locale}
+            />
+          </div>
+        )}
+      </section>
+
+      <section id="icecekler" className="mt-16 scroll-mt-24" aria-labelledby="menu-drinks-heading">
+        <h2 id="menu-drinks-heading" className="font-display text-2xl font-bold text-[#c49746]">
+          {t("menu.sectionDrinks")}
+        </h2>
+        <p className="mt-2 max-w-2xl text-sm text-white/50">{t("menu.sectionDrinksHint")}</p>
+
+        {icecekler.length === 0 ? (
+          <p className="mt-6 text-sm text-white/45">{t("menu.emptySection")}</p>
+        ) : (
+          <div className="mt-8">
+            <MenuGrid
+              hideHeading
+              title=""
+              variant="embedded"
+              items={icecekler}
+              category="drink"
               locale={locale}
             />
           </div>
