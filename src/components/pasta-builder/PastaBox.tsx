@@ -28,8 +28,6 @@ type Pouring =
   | { kind: "topping"; id: string }
   | null;
 
-type PreviewMode = "full" | "compact" | "fab";
-
 function useBoxPouring(pastaId: string | undefined, layers: BoxLayer[]) {
   const [pouring, setPouring] = useState<Pouring>(null);
   const prevLayerIds = useRef<string[]>([]);
@@ -97,17 +95,28 @@ function BoxInterior({
   );
 }
 
-function PastaBoxPreview({
+type BoxSceneProps = PastaBoxProps & {
+  pouring: Pouring;
+  showTitle?: boolean;
+  showPastaName?: boolean;
+  showLayerTags?: boolean;
+  showEmptyHint?: boolean;
+  boxWidth?: string;
+};
+
+/** Mobil + masaüstü aynı kutu — sadece çerçeve boyutu değişir. */
+function BoxScene({
   pastaName,
   pastaId,
   layers,
   pouring,
-  mode,
-}: PastaBoxProps & { pouring: Pouring; mode: PreviewMode }) {
+  showTitle = false,
+  showPastaName = true,
+  showLayerTags = true,
+  showEmptyHint = false,
+  boxWidth = "w-full max-w-[240px]",
+}: BoxSceneProps) {
   const { t } = useI18n();
-  const isFab = mode === "fab";
-  const isCompact = mode === "compact";
-  const isFull = mode === "full";
 
   const showSauceStream = pouring?.kind === "sauce";
   const showPastaStream = pouring?.kind === "pasta";
@@ -121,65 +130,49 @@ function PastaBoxPreview({
     </AnimatePresence>
   );
 
-  if (isFab) {
-    return (
-      <div className="pointer-events-none relative h-full w-full overflow-hidden">
-        <div className="absolute left-1/2 top-1/2 w-[260px] -translate-x-1/2 -translate-y-[42%] scale-[0.28]">
-          <PasteraIsometricBox pourOverlay={pourOverlay}>
-            <BoxInterior pastaId={pastaId} layers={layers} pouring={pouring} />
-          </PasteraIsometricBox>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div
-      className={`flex w-full flex-col items-center ${isCompact ? "max-w-[260px]" : "max-w-sm"}`}
-    >
-      {isFull ? (
+    <div className="flex w-full flex-col items-center">
+      {showTitle ? (
         <p className="mb-1 font-display text-xs font-semibold uppercase tracking-[0.2em] text-[#c49746]">
           {t("pastaBox.preview")}
         </p>
       ) : null}
-      <AnimatePresence mode="wait">
-        <motion.p
-          key={pastaName}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className={`truncate text-center font-medium text-white/85 ${
-            isCompact ? "mb-2 max-w-[220px] text-xs" : "mb-2 max-w-[260px] text-sm"
-          }`}
-        >
-          {pastaName}
-        </motion.p>
-      </AnimatePresence>
 
-      <div className={`relative w-full ${isCompact ? "scale-[0.92] origin-top" : ""}`}>
+      {showPastaName ? (
+        <AnimatePresence mode="wait">
+          <motion.p
+            key={pastaName}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="mb-2 max-w-[220px] truncate text-center text-xs font-medium text-white/85"
+          >
+            {pastaName}
+          </motion.p>
+        </AnimatePresence>
+      ) : null}
+
+      <div className={`relative ${boxWidth}`}>
         <PasteraIsometricBox pourOverlay={pourOverlay}>
           <BoxInterior pastaId={pastaId} layers={layers} pouring={pouring} />
         </PasteraIsometricBox>
-
-        {isFull && layers.length === 0 ? (
-          <p className="mt-3 px-4 text-center text-xs text-white/40">{t("pastaBox.empty")}</p>
-        ) : null}
-        {layers.length > 0 ? (
-          <ul
-            className={`flex flex-wrap justify-center gap-1 px-1 ${
-              isCompact ? "mt-2 max-h-16 overflow-y-auto" : "mt-3 max-w-[280px]"
-            }`}
-          >
-            {layers.map((layer) => (
-              <li
-                key={layer.id}
-                className="rounded-full border border-[#2e402a] bg-[#141414] px-2 py-0.5 text-[10px] font-medium text-white/70"
-              >
-                {layer.name}
-              </li>
-            ))}
-          </ul>
-        ) : null}
       </div>
+
+      {showEmptyHint && layers.length === 0 ? (
+        <p className="mt-2 px-2 text-center text-[10px] text-white/40">{t("pastaBox.empty")}</p>
+      ) : null}
+
+      {showLayerTags && layers.length > 0 ? (
+        <ul className="mt-2 flex max-h-14 flex-wrap justify-center gap-1 overflow-y-auto px-1">
+          {layers.map((layer) => (
+            <li
+              key={layer.id}
+              className="rounded-full border border-[#2e402a] bg-[#141414] px-2 py-0.5 text-[10px] font-medium text-white/70"
+            >
+              {layer.name}
+            </li>
+          ))}
+        </ul>
+      ) : null}
     </div>
   );
 }
@@ -256,12 +249,15 @@ function MobileBoxFloater(props: PastaBoxProps & { pouring: Pouring }) {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 12, scale: 0.96 }}
               transition={{ type: "spring", stiffness: 380, damping: 28 }}
-              className="absolute bottom-full right-0 mb-3 w-[min(272px,calc(100vw-2rem))] rounded-2xl border border-[#2e402a] bg-[#141414] p-3 shadow-[0_12px_40px_rgba(0,0,0,0.55)]"
+              className="absolute bottom-full right-0 mb-3 w-[min(260px,calc(100vw-2rem))] rounded-2xl border border-[#2e402a] bg-[#141414] p-3 shadow-[0_12px_40px_rgba(0,0,0,0.55)]"
             >
-              <p className="mb-2 text-center font-display text-[10px] font-semibold uppercase tracking-[0.18em] text-[#c49746]">
-                {t("pastaBox.preview")}
-              </p>
-              <PastaBoxPreview {...props} mode="compact" />
+              <BoxScene
+                {...props}
+                showTitle
+                showPastaName
+                showLayerTags
+                boxWidth="w-full"
+              />
             </motion.div>
           ) : null}
         </AnimatePresence>
@@ -273,11 +269,16 @@ function MobileBoxFloater(props: PastaBoxProps & { pouring: Pouring }) {
           onClick={toggle}
           animate={pulse ? { scale: [1, 1.1, 1] } : { scale: 1 }}
           transition={{ duration: 0.45 }}
-          className="relative h-[4.75rem] w-[4.75rem] overflow-hidden rounded-2xl border-2 border-[#c49746] bg-[#1a2418] shadow-[0_6px_24px_rgba(0,0,0,0.5)] ring-2 ring-black/20"
+          className="relative flex h-[4.75rem] w-[4.75rem] items-center justify-center overflow-hidden rounded-2xl border-2 border-[#c49746] bg-[#1a2418] p-1 shadow-[0_6px_24px_rgba(0,0,0,0.5)] ring-2 ring-black/20"
         >
-          <PastaBoxPreview {...props} mode="fab" />
+          <BoxScene
+            {...props}
+            showPastaName={false}
+            showLayerTags={false}
+            boxWidth="w-full"
+          />
           {layerCount > 0 ? (
-            <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#c49746] px-1 text-[10px] font-bold text-[#0a0a0a] shadow-md">
+            <span className="absolute -right-1 -top-1 z-30 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#c49746] px-1 text-[10px] font-bold text-[#0a0a0a] shadow-md">
               {layerCount}
             </span>
           ) : null}
@@ -292,7 +293,7 @@ function MobileBoxFloater(props: PastaBoxProps & { pouring: Pouring }) {
   );
 }
 
-/** Builder / sepet: mobilde sağ altta yüzen kutu, masaüstünde yapışkan panel. */
+/** Builder / sepet: mobilde yüzen kutu, masaüstünde yapışkan panel. */
 export function PastaBox(props: PastaBoxProps) {
   const pouring = useBoxPouring(props.pastaId, props.layers);
 
@@ -301,8 +302,16 @@ export function PastaBox(props: PastaBoxProps) {
       <MobileBoxFloater {...props} pouring={pouring} />
 
       <div className="hidden w-full lg:block lg:sticky lg:top-20 lg:z-10 lg:self-start">
-        <div className="rounded-2xl border border-[#2e402a]/50 bg-matte/90 px-2 py-3 shadow-[0_8px_32px_rgba(0,0,0,0.3)] backdrop-blur-sm">
-          <PastaBoxPreview {...props} pouring={pouring} mode="full" />
+        <div className="rounded-2xl border border-[#2e402a]/50 bg-matte/90 px-3 py-3 shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
+          <BoxScene
+            {...props}
+            pouring={pouring}
+            showTitle
+            showPastaName
+            showLayerTags
+            showEmptyHint
+            boxWidth="w-full max-w-[240px]"
+          />
         </div>
       </div>
     </>
@@ -313,10 +322,12 @@ export function PastaBox(props: PastaBoxProps) {
 export function PastaBoxContent(props: PastaBoxProps & { compact?: boolean }) {
   const pouring = useBoxPouring(props.pastaId, props.layers);
   return (
-    <PastaBoxPreview
+    <BoxScene
       {...props}
       pouring={pouring}
-      mode={props.compact ? "compact" : "full"}
+      showTitle={!props.compact}
+      showLayerTags
+      boxWidth="w-full max-w-[240px]"
     />
   );
 }

@@ -9,16 +9,16 @@ const EASE = [0.22, 1, 0.36, 1] as const;
 export function PastaFill({ pastaId, pouring }: { pastaId?: string; pouring?: boolean }) {
   const { noodle, glow } = pastaTint(pastaId);
   const strands = [
-    { left: 4, bottom: 2, w: 82, rot: -10, h: 4 },
-    { left: 14, bottom: 6, w: 78, rot: -6, h: 4 },
-    { left: 2, bottom: 10, w: 85, rot: -14, h: 3.5 },
-    { left: 22, bottom: 13, w: 72, rot: -4, h: 4 },
-    { left: 8, bottom: 17, w: 80, rot: -11, h: 3.5 },
-    { left: 30, bottom: 20, w: 68, rot: -2, h: 4 },
-    { left: 5, bottom: 24, w: 78, rot: -8, h: 3.5 },
-    { left: 18, bottom: 28, w: 74, rot: -5, h: 3.5 },
-    { left: 35, bottom: 31, w: 60, rot: 3, h: 3 },
-    { left: 10, bottom: 34, w: 70, rot: -7, h: 3 },
+    { left: 4, bottom: 2, w: 82, rot: -10, h: 10 },
+    { left: 14, bottom: 8, w: 78, rot: -6, h: 10 },
+    { left: 2, bottom: 14, w: 85, rot: -14, h: 9 },
+    { left: 22, bottom: 19, w: 72, rot: -4, h: 10 },
+    { left: 8, bottom: 24, w: 80, rot: -11, h: 9 },
+    { left: 30, bottom: 29, w: 68, rot: -2, h: 10 },
+    { left: 5, bottom: 34, w: 78, rot: -8, h: 9 },
+    { left: 18, bottom: 39, w: 74, rot: -5, h: 9 },
+    { left: 35, bottom: 44, w: 60, rot: 3, h: 8 },
+    { left: 10, bottom: 48, w: 70, rot: -7, h: 8 },
   ];
 
   return (
@@ -31,7 +31,7 @@ export function PastaFill({ pastaId, pouring }: { pastaId?: string; pouring?: bo
             left: `${s.left}%`,
             bottom: `${s.bottom}%`,
             width: `${s.w}%`,
-            height: s.h,
+            height: `${s.h}%`,
             background: `linear-gradient(180deg, ${glow} 0%, ${noodle} 50%, ${glow} 100%)`,
             boxShadow: "inset 0 0.5px 0 rgba(255,255,255,0.3), 0 1px 2px rgba(0,0,0,0.2)",
             transform: `rotate(${s.rot}deg)`,
@@ -195,10 +195,10 @@ function PieceShape({ type, variant }: { type: ReturnType<typeof toppingPieceTyp
 }
 
 const PIECE_OFFSETS = [
-  { left: 10, bottom: 30, rot: -14, scale: 1 },
-  { left: 38, bottom: 34, rot: 10, scale: 0.9 },
-  { left: 24, bottom: 26, rot: -6, scale: 1 },
-  { left: 52, bottom: 28, rot: 16, scale: 0.85 },
+  { left: 10, bottom: 38, rot: -14, scale: 1 },
+  { left: 38, bottom: 42, rot: 10, scale: 0.9 },
+  { left: 24, bottom: 34, rot: -6, scale: 1 },
+  { left: 52, bottom: 36, rot: 16, scale: 0.85 },
 ];
 
 /** Topping parçaları — makarna yığınının üstünde, kutu içinde. */
@@ -213,7 +213,11 @@ export function ToppingPieces({
 }) {
   const type = toppingPieceType(layerId);
   const size =
-    type === "olive" ? { w: 12, h: 16 } : type === "corn" ? { w: 11, h: 17 } : { w: 18, h: 12 };
+    type === "olive"
+      ? { w: "14%", h: "28%" }
+      : type === "corn"
+        ? { w: "12%", h: "30%" }
+        : { w: "22%", h: "22%" };
 
   return (
     <>
@@ -296,7 +300,7 @@ export function PastaPourStream({ pastaId }: { pastaId?: string }) {
           style={{
             left: `${8 + i * 16}%`,
             width: `${28 + (i % 2) * 8}%`,
-            height: 4,
+            height: "12%",
             background: `linear-gradient(90deg, ${glow}, ${noodle})`,
             transform: `rotate(${-12 + i * 4}deg)`,
           }}
