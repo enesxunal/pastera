@@ -140,20 +140,7 @@ export function ChocolateBuilder() {
       </motion.div>
 
       <div className="grid gap-10 lg:grid-cols-[1fr_minmax(0,300px)] lg:items-start">
-        <motion.aside
-          className="order-1 w-full lg:order-2 lg:w-auto"
-          initial={{ opacity: 0, x: 28 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true, amount: 0.2 }}
-        >
-          <PastaBox
-            pastaId={CHOCOLATE_PASTA.id}
-            pastaName={pastaItem.name}
-            layers={boxLayers}
-          />
-        </motion.aside>
-
-        <div className="order-2 space-y-10 lg:order-1">
+        <div className="space-y-10 pt-[11.5rem] lg:order-1 lg:pt-0">
           <section>
             <h2 className="font-display text-lg font-semibold text-white">
               {t("chocolateBuilder.pastaTitle")}
@@ -232,6 +219,14 @@ export function ChocolateBuilder() {
               </button>
             </div>
           </motion.div>
+        </div>
+
+        <div className="lg:order-2">
+          <PastaBox
+            pastaId={CHOCOLATE_PASTA.id}
+            pastaName={pastaItem.name}
+            layers={boxLayers}
+          />
         </div>
       </div>
 

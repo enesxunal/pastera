@@ -19,7 +19,8 @@ type PastaBoxProps = {
   pastaName: string;
   pastaId?: string;
   layers: BoxLayer[];
-  sticky?: boolean;
+  /** compact: mobil sabit çubuk için küçük görünüm */
+  compact?: boolean;
 };
 
 type Pouring =
@@ -39,29 +40,25 @@ function BoxInterior({
 }) {
   const sauces = layers.filter((l) => layerKind(l.id) === "sauce");
   const toppings = layers.filter((l) => layerKind(l.id) === "topping");
-  const pastaPouring = pouring?.kind === "pasta";
 
   return (
     <div className="relative h-full w-full">
-      {/* 1. Katman: makarna (alt) */}
-      <PastaFill pastaId={pastaId} pouring={pastaPouring} />
-
-      {/* 2. Katman: soslar (ortada, makarnanın üstü) */}
+      <PastaFill pastaId={pastaId} pouring={pouring?.kind === "pasta"} />
       {sauces.map((layer, idx) => (
         <SauceFill
           key={layer.id}
           id={layer.id}
           index={idx}
+          image={layer.image}
           pouring={pouring?.kind === "sauce" && pouring.id === layer.id}
         />
       ))}
-
-      {/* 3. Katman: topping parçaları (en üst) */}
       {toppings.map((layer, idx) => (
         <ToppingPieces
           key={layer.id}
           layerId={layer.id}
           globalIndex={idx}
+          image={layer.image}
           pouring={pouring?.kind === "topping" && pouring.id === layer.id}
         />
       ))}
@@ -69,7 +66,7 @@ function BoxInterior({
   );
 }
 
-function PastaBoxInner({ pastaName, pastaId, layers }: Omit<PastaBoxProps, "sticky">) {
+function PastaBoxContent({ pastaName, pastaId, layers, compact }: PastaBoxProps) {
   const { t } = useI18n();
   const prevLayerIds = useRef<string[]>([]);
   const prevPastaId = useRef<string | undefined>(undefined);
@@ -79,13 +76,10 @@ function PastaBoxInner({ pastaName, pastaId, layers }: Omit<PastaBoxProps, "stic
     const ids = layers.map((l) => l.id);
     const added = ids.find((id) => !prevLayerIds.current.includes(id));
     prevLayerIds.current = ids;
-
     if (!added) return;
-
     const kind = layerKind(added);
     if (kind === "sauce") setPouring({ kind: "sauce", id: added });
     else if (kind === "topping") setPouring({ kind: "topping", id: added });
-
     const timer = window.setTimeout(() => setPouring(null), 1100);
     return () => window.clearTimeout(timer);
   }, [layers]);
@@ -104,65 +98,82 @@ function PastaBoxInner({ pastaName, pastaId, layers }: Omit<PastaBoxProps, "stic
 
   const showSauceStream = pouring?.kind === "sauce";
   const showPastaStream = pouring?.kind === "pasta";
-  const sauceStreamColor =
-    pouring?.kind === "sauce" ? sauceColor(pouring.id) : "#c73e2e";
 
   return (
-    <div className="flex w-full max-w-sm flex-col items-center">
-      <p className="mb-1 font-display text-xs font-semibold uppercase tracking-[0.2em] text-[#c49746]">
-        {t("pastaBox.preview")}
-      </p>
+    <div className={`flex w-full flex-col items-center ${compact ? "max-w-[280px]" : "max-w-sm"}`}>
+      {!compact ? (
+        <p className="mb-1 font-display text-xs font-semibold uppercase tracking-[0.2em] text-[#c49746]">
+          {t("pastaBox.preview")}
+        </p>
+      ) : null}
       <AnimatePresence mode="wait">
         <motion.p
           key={pastaName}
-          initial={{ opacity: 0, y: -6 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 4 }}
-          className="mb-2 max-w-[260px] truncate text-center text-sm font-medium text-white/85"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className={`truncate text-center font-medium text-white/85 ${compact ? "mb-1 max-w-[220px] text-xs" : "mb-2 max-w-[260px] text-sm"}`}
         >
           {pastaName}
         </motion.p>
       </AnimatePresence>
 
-      <div className="relative w-full">
+      <div className={`relative w-full ${compact ? "scale-[0.88] origin-top" : ""}`}>
         <AnimatePresence>
           {showPastaStream ? <PastaPourStream pastaId={pastaId} /> : null}
-          {showSauceStream ? <SaucePourStream color={sauceStreamColor} /> : null}
+          {showSauceStream ? (
+            <SaucePourStream color={sauceColor(pouring.id)} />
+          ) : null}
         </AnimatePresence>
 
         <PasteraIsometricBox>
           <BoxInterior pastaId={pastaId} layers={layers} pouring={pouring} />
         </PasteraIsometricBox>
 
-        {layers.length === 0 ? (
+        {!compact && layers.length === 0 ? (
           <p className="mt-3 px-4 text-center text-xs text-white/40">{t("pastaBox.empty")}</p>
-        ) : (
-          <ul className="mt-3 flex max-w-[280px] flex-wrap justify-center gap-1.5 px-2">
+        ) : null}
+        {layers.length > 0 ? (
+          <ul className={`flex flex-wrap justify-center gap-1 px-1 ${compact ? "mt-1 max-h-8 overflow-hidden" : "mt-3 max-w-[280px]"}`}>
             {layers.map((layer) => (
               <li
                 key={layer.id}
-                className="rounded-full border border-[#2e402a] bg-[#141414] px-2.5 py-1 text-[10px] font-medium text-white/70"
+                className="rounded-full border border-[#2e402a] bg-[#141414] px-2 py-0.5 text-[10px] font-medium text-white/70"
               >
                 {layer.name}
               </li>
             ))}
           </ul>
-        )}
+        ) : null}
       </div>
     </div>
   );
 }
 
-export function PastaBox({ sticky = true, ...props }: PastaBoxProps) {
-  const inner = <PastaBoxInner {...props} />;
-
-  if (!sticky) return inner;
+/** Builder / sepet için: mobilde sabit üst, masaüstünde yapışkan sağ panel. */
+export function PastaBox(props: PastaBoxProps) {
+  const shared = <PastaBoxContent {...props} />;
 
   return (
-    <div
-      className="sticky top-16 z-20 w-full self-start rounded-2xl border border-[#2e402a]/50 bg-matte/90 px-2 py-3 shadow-[0_8px_32px_rgba(0,0,0,0.35)] backdrop-blur-md sm:px-3 lg:top-24"
-    >
-      {inner}
-    </div>
+    <>
+      {/* Mobil — her zaman ekranda (fixed) */}
+      <div
+        className="fixed inset-x-0 top-16 z-30 border-b border-[#2e402a]/80 bg-matte/96 px-2 py-2 backdrop-blur-md lg:hidden"
+        style={{ paddingBottom: "max(0.35rem, env(safe-area-inset-bottom))" }}
+      >
+        <div className="mx-auto flex justify-center">
+          <PastaBoxContent {...props} compact />
+        </div>
+      </div>
+
+      {/* Masaüstü — sağda yapışkan */}
+      <div className="hidden w-full lg:block lg:sticky lg:top-20 lg:z-10 lg:self-start">
+        <div className="rounded-2xl border border-[#2e402a]/50 bg-matte/90 px-2 py-3 shadow-[0_8px_32px_rgba(0,0,0,0.3)] backdrop-blur-sm">
+          {shared}
+        </div>
+      </div>
+    </>
   );
 }
+
+/** Sadece içerik (çift render önlemek için export). */
+export { PastaBoxContent };

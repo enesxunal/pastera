@@ -146,21 +146,7 @@ export function PastaBuilder() {
       </motion.div>
 
       <div className="grid gap-10 lg:grid-cols-[1fr_minmax(0,300px)] lg:items-start">
-        <motion.aside
-          className="order-1 w-full lg:order-2 lg:w-auto"
-          initial={{ opacity: 0, x: 28 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true, amount: 0.2 }}
-          transition={{ type: "spring", stiffness: 180, damping: 22 }}
-        >
-          <PastaBox
-            pastaId={pastaId}
-            pastaName={menuItemLabel(pasta.id, locale, pasta.name)}
-            layers={boxLayers}
-          />
-        </motion.aside>
-
-        <div className="order-2 space-y-10 lg:order-1">
+        <div className="space-y-10 pt-[11.5rem] lg:order-1 lg:pt-0">
           <section>
             <h2 className="font-display text-lg font-semibold text-white">
               {t("builder.step1Title")}
@@ -263,6 +249,14 @@ export function PastaBuilder() {
             </div>
             <p className="mt-3 text-xs text-white/45">{t("builder.previewHint")}</p>
           </motion.div>
+        </div>
+
+        <div className="lg:order-2">
+          <PastaBox
+            pastaId={pastaId}
+            pastaName={menuItemLabel(pasta.id, locale, pasta.name)}
+            layers={boxLayers}
+          />
         </div>
       </div>
 

@@ -372,7 +372,7 @@ export function WarenkorbClient() {
       <p className="mt-2 max-w-xl text-white/55">{t("cart.pageSubtitle")}</p>
 
       <div className="mt-10 grid gap-8 lg:grid-cols-[1fr_320px] lg:items-start">
-        <div className="order-2 flex flex-col gap-6 lg:order-1">
+        <div className="flex flex-col gap-6 pt-[10rem] lg:order-1 lg:pt-0">
           <motion.section
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
@@ -714,8 +714,8 @@ export function WarenkorbClient() {
           </div>
         </div>
 
-        <div className="order-1 flex w-full flex-col items-center gap-4 lg:order-2 lg:w-auto">
-          <PastaBox pastaId={cart.pastaId} pastaName={pastaName} layers={boxLayers} sticky />
+        <div className="lg:order-2">
+          <PastaBox pastaId={cart.pastaId} pastaName={pastaName} layers={boxLayers} />
         </div>
       </div>
 

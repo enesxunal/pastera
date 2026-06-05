@@ -1,80 +1,132 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Image from "next/image";
+import { pastaPhotoForBox, saucePhotoForBox, toppingPhotoForBox } from "./box-photo-map";
 import { sauceColor, pastaTint, toppingPieceType } from "./pasta-box-visual";
 
-/** Kutunun dibini dolduran makarna yığını — ikon değil, gerçek erişte görünümü. */
+function pastaFilter(pastaId?: string): string | undefined {
+  if (pastaId === "noodle-black") return "brightness(0.35) contrast(1.1)";
+  if (pastaId === "noodle-vegan") return "hue-rotate(-18deg) saturate(0.9)";
+  if (pastaId === "noodle-chocolate") return "sepia(0.55) brightness(0.75)";
+  return undefined;
+}
+
+/** Kalın fettuccine — gerçek ürün fotoğrafı + üstten dökülme. */
 export function PastaFill({ pastaId, pouring }: { pastaId?: string; pouring?: boolean }) {
+  const src = pastaPhotoForBox(pastaId);
   const { noodle, glow } = pastaTint(pastaId);
-  const strands = Array.from({ length: 18 }, (_, i) => i);
 
   return (
-    <div className="absolute inset-x-[4%] bottom-0 top-[8%] overflow-hidden">
-      {strands.map((i) => {
-        const w = 55 + (i % 4) * 12;
-        const left = (i * 11) % 55;
-        const bottom = (i % 6) * 5;
-        const rot = -12 + (i % 5) * 6;
-        return (
-          <motion.span
-            key={i}
-            className="absolute block rounded-full"
-            style={{
-              width: `${w}%`,
-              height: 5 + (i % 3),
-              left: `${left}%`,
-              bottom: `${bottom}%`,
-              background: `linear-gradient(90deg, ${noodle}, ${glow})`,
-              transform: `rotate(${rot}deg)`,
-              boxShadow: `0 1px 2px rgba(0,0,0,0.2)`,
-            }}
-            initial={pouring ? { y: -90, opacity: 0 } : false}
-            animate={{ y: 0, opacity: 0.95 }}
-            transition={{
-              type: "spring",
-              stiffness: 180,
-              damping: 16,
-              delay: pouring ? i * 0.035 : 0,
-            }}
-          />
-        );
-      })}
+    <div className="absolute inset-0 overflow-hidden">
       <motion.div
-        className="absolute inset-x-0 bottom-0 h-[18%] rounded-t-[40%]"
-        style={{
-          background: `linear-gradient(to top, ${noodle}dd, transparent)`,
-        }}
-        initial={pouring ? { scaleY: 0 } : false}
-        animate={{ scaleY: 1 }}
-        transition={{ delay: pouring ? 0.3 : 0, duration: 0.4 }}
+        className="absolute inset-0"
+        initial={pouring ? { y: "-110%", opacity: 0 } : false}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ type: "spring", stiffness: 140, damping: 18, duration: 0.7 }}
+      >
+        {src ? (
+          <Image
+            src={src}
+            alt=""
+            fill
+            className="object-cover"
+            style={{
+              objectPosition: "50% 38%",
+              transform: "scale(1.65)",
+              filter: pastaFilter(pastaId),
+            }}
+            sizes="200px"
+            unoptimized
+          />
+        ) : (
+          <FettuccineSvg noodle={noodle} glow={glow} pouring={pouring} />
+        )}
+      </motion.div>
+      <div
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-[30%]"
+        style={{ background: "linear-gradient(to top, rgba(0,0,0,0.15), transparent)" }}
       />
     </div>
   );
 }
 
-/** Sos sıvısı — makarnanın üstünde birikir. */
-export function SauceFill({ id, index, pouring }: { id: string; index: number; pouring?: boolean }) {
+function FettuccineSvg({
+  noodle,
+  glow,
+  pouring,
+}: {
+  noodle: string;
+  glow: string;
+  pouring?: boolean;
+}) {
+  const bands = Array.from({ length: 10 }, (_, i) => i);
+  return (
+    <svg viewBox="0 0 200 100" className="h-full w-full" preserveAspectRatio="xMidYMid slice" aria-hidden>
+      {bands.map((i) => (
+        <motion.ellipse
+          key={i}
+          cx={30 + (i % 5) * 35}
+          cy={55 + (i % 3) * 8}
+          rx={28}
+          ry={7 + (i % 2)}
+          fill={i % 2 ? noodle : glow}
+          opacity={0.92}
+          initial={pouring ? { cy: -20, opacity: 0 } : false}
+          animate={{ cy: 55 + (i % 3) * 8, opacity: 0.92 }}
+          transition={{ delay: pouring ? i * 0.04 : 0, type: "spring", stiffness: 200, damping: 16 }}
+        />
+      ))}
+    </svg>
+  );
+}
+
+/** Sos — sıvı + varsa gerçek sos fotoğrafı. */
+export function SauceFill({
+  id,
+  index,
+  pouring,
+  image,
+}: {
+  id: string;
+  index: number;
+  pouring?: boolean;
+  image?: string;
+}) {
   const color = sauceColor(id);
-  const base = 28 + index * 14;
+  const photo = saucePhotoForBox(id) || image;
+  const base = 30 + index * 12;
 
   return (
     <motion.div
-      className="absolute inset-x-[6%] overflow-hidden rounded-[45%]"
+      className="absolute inset-x-[4%] overflow-hidden"
       style={{
-        bottom: `${8 + index * 10}%`,
+        bottom: `${6 + index * 8}%`,
         height: `${base}%`,
-        backgroundColor: color,
         transformOrigin: "bottom center",
-        boxShadow: `inset 0 -4px 10px rgba(0,0,0,0.25), 0 2px 6px rgba(0,0,0,0.15)`,
+        borderRadius: "45% 45% 40% 40%",
+        boxShadow: "inset 0 -5px 12px rgba(0,0,0,0.28)",
       }}
-      initial={pouring ? { scaleY: 0, opacity: 0 } : { scaleY: 0.3, opacity: 0 }}
-      animate={{ scaleY: 1, opacity: 0.88 - index * 0.06 }}
-      transition={{ type: "spring", stiffness: 200, damping: 22, delay: pouring ? 0.1 : index * 0.08 }}
+      initial={pouring ? { scaleY: 0, opacity: 0 } : { scaleY: 0.2, opacity: 0 }}
+      animate={{ scaleY: 1, opacity: 0.92 - index * 0.05 }}
+      transition={{ type: "spring", stiffness: 180, damping: 20, delay: pouring ? 0.15 : index * 0.07 }}
     >
+      <div className="absolute inset-0" style={{ backgroundColor: color }} />
+      {photo ? (
+        <Image
+          src={photo}
+          alt=""
+          fill
+          className="object-cover mix-blend-multiply"
+          style={{ objectPosition: "center", opacity: 0.75, transform: "scale(1.4)" }}
+          sizes="120px"
+          unoptimized
+        />
+      ) : null}
       <div
-        className="absolute inset-x-0 top-0 h-[22%]"
+        className="absolute inset-x-0 top-0 h-[28%]"
         style={{
-          background: `linear-gradient(to bottom, ${color}aa, transparent)`,
+          background: `linear-gradient(to bottom, ${color}cc, transparent)`,
           borderRadius: "50% 50% 0 0",
         }}
       />
@@ -86,182 +138,190 @@ function PieceShape({ type, variant }: { type: ReturnType<typeof toppingPieceTyp
   const s = variant % 4;
   if (type === "meat") {
     return (
-      <svg viewBox="0 0 24 16" className="h-full w-full" aria-hidden>
-        <rect x="2" y="5" width="20" height="6" rx="2" fill={s % 2 ? "#d4a574" : "#c49060"} transform={`rotate(${-8 + s * 5} 12 8)`} />
+      <svg viewBox="0 0 28 14" className="h-full w-full drop-shadow-sm" aria-hidden>
+        <rect x="1" y="4" width="26" height="7" rx="2.5" fill={s % 2 ? "#c8864a" : "#a86a38"} />
+        <rect x="4" y="5" width="8" height="2" rx="1" fill="#e8b878" opacity="0.5" />
       </svg>
     );
   }
   if (type === "shrimp") {
     return (
-      <svg viewBox="0 0 24 16" className="h-full w-full" aria-hidden>
-        <path d="M4 10 Q12 4 20 10" fill="none" stroke="#f0a090" strokeWidth="4" strokeLinecap="round" />
+      <svg viewBox="0 0 28 14" className="h-full w-full drop-shadow-sm" aria-hidden>
+        <path d="M3 9 Q14 2 25 9" fill="none" stroke="#e8907a" strokeWidth="5" strokeLinecap="round" />
+        <circle cx="24" cy="8" r="1.5" fill="#333" />
       </svg>
     );
   }
   if (type === "olive") {
     return (
-      <svg viewBox="0 0 16 20" className="h-full w-full" aria-hidden>
-        <ellipse cx="8" cy="10" rx="6" ry="8" fill={s % 2 ? "#2a2a2a" : "#4a6830"} />
-        <circle cx="8" cy="7" r="1.2" fill="#c49746" />
+      <svg viewBox="0 0 14 18" className="h-full w-full drop-shadow-sm" aria-hidden>
+        <ellipse cx="7" cy="10" rx="5.5" ry="7" fill={s % 2 ? "#1a1a1a" : "#4a6830"} />
+        <ellipse cx="5" cy="8" rx="2" ry="3" fill="rgba(255,255,255,0.12)" />
+        <circle cx="7" cy="6" r="1" fill="#c49746" />
       </svg>
     );
   }
   if (type === "corn") {
     return (
-      <svg viewBox="0 0 14 20" className="h-full w-full" aria-hidden>
-        <ellipse cx="7" cy="10" rx="5" ry="9" fill="#f0d040" />
-        <line x1="5" y1="4" x2="5" y2="16" stroke="#d4a820" strokeWidth="0.8" />
-        <line x1="9" y1="4" x2="9" y2="16" stroke="#d4a820" strokeWidth="0.8" />
+      <svg viewBox="0 0 12 18" className="h-full w-full drop-shadow-sm" aria-hidden>
+        <ellipse cx="6" cy="9" rx="4.5" ry="8" fill="#f0d040" />
+        <path d="M4 3v12M6 2v14M8 3v12" stroke="#c8a020" strokeWidth="0.7" />
       </svg>
     );
   }
   if (type === "mushroom") {
     return (
-      <svg viewBox="0 0 20 18" className="h-full w-full" aria-hidden>
-        <ellipse cx="10" cy="7" rx="9" ry="5" fill="#c4a882" />
-        <rect x="8" y="7" width="4" height="8" rx="1" fill="#e0d0b8" />
+      <svg viewBox="0 0 20 16" className="h-full w-full drop-shadow-sm" aria-hidden>
+        <ellipse cx="10" cy="6" rx="9" ry="5" fill="#b89870" />
+        <ellipse cx="8" cy="5" rx="3" ry="2" fill="#d4b890" opacity="0.4" />
+        <rect x="8" y="6" width="4" height="8" rx="1" fill="#ddd0b8" />
       </svg>
     );
   }
   if (type === "green") {
     return (
-      <svg viewBox="0 0 20 16" className="h-full w-full" aria-hidden>
-        <ellipse cx="10" cy="10" rx="8" ry="5" fill="#4a8c40" />
-        <path d="M10 2 Q6 8 10 10 Q14 8 10 2" fill="#3a7a32" />
+      <svg viewBox="0 0 22 14" className="h-full w-full drop-shadow-sm" aria-hidden>
+        <path d="M3 12 Q11 2 19 12" fill="#3d8c38" />
+        <path d="M11 2 Q9 8 11 12 Q13 8 11 2" fill="#2d7030" />
       </svg>
     );
   }
   if (type === "cheese") {
     return (
-      <svg viewBox="0 0 18 14" className="h-full w-full" aria-hidden>
-        <path d="M2 12 L9 2 L16 12 Z" fill="#f0f0e8" stroke="#d8d8d0" />
-        <circle cx="8" cy="8" r="1" fill="#a0a8b0" />
+      <svg viewBox="0 0 18 14" className="h-full w-full drop-shadow-sm" aria-hidden>
+        <path d="M2 12 L9 2 L16 12 Z" fill="#f5f5ec" stroke="#d0d0c8" />
+        <circle cx="8" cy="9" r="1.2" fill="#a8b0b8" />
       </svg>
     );
   }
   if (type === "fruit") {
     return (
-      <svg viewBox="0 0 16 16" className="h-full w-full" aria-hidden>
-        <circle cx="8" cy="9" r="6" fill={s % 2 ? "#e04050" : "#f0d040"} />
+      <svg viewBox="0 0 16 16" className="h-full w-full drop-shadow-sm" aria-hidden>
+        <circle cx="8" cy="9" r="6" fill={s % 2 ? "#d83848" : "#f0c838" } />
+        <circle cx="6" cy="7" r="2" fill="rgba(255,255,255,0.2)" />
       </svg>
     );
   }
   return (
-    <svg viewBox="0 0 16 14" className="h-full w-full" aria-hidden>
-      <rect x="3" y="4" width="10" height="6" rx="2" fill="#a08050" transform={`rotate(${s * 8} 8 7)`} />
+    <svg viewBox="0 0 18 12" className="h-full w-full drop-shadow-sm" aria-hidden>
+      <rect x="2" y="3" width="14" height="6" rx="2" fill="#9a7048" />
     </svg>
   );
 }
 
 const PIECE_OFFSETS = [
-  { left: 20, top: 8, rot: -12 },
-  { left: 50, top: 5, rot: 8 },
-  { left: 35, top: 18, rot: -5 },
-  { left: 58, top: 14, rot: 15 },
+  { left: 12, top: 4, rot: -14, scale: 1 },
+  { left: 42, top: 2, rot: 10, scale: 0.95 },
+  { left: 28, top: 16, rot: -6, scale: 1.05 },
+  { left: 55, top: 12, rot: 18, scale: 0.9 },
 ];
 
-/** Her topping için 3–4 gerçek parça düşer. */
 export function ToppingPieces({
   layerId,
   globalIndex,
   pouring,
+  image,
 }: {
   layerId: string;
   globalIndex: number;
   pouring?: boolean;
+  image?: string;
 }) {
   const type = toppingPieceType(layerId);
-  const count = 4;
+  const photo = toppingPhotoForBox(layerId, image);
 
   return (
     <>
-      {Array.from({ length: count }, (_, i) => {
-        const off = PIECE_OFFSETS[(globalIndex + i) % PIECE_OFFSETS.length];
-        return (
-          <motion.div
-            key={`${layerId}-${i}`}
-            className="absolute z-20"
-            style={{
-              left: `${off.left + (i % 2) * 4}%`,
-              top: `${off.top + (i % 3) * 3}%`,
-              width: type === "olive" ? 14 : 22,
-              height: type === "olive" ? 18 : 14,
-            }}
-            initial={pouring ? { y: -100, opacity: 0, rotate: off.rot - 20 } : false}
-            animate={{ y: 0, opacity: 1, rotate: off.rot }}
-            transition={{
-              type: "spring",
-              stiffness: 260,
-              damping: 14,
-              delay: pouring ? i * 0.08 : 0,
-            }}
-          >
+      {PIECE_OFFSETS.map((off, i) => (
+        <motion.div
+          key={`${layerId}-${i}`}
+          className="absolute z-20 overflow-hidden rounded-md shadow-md"
+          style={{
+            left: `${off.left + (i % 2) * 3}%`,
+            top: `${off.top}%`,
+            width: photo ? 26 : type === "olive" ? 16 : 24,
+            height: photo ? 26 : type === "olive" ? 20 : 16,
+            transform: `rotate(${off.rot}deg) scale(${off.scale})`,
+          }}
+          initial={pouring ? { y: -120, opacity: 0, scale: 0.2 } : false}
+          animate={{ y: 0, opacity: 1, scale: off.scale }}
+          transition={{
+            type: "spring",
+            stiffness: 240,
+            damping: 14,
+            delay: pouring ? i * 0.09 : 0,
+          }}
+        >
+          {photo ? (
+            <Image
+              src={photo}
+              alt=""
+              fill
+              className="object-cover"
+              style={{ transform: "scale(1.8)", objectPosition: "center" }}
+              sizes="40px"
+              unoptimized
+            />
+          ) : (
             <PieceShape type={type} variant={globalIndex + i} />
-          </motion.div>
-        );
-      })}
+          )}
+        </motion.div>
+      ))}
     </>
   );
 }
 
-/** Sos dökülürken üstten akan sıvı. */
 export function SaucePourStream({ color }: { color: string }) {
   return (
     <motion.div
       className="pointer-events-none absolute left-1/2 z-40 -translate-x-1/2"
-      style={{ top: "-12%" }}
+      style={{ top: "-20%" }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
       <motion.div
         style={{
-          width: 14,
-          background: `linear-gradient(to bottom, ${color}, ${color}cc)`,
-          borderRadius: 8,
-          boxShadow: `0 0 16px ${color}88`,
+          width: 16,
+          background: `linear-gradient(to bottom, ${color}ee, ${color}99)`,
+          borderRadius: 10,
+          boxShadow: `0 0 20px ${color}99`,
         }}
         initial={{ height: 0 }}
-        animate={{ height: [0, 70, 70, 0] }}
-        transition={{ duration: 1, times: [0, 0.35, 0.7, 1] }}
+        animate={{ height: [0, 90, 90, 0] }}
+        transition={{ duration: 1.1, times: [0, 0.32, 0.68, 1] }}
       />
       <motion.div
         className="mx-auto rounded-full"
-        style={{ width: 36, height: 10, backgroundColor: color, marginTop: -4 }}
-        initial={{ scale: 0 }}
-        animate={{ scale: [0, 1.2, 0.9] }}
-        transition={{ duration: 0.9, delay: 0.2 }}
+        style={{ width: 42, height: 12, backgroundColor: color, marginTop: -6 }}
+        initial={{ scale: 0, opacity: 0 }}
+        animate={{ scale: [0, 1.3, 1], opacity: [0, 1, 0.6] }}
+        transition={{ duration: 1, delay: 0.25 }}
       />
     </motion.div>
   );
 }
 
-/** Makarna dökülürken üstten inen teller. */
 export function PastaPourStream({ pastaId }: { pastaId?: string }) {
-  const { noodle } = pastaTint(pastaId);
+  const src = pastaPhotoForBox(pastaId);
   return (
     <motion.div
       className="pointer-events-none absolute left-1/2 z-40 -translate-x-1/2"
-      style={{ top: "-18%" }}
+      style={{ top: "-28%" }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      {Array.from({ length: 6 }, (_, i) => (
-        <motion.span
-          key={i}
-          className="absolute block rounded-full"
-          style={{
-            width: 40 + i * 8,
-            height: 4,
-            background: noodle,
-            left: -20 + i * 6,
-          }}
-          initial={{ y: -40, opacity: 0 }}
-          animate={{ y: [ -40, 20, 0 ], opacity: [0, 1, 0] }}
-          transition={{ duration: 0.7, delay: i * 0.06 }}
-        />
-      ))}
+      <motion.div
+        className="relative h-16 w-20 overflow-hidden rounded-lg"
+        initial={{ y: -30, opacity: 0 }}
+        animate={{ y: [ -30, 10, 0 ], opacity: [0, 1, 0] }}
+        transition={{ duration: 0.8 }}
+      >
+        {src ? (
+          <Image src={src} alt="" fill className="object-cover" style={{ transform: "scale(2)", objectPosition: "50% 40%" }} unoptimized />
+        ) : null}
+      </motion.div>
     </motion.div>
   );
 }
