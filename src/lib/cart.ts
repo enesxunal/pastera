@@ -198,8 +198,8 @@ function buildBowlParts(
       }
     : { ...pastaStatic, name: label(pastaStatic, locale) };
 
-  const aS = allowedIds(saucesForPasta(pasta.vegan));
-  const aT = allowedIds(toppingsForPasta(pasta.vegan));
+  const aS = allowedIds(saucesForPasta(pastaId));
+  const aT = allowedIds(toppingsForPasta(pastaId));
 
   const sauceItems = pickMenuItems(snapshot.sauceIds, aS, catalog, locale);
   const ingItems = pickMenuItems(snapshot.ingredientIds, aT, catalog, locale);

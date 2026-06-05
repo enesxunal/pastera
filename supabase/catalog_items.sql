@@ -4,7 +4,7 @@
   create table if not exists public.catalog_items (
     id text primary key,
     category text not null
-      check (category in ('pasta_base', 'sauce', 'special', 'topping', 'chef_special', 'soup', 'starter', 'drink')),
+      check (category in ('pasta_base', 'sauce', 'special', 'topping', 'chef_special', 'dessert', 'soup', 'starter', 'drink')),
     name_de text not null,
     name_tr text not null,
     price numeric(10, 2) not null,

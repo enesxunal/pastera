@@ -19,6 +19,7 @@ export type MenuGridCategory =
   | "special"
   | "topping"
   | "chef_special"
+  | "dessert"
   | "drink";
 
 type MenuGridProps = {
@@ -61,6 +62,7 @@ export function MenuGrid({
 
   const canAddCart =
     category === "chef_special" ||
+    category === "dessert" ||
     category === "soup" ||
     category === "starter" ||
     category === "drink";

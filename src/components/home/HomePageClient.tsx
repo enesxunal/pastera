@@ -26,8 +26,9 @@ export function HomePageClient() {
     return () => window.clearInterval(id);
   }, []);
 
-  const noodles = catalogByCategory(catalog, "pasta_base");
-  const chefSpecials = catalogByCategory(catalog, "chef_special");
+  const noodles = catalogByCategory(catalog, "pasta_base").filter((x) => x.id !== "noodle-chocolate");
+  const standardPastas = catalogByCategory(catalog, "chef_special");
+  const desserts = catalogByCategory(catalog, "dessert");
 
   return (
     <div className="mx-auto max-w-6xl px-4 pb-16 pt-6 sm:px-6 sm:pb-20 sm:pt-8">
@@ -133,16 +134,31 @@ export function HomePageClient() {
             </div>
           ) : null}
 
-          {chefSpecials.length > 0 ? (
+          {standardPastas.length > 0 ? (
             <div>
-              <h3 className="font-display text-lg font-bold text-[#c49746]">{t("menu.sectionChefSpecials")}</h3>
-              <p className="mt-1 text-sm text-white/45">{t("menu.sectionChefSpecialsHint")}</p>
+              <h3 className="font-display text-lg font-bold text-[#c49746]">{t("menu.sectionStandard")}</h3>
+              <p className="mt-1 text-sm text-white/45">{t("menu.sectionStandardHint")}</p>
               <MenuGrid
                 variant="embedded"
                 hideHeading
                 title=""
-                items={chefSpecials}
+                items={standardPastas}
                 category="chef_special"
+                locale={locale}
+              />
+            </div>
+          ) : null}
+
+          {desserts.length > 0 ? (
+            <div>
+              <h3 className="font-display text-lg font-bold text-[#c49746]">{t("menu.sectionDessert")}</h3>
+              <p className="mt-1 text-sm text-white/45">{t("menu.sectionDessertHint")}</p>
+              <MenuGrid
+                variant="embedded"
+                hideHeading
+                title=""
+                items={desserts}
+                category="dessert"
                 locale={locale}
               />
             </div>

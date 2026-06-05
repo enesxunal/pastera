@@ -10,10 +10,11 @@ export function MenuHub() {
   const { catalog } = useCatalog();
   const { locale, t } = useI18n();
 
-  const noodles = catalogByCategory(catalog, "pasta_base");
-  const chefSpecials = catalogByCategory(catalog, "chef_special");
-  const chefClassic = chefSpecials.filter((x) => !x.vegan);
-  const chefVegan = chefSpecials.filter((x) => x.vegan);
+  const allPastaBase = catalogByCategory(catalog, "pasta_base");
+  const noodles = allPastaBase.filter((x) => x.id !== "noodle-chocolate");
+  const chocolatePasta = allPastaBase.filter((x) => x.id === "noodle-chocolate");
+  const standardPastas = catalogByCategory(catalog, "chef_special");
+  const desserts = catalogByCategory(catalog, "dessert");
 
   return (
     <>
@@ -41,35 +42,67 @@ export function MenuHub() {
         )}
       </section>
 
-      <section id="chef-specials" className="mt-16 scroll-mt-24" aria-labelledby="menu-chef-heading">
-        <h2 id="menu-chef-heading" className="font-display text-2xl font-bold text-[#c49746]">
-          {t("menu.sectionChefSpecials")}
+      <section
+        id="standart-makarna"
+        className="mt-16 scroll-mt-24"
+        aria-labelledby="menu-standard-heading"
+      >
+        <h2 id="menu-standard-heading" className="font-display text-2xl font-bold text-[#c49746]">
+          {t("menu.sectionStandard")}
         </h2>
-        <p className="mt-2 max-w-2xl text-sm text-white/50">{t("menu.sectionChefSpecialsHint")}</p>
-        {chefSpecials.length === 0 ? (
+        <p className="mt-2 max-w-2xl text-sm text-white/50">{t("menu.sectionStandardHint")}</p>
+        {standardPastas.length === 0 ? (
           <p className="mt-6 text-sm text-white/45">{t("menu.emptySection")}</p>
         ) : (
-          <div className="mt-6 space-y-10">
-            {chefClassic.length > 0 ? (
-              <MenuGrid
-                variant="embedded"
-                title={t("menu.subChefClassic")}
-                items={chefClassic}
-                category="chef_special"
-                locale={locale}
-              />
-            ) : null}
-            {chefVegan.length > 0 ? (
-              <MenuGrid
-                variant="embedded"
-                title={t("menu.subChefVegan")}
-                items={chefVegan}
-                category="chef_special"
-                locale={locale}
-              />
-            ) : null}
+          <div className="mt-6">
+            <MenuGrid
+              hideHeading
+              title=""
+              variant="embedded"
+              items={standardPastas}
+              category="chef_special"
+              locale={locale}
+            />
           </div>
         )}
+      </section>
+
+      <section id="tatli" className="mt-16 scroll-mt-24" aria-labelledby="menu-dessert-heading">
+        <h2 id="menu-dessert-heading" className="font-display text-2xl font-bold text-[#c49746]">
+          {t("menu.sectionDessert")}
+        </h2>
+        <p className="mt-2 max-w-2xl text-sm text-white/50">{t("menu.sectionDessertHint")}</p>
+        <div className="mt-6 space-y-10">
+          {desserts.length > 0 ? (
+            <MenuGrid
+              hideHeading
+              title=""
+              variant="embedded"
+              items={desserts}
+              category="dessert"
+              locale={locale}
+            />
+          ) : null}
+          {chocolatePasta.length > 0 ? (
+            <div>
+              <h3 className="font-display text-lg font-bold text-[#c49746]">
+                {t("menu.subChocolatePasta")}
+              </h3>
+              <p className="mt-1 text-sm text-white/50">{t("menu.subChocolatePastaHint")}</p>
+              <MenuGrid
+                hideHeading
+                title=""
+                variant="embedded"
+                items={chocolatePasta}
+                category="pasta"
+                locale={locale}
+              />
+            </div>
+          ) : null}
+          {desserts.length === 0 && chocolatePasta.length === 0 ? (
+            <p className="text-sm text-white/45">{t("menu.emptySection")}</p>
+          ) : null}
+        </div>
       </section>
 
       <div className="mt-14 flex flex-wrap gap-4">

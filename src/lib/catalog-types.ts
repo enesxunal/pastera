@@ -4,6 +4,7 @@ export type CatalogCategory =
   | "special"
   | "topping"
   | "chef_special"
+  | "dessert"
   | "soup"
   | "starter"
   | "drink";

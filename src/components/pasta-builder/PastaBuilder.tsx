@@ -7,10 +7,12 @@ import { useI18n } from "@/components/providers/I18nProvider";
 import { loadCartSnapshot, saveCartSnapshot } from "@/lib/cart";
 import { pageIntro, staggerGrid } from "@/lib/motion-variants";
 import {
+  isChocolatePasta,
   normalizePastaId,
   PASTAS,
   saucesForPasta,
-  toppingsForPasta,
+  toppingGroupsForPasta,
+  type MenuItem,
 } from "@/lib/menu-data";
 import { formatEur } from "@/lib/format";
 import { MenuPickCard } from "@/components/menu/MenuPickCard";
@@ -18,6 +20,36 @@ import { PastaBox } from "./PastaBox";
 
 function toggleId(ids: string[], id: string): string[] {
   return ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id];
+}
+
+function ToppingGrid({
+  items,
+  ingredientIds,
+  setIngredientIds,
+}: {
+  items: MenuItem[];
+  ingredientIds: string[];
+  setIngredientIds: React.Dispatch<React.SetStateAction<string[]>>;
+}) {
+  return (
+    <motion.div
+      className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3"
+      variants={staggerGrid}
+      initial="hidden"
+      whileInView="show"
+      viewport={{ once: true, amount: 0.12 }}
+    >
+      {items.map((item) => (
+        <MenuPickCard
+          key={item.id}
+          item={item}
+          mode="multi"
+          selected={ingredientIds.includes(item.id)}
+          onSelect={() => setIngredientIds((ids) => toggleId(ids, item.id))}
+        />
+      ))}
+    </motion.div>
+  );
 }
 
 export function PastaBuilder() {
@@ -29,8 +61,16 @@ export function PastaBuilder() {
   const [ingredientIds, setIngredientIds] = useState<string[]>([]);
 
   const pasta = PASTAS.find((p) => p.id === pastaId) ?? PASTAS[0];
-  const sauces = useMemo(() => saucesForPasta(pasta.vegan), [pasta.vegan]);
-  const toppings = useMemo(() => toppingsForPasta(pasta.vegan), [pasta.vegan]);
+  const chocolate = isChocolatePasta(pastaId);
+  const sauces = useMemo(() => saucesForPasta(pastaId), [pastaId]);
+  const toppingGroups = useMemo(() => toppingGroupsForPasta(pastaId), [pastaId]);
+  const allToppings = useMemo(
+    () =>
+      chocolate
+        ? toppingGroups.chocolate
+        : [...toppingGroups.main, ...toppingGroups.extra],
+    [chocolate, toppingGroups],
+  );
 
   useEffect(() => {
     const saved = loadCartSnapshot();
@@ -52,13 +92,13 @@ export function PastaBuilder() {
 
   useEffect(() => {
     const sauceAllow = new Set(sauces.map((s) => s.id));
-    const topAllow = new Set(toppings.map((x) => x.id));
+    const topAllow = new Set(allToppings.map((x) => x.id));
     setSauceIds((ids) => ids.filter((id) => sauceAllow.has(id)));
     setIngredientIds((ids) => ids.filter((id) => topAllow.has(id)));
-  }, [pastaId, sauces, toppings]);
+  }, [pastaId, sauces, allToppings]);
 
   const sauceItems = sauces.filter((x) => sauceIds.includes(x.id));
-  const ingredientItems = toppings.filter((x) => ingredientIds.includes(x.id));
+  const ingredientItems = allToppings.filter((x) => ingredientIds.includes(x.id));
 
   const total = useMemo(() => {
     const s = sauceItems.reduce((a, x) => a + x.price, 0);
@@ -116,7 +156,7 @@ export function PastaBuilder() {
             </h2>
             <p className="mt-1 text-sm text-white/50">{t("builder.step1Hint")}</p>
             <motion.div
-              className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3"
+              className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4"
               variants={staggerGrid}
               initial="hidden"
               whileInView="show"
@@ -134,52 +174,69 @@ export function PastaBuilder() {
             </motion.div>
           </section>
 
-          <section>
-            <h2 className="font-display text-lg font-semibold text-white">
-              {t("builder.step2Title")}
-            </h2>
-            <p className="mt-1 text-sm text-white/50">{t("builder.step2Hint")}</p>
-            <motion.div
-              className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3"
-              variants={staggerGrid}
-              initial="hidden"
-              whileInView="show"
-              viewport={{ once: true, amount: 0.12 }}
-            >
-              {sauces.map((item) => (
-                <MenuPickCard
-                  key={item.id}
-                  item={item}
-                  mode="multi"
-                  selected={sauceIds.includes(item.id)}
-                  onSelect={() => setSauceIds((ids) => toggleId(ids, item.id))}
-                />
-              ))}
-            </motion.div>
-          </section>
+          {!chocolate && sauces.length > 0 ? (
+            <section>
+              <h2 className="font-display text-lg font-semibold text-white">
+                {t("builder.step2Title")}
+              </h2>
+              <p className="mt-1 text-sm text-white/50">{t("builder.step2Hint")}</p>
+              <motion.div
+                className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3"
+                variants={staggerGrid}
+                initial="hidden"
+                whileInView="show"
+                viewport={{ once: true, amount: 0.12 }}
+              >
+                {sauces.map((item) => (
+                  <MenuPickCard
+                    key={item.id}
+                    item={item}
+                    mode="multi"
+                    selected={sauceIds.includes(item.id)}
+                    onSelect={() => setSauceIds((ids) => toggleId(ids, item.id))}
+                  />
+                ))}
+              </motion.div>
+            </section>
+          ) : null}
 
           <section>
             <h2 className="font-display text-lg font-semibold text-white">
-              {t("builder.step3Title")}
+              {chocolate ? t("builder.stepChocolateTitle") : t("builder.step3Title")}
             </h2>
-            <p className="mt-1 text-sm text-white/50">{t("builder.step3Hint")}</p>
-            <motion.div
-              className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3"
-              variants={staggerGrid}
-              initial="hidden"
-              whileInView="show"
-              viewport={{ once: true, amount: 0.12 }}
-            >
-              {toppings.map((item) => (
-                <MenuPickCard
-                  key={item.id}
-                  item={item}
-                  mode="multi"
-                  selected={ingredientIds.includes(item.id)}
-                  onSelect={() => setIngredientIds((ids) => toggleId(ids, item.id))}
-                />
-              ))}
-            </motion.div>
+            <p className="mt-1 text-sm text-white/50">
+              {chocolate ? t("builder.stepChocolateHint") : t("builder.step3Hint")}
+            </p>
+            {chocolate ? (
+              <ToppingGrid
+                items={toppingGroups.chocolate}
+                ingredientIds={ingredientIds}
+                setIngredientIds={setIngredientIds}
+              />
+            ) : (
+              <div className="space-y-8">
+                {toppingGroups.main.length > 0 ? (
+                  <div>
+                    <h3 className="text-sm font-semibold text-[#c49746]">{t("builder.toppingsMain")}</h3>
+                    <ToppingGrid
+                      items={toppingGroups.main}
+                      ingredientIds={ingredientIds}
+                      setIngredientIds={setIngredientIds}
+                    />
+                  </div>
+                ) : null}
+                {toppingGroups.extra.length > 0 ? (
+                  <div>
+                    <h3 className="text-sm font-semibold text-[#c49746]">{t("builder.toppingsExtra")}</h3>
+                    <ToppingGrid
+                      items={toppingGroups.extra}
+                      ingredientIds={ingredientIds}
+                      setIngredientIds={setIngredientIds}
+                    />
+                  </div>
+                ) : null}
+              </div>
+            )}
           </section>
 
           <motion.div

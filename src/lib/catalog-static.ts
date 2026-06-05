@@ -1,15 +1,11 @@
 import type { CatalogCategory, CatalogItem } from "@/lib/catalog-types";
 import type { MenuItem } from "@/lib/menu-data";
 import {
-  CHEF_SPECIALS_CLASSIC,
-  CHEF_SPECIALS_VEGAN,
-  DRINKS,
+  DESSERTS,
   PASTAS,
-  SAUCEN_KLASSISCH,
-  SAUCEN_VEGAN,
-  SUPPEN,
+  SAUCES,
+  STANDARD_PASTAS,
   TOPPINGS,
-  VORSPEISEN,
 } from "@/lib/menu-data";
 
 import { catalogNameTr } from "@/lib/catalog-name-tr";
@@ -34,14 +30,10 @@ export function getStaticCatalog(): CatalogItem[] {
   let o = 0;
   const blocks: { items: MenuItem[]; cat: CatalogCategory }[] = [
     { items: PASTAS, cat: "pasta_base" },
-    { items: SAUCEN_KLASSISCH, cat: "sauce" },
-    { items: SAUCEN_VEGAN, cat: "sauce" },
+    { items: SAUCES, cat: "sauce" },
     { items: TOPPINGS, cat: "topping" },
-    { items: CHEF_SPECIALS_CLASSIC, cat: "chef_special" },
-    { items: CHEF_SPECIALS_VEGAN, cat: "chef_special" },
-    { items: SUPPEN, cat: "soup" },
-    { items: VORSPEISEN, cat: "starter" },
-    { items: DRINKS, cat: "drink" },
+    { items: STANDARD_PASTAS, cat: "chef_special" },
+    { items: DESSERTS, cat: "dessert" },
   ];
   for (const { items, cat } of blocks) {
     out.push(...mapItems(items, cat, o));
