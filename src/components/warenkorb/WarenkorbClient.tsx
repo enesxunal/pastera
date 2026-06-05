@@ -51,6 +51,8 @@ export function WarenkorbClient() {
   const [pickupBranchId, setPickupBranchId] = useState("");
   const [pickupName, setPickupName] = useState("");
   const [pickupPhone, setPickupPhone] = useState("");
+  const [profileName, setProfileName] = useState("");
+  const [profilePhone, setProfilePhone] = useState("");
 
   const refresh = useCallback(() => {
     setCart(loadCartSnapshot());
@@ -79,13 +81,36 @@ export function WarenkorbClient() {
   }, [refresh, syncDelivery]);
 
   useEffect(() => {
-    if (!user || loadDeliveryContext() || loadDineInContext() || loadPickupContext()) return;
+    if (!user) {
+      setSavedAddresses([]);
+      setProfileName("");
+      setProfilePhone("");
+      return;
+    }
 
     void (async () => {
-      const res = await fetch("/api/account/addresses", { credentials: "include" });
-      const j = (await res.json()) as { addresses?: SavedAddress[] };
-      const list = j.addresses ?? [];
-      setSavedAddresses(list);
+      const [addrRes, profileRes] = await Promise.all([
+        fetch("/api/account/addresses", { credentials: "include" }),
+        fetch("/api/account/profile", { credentials: "include" }),
+      ]);
+      const addrJson = (await addrRes.json()) as { addresses?: SavedAddress[] };
+      setSavedAddresses(addrJson.addresses ?? []);
+
+      const profileJson = (await profileRes.json()) as {
+        profile?: { full_name?: string; phone?: string };
+      };
+      const p = profileJson.profile;
+      const name = p?.full_name?.trim() ?? "";
+      const phone = p?.phone?.trim() ?? "";
+      if (name) {
+        setProfileName(name);
+        setPickupName((x) => x || name);
+      }
+      if (phone) {
+        setProfilePhone(phone);
+        setPhoneInput((x) => x || phone);
+        setPickupPhone((x) => x || phone);
+      }
     })().catch(() => {});
   }, [user]);
 
@@ -108,18 +133,6 @@ export function WarenkorbClient() {
       .catch(() => {});
   }, [mounted]);
 
-  useEffect(() => {
-    if (!user || modeTab !== "pickup" || loadPickupContext() || loadDineInContext()) return;
-    void fetch("/api/account/profile", { credentials: "include" })
-      .then((r) => r.json())
-      .then((j: { profile?: { full_name?: string; phone?: string } }) => {
-        const p = j.profile;
-        if (p?.full_name) setPickupName((x) => x || p.full_name!);
-        if (p?.phone) setPickupPhone((x) => x || p.phone!);
-      })
-      .catch(() => {});
-  }, [user, modeTab]);
-
   function switchToDeliveryTab() {
     setCheckoutErr("");
     setModeTab("delivery");
@@ -131,34 +144,54 @@ export function WarenkorbClient() {
     setCheckoutErr("");
     setModeTab("pickup");
     clearDeliveryContext();
+    if (user && pickupBranchId) confirmPickupOnCart(pickupBranchId);
     syncDelivery();
   }
 
-  function confirmPickupOnCart() {
+  useEffect(() => {
+    if (!mounted || !user || modeTab !== "pickup" || loadPickupContext() || loadDineInContext()) return;
+    if (!pickupBranchId || branches.length === 0) return;
+    confirmPickupOnCart(pickupBranchId);
+  }, [mounted, user, modeTab, pickupBranchId, branches.length]);
+
+  function confirmPickupOnCart(branchId = pickupBranchId) {
     setCheckoutErr("");
-    const b = branches.find((x) => x.id === pickupBranchId);
+    const b = branches.find((x) => x.id === branchId);
     if (!b) {
       setCheckoutErr(t("cart.checkoutFailed"));
       return;
     }
+    const name = user
+      ? profileName || pickupName.trim() || String(user.user_metadata?.full_name ?? "")
+      : pickupName.trim();
+    const phone = user ? profilePhone || pickupPhone.trim() : pickupPhone.trim();
     savePickupContext({
       branchId: b.id,
       branchSlug: b.slug,
       branchName: b.name,
-      customerName: pickupName.trim() || undefined,
-      customerPhone: pickupPhone.trim() || undefined,
+      customerName: name || undefined,
+      customerPhone: phone || undefined,
     });
     syncDelivery();
   }
 
+  function handlePickupBranchChange(branchId: string) {
+    setPickupBranchId(branchId);
+    if (user) confirmPickupOnCart(branchId);
+  }
+
   async function applySavedAddress(addr: SavedAddress) {
     setCheckoutErr("");
-    const phone = phoneInput.trim() || loadDeliveryContact()?.customerPhone?.trim();
+    const phone =
+      profilePhone ||
+      phoneInput.trim() ||
+      loadDeliveryContact()?.customerPhone?.trim();
     if (!phone) {
       setCheckoutErr(t("cart.phoneRequired"));
       return;
     }
-    const name = String(user?.user_metadata?.full_name ?? user?.email ?? "");
+    const name =
+      profileName || String(user?.user_metadata?.full_name ?? user?.email ?? "");
     setActivateBusy(true);
     try {
       const result = await activateSavedAddress(addr, {
@@ -313,8 +346,7 @@ export function WarenkorbClient() {
   }
 
   const sections = resolveCartSections(cart, catalog, locale);
-  const { bowlLines, bowlSubtotal, boxLayers, extras, extrasSubtotal, pastaName, total } =
-    sections;
+  const { bowlLines, bowlSubtotal, boxLayers, extras, pastaName, total } = sections;
   const dineIn = mounted && deliveryReady ? loadDineInContext() : null;
   const delivery = mounted && deliveryReady ? loadDeliveryContext() : null;
   const pickup = mounted && deliveryReady ? loadPickupContext() : null;
@@ -326,6 +358,8 @@ export function WarenkorbClient() {
     : pickup
       ? t("cart.checkoutPickup")
       : t("cart.checkoutDelivery");
+  const itemCount = (bowlLines.length > 0 ? 1 : 0) + extras.reduce((n, x) => n + x.qty, 0);
+  const showPhoneInput = !!user && !profilePhone;
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 pb-28 sm:px-6 lg:py-14 lg:pb-14">
@@ -338,88 +372,73 @@ export function WarenkorbClient() {
       <p className="mt-2 max-w-xl text-white/55">{t("cart.pageSubtitle")}</p>
 
       <div className="mt-10 grid gap-8 lg:grid-cols-[1fr_320px] lg:items-start">
-        <div className="order-2 flex flex-col gap-8 lg:order-1">
+        <div className="order-2 flex flex-col gap-6 lg:order-1">
           <motion.section
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             className="overflow-hidden rounded-2xl border-2 border-[#2e402a] bg-gradient-to-b from-[#141414] to-[#0c0c0c] shadow-box"
           >
-            <div className="border-b border-[#2e402a]/80 bg-[#1a1a1a]/80 px-5 py-4">
+            <div className="flex items-center justify-between border-b border-[#2e402a]/80 bg-[#1a1a1a]/80 px-5 py-4">
               <h2 className="font-display text-lg font-bold text-[#c49746]">
-                {t("cart.sectionBowl")}
+                {t("cart.sectionProducts")}
               </h2>
-              <p className="mt-0.5 text-sm text-white/50">{pastaName}</p>
+              {itemCount > 0 ? (
+                <span className="rounded-full bg-[#2e402a]/60 px-2.5 py-0.5 text-xs font-semibold text-white/70">
+                  {itemCount}
+                </span>
+              ) : null}
             </div>
-            <div className="p-5 sm:p-6">
-              <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
-                <div className="min-w-0 flex-1 space-y-3">
-                  <div className="flex items-baseline justify-between gap-3 border-b border-white/[0.08] pb-3">
-                    <span className="text-base font-semibold text-white">{bowlLines[0]?.label}</span>
-                    <span className="shrink-0 text-sm font-semibold text-[#c49746]">
-                      {bowlLines[0] ? formatEur(bowlLines[0].amount) : "—"}
+
+            <div className="divide-y divide-[#2e402a]/60">
+              {bowlLines.length > 0 ? (
+                <div className="p-5 sm:p-6">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="font-semibold text-white">{pastaName}</p>
+                      <p className="mt-0.5 text-xs uppercase tracking-widest text-white/40">
+                        {t("cart.sectionBowl")}
+                      </p>
+                    </div>
+                    <span className="shrink-0 font-display text-lg font-bold text-[#c49746]">
+                      {formatEur(bowlSubtotal)}
                     </span>
                   </div>
                   {bowlDetailLines.length > 0 ? (
-                    <ul className="space-y-2">
+                    <ul className="mt-3 space-y-1.5 border-l-2 border-[#c49746]/30 pl-3">
                       {bowlDetailLines.map((line, idx) => (
                         <li
                           key={`${line.kind}-${line.label}-${idx}`}
-                          className="flex justify-between gap-3 text-sm"
+                          className="flex justify-between gap-3 text-sm text-white/70"
                         >
-                          <span className="text-white/75">{line.label}</span>
-                          <span className="shrink-0 font-medium text-[#c49746]/90">
-                            {formatEur(line.amount)}
-                          </span>
+                          <span>{line.label}</span>
+                          <span className="shrink-0 text-[#c49746]/90">{formatEur(line.amount)}</span>
                         </li>
                       ))}
                     </ul>
                   ) : (
-                    <p className="text-sm text-white/40">{t("cart.bowlEmptyHint")}</p>
+                    <p className="mt-2 text-sm text-white/40">{t("cart.bowlEmptyHint")}</p>
                   )}
-                  <div className="flex items-center justify-between border-t border-white/[0.08] pt-4">
-                    <span className="text-xs font-semibold uppercase tracking-widest text-white/45">
-                      {t("cart.bowlSubtotal")}
-                    </span>
-                    <span className="font-display text-xl font-bold text-white">
-                      {formatEur(bowlSubtotal)}
-                    </span>
-                  </div>
                   <Link
                     href="/builder"
-                    className="inline-flex w-full items-center justify-center rounded-xl border-2 border-[#c49746]/55 bg-[#c49746]/10 py-3 text-sm font-bold text-[#c49746] transition hover:bg-[#c49746]/20 sm:w-auto sm:px-8"
+                    className="mt-4 inline-flex min-h-11 items-center rounded-lg border border-[#c49746]/45 px-4 text-sm font-semibold text-[#c49746] transition hover:bg-[#c49746]/10"
                   >
                     {t("cart.editBowl")}
                   </Link>
                 </div>
-              </div>
-            </div>
-          </motion.section>
+              ) : null}
 
-          {extras.length > 0 ? (
-            <motion.section
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.05 }}
-            >
-              <h2 className="font-display text-lg font-bold text-[#c49746]">
-                {t("cart.sectionExtras")}
-              </h2>
-              <ul className="mt-4 flex flex-col gap-4">
-                {extras.map((line) => {
-                  const lineImageSrc = publicMenuImageSrc(line.image);
-                  return (
-                  <li
-                    key={line.id}
-                    className="flex gap-4 rounded-2xl border-2 border-[#2e402a] bg-[#111] p-4 shadow-md"
-                  >
-                    <div className="relative h-24 w-28 shrink-0 overflow-hidden rounded-xl border border-[#2e402a] bg-black">
+              {extras.map((line) => {
+                const lineImageSrc = publicMenuImageSrc(line.image);
+                return (
+                  <div key={line.id} className="flex gap-3 p-4 sm:gap-4 sm:p-5">
+                    <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-[#2e402a] bg-black sm:h-20 sm:w-20">
                       {lineImageSrc ? (
                         <Image
                           src={lineImageSrc}
                           alt=""
                           fill
                           className="object-cover"
-                          sizes="112px"
+                          sizes="80px"
                           unoptimized
                         />
                       ) : (
@@ -429,34 +448,36 @@ export function WarenkorbClient() {
                         />
                       )}
                     </div>
-                    <div className="flex min-w-0 flex-1 flex-col justify-between gap-3">
-                      <div>
-                        <p className="font-semibold text-white">{line.label}</p>
-                        <p className="mt-1 text-xs text-white/45">
-                          {formatEur(line.unitPrice)} · {t("cart.unitEach")}
-                        </p>
-                        <p className="mt-2 text-sm font-bold text-[#c49746]">
+                    <div className="flex min-w-0 flex-1 flex-col justify-between gap-2">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <p className="font-semibold leading-snug text-white">{line.label}</p>
+                          <p className="mt-0.5 text-xs text-white/45">
+                            {formatEur(line.unitPrice)} · {line.qty}×
+                          </p>
+                        </div>
+                        <p className="shrink-0 text-sm font-bold text-[#c49746]">
                           {formatEur(line.lineTotal)}
                         </p>
                       </div>
                       <div className="flex flex-wrap items-center gap-2">
-                        <div className="flex items-center gap-1 rounded-xl border border-[#2e402a] bg-black/40 p-1">
+                        <div className="flex items-center gap-1 rounded-lg border border-[#2e402a] bg-black/40 p-0.5">
                           <button
                             type="button"
                             onClick={() => setExtraQtyInCart(line.id, line.qty - 1)}
-                            className="flex h-11 w-11 items-center justify-center rounded-lg text-lg font-bold text-white transition hover:bg-white/10"
+                            className="flex h-9 w-9 items-center justify-center rounded-md text-base font-bold text-white transition hover:bg-white/10 sm:h-10 sm:w-10"
                             aria-label={t("cart.ariaDecrease")}
                           >
                             −
                           </button>
-                          <span className="min-w-[2rem] text-center font-display text-lg font-bold text-white">
+                          <span className="min-w-[1.75rem] text-center text-sm font-bold text-white">
                             {line.qty}
                           </span>
                           <button
                             type="button"
                             disabled={line.qty >= 99}
                             onClick={() => setExtraQtyInCart(line.id, line.qty + 1)}
-                            className="flex h-11 w-11 items-center justify-center rounded-lg text-lg font-bold text-white transition hover:bg-white/10 disabled:opacity-35"
+                            className="flex h-9 w-9 items-center justify-center rounded-md text-base font-bold text-white transition hover:bg-white/10 disabled:opacity-35 sm:h-10 sm:w-10"
                             aria-label={t("cart.ariaIncrease")}
                           >
                             +
@@ -465,30 +486,21 @@ export function WarenkorbClient() {
                         <button
                           type="button"
                           onClick={() => removeExtraFromCart(line.id)}
-                          className="min-h-11 rounded-lg border border-red-500/35 px-4 py-2 text-sm font-semibold text-red-300/90 hover:bg-red-500/10"
+                          className="text-xs font-semibold text-red-300/80 hover:text-red-300"
                         >
                           {t("cart.remove")}
                         </button>
                       </div>
                     </div>
-                  </li>
-                  );
-                })}
-              </ul>
-              <div className="mt-4 flex justify-end border-t border-[#2e402a]/60 pt-4">
-                <p className="text-sm text-white/55">
-                  <span className="mr-2 uppercase tracking-widest text-white/40">
-                    {t("cart.extrasSubtotal")}
-                  </span>
-                  <span className="font-semibold text-[#c49746]">{formatEur(extrasSubtotal)}</span>
-                </p>
-              </div>
-            </motion.section>
-          ) : null}
+                  </div>
+                );
+              })}
+            </div>
+          </motion.section>
 
-          <div className="rounded-2xl border-2 border-[#2e402a] bg-[#111] p-6 shadow-box">
+          <div className="rounded-2xl border-2 border-[#2e402a] bg-[#111] p-5 shadow-box sm:p-6">
             {dineIn ? (
-              <p className="mb-4 text-sm text-[#c49746]">
+              <p className="mb-4 rounded-xl border border-[#c49746]/35 bg-[#c49746]/10 p-4 text-sm text-[#c49746]">
                 {t("dineIn.banner")} {dineIn.branchName} · {t("account.table")} {dineIn.tableNumber}
               </p>
             ) : (
@@ -496,11 +508,11 @@ export function WarenkorbClient() {
                 <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-white/45">
                   {t("cart.orderModeTitle")}
                 </p>
-                <div className="mb-4 flex flex-wrap gap-2">
+                <div className="mb-5 grid grid-cols-2 gap-2">
                   <button
                     type="button"
                     onClick={() => switchToDeliveryTab()}
-                    className={`min-h-11 rounded-full px-5 py-2.5 text-sm font-bold ${
+                    className={`min-h-11 rounded-xl px-3 py-2.5 text-sm font-bold ${
                       modeTab === "delivery"
                         ? "bg-[#c49746] text-[#0a0a0a]"
                         : "border border-[#2e402a] text-white/60 hover:border-[#c49746]/40"
@@ -511,7 +523,7 @@ export function WarenkorbClient() {
                   <button
                     type="button"
                     onClick={() => switchToPickupTab()}
-                    className={`min-h-11 rounded-full px-5 py-2.5 text-sm font-bold ${
+                    className={`min-h-11 rounded-xl px-3 py-2.5 text-sm font-bold ${
                       modeTab === "pickup"
                         ? "bg-[#c49746] text-[#0a0a0a]"
                         : "border border-[#2e402a] text-white/60 hover:border-[#c49746]/40"
@@ -522,78 +534,89 @@ export function WarenkorbClient() {
                 </div>
 
                 {modeTab === "delivery" ? (
-                  <div className="mb-4">
+                  <div className="mb-5">
                     {delivery ? (
-                      <p className="text-sm text-[#c49746]">
-                        {t("delivery.banner")} {delivery.street}, {delivery.city}
-                      </p>
-                    ) : (
-                      <div className="rounded-xl border border-[#c49746]/35 bg-[#c49746]/10 p-4 text-sm text-white/75">
-                        <p>{t("cart.needDeliveryHint")}</p>
-                        {savedAddresses.length > 0 ? (
-                          <div className="mt-4 space-y-3">
-                            <p className="text-xs font-semibold uppercase tracking-widest text-[#c49746]">
-                              {t("cart.savedAddresses")}
-                            </p>
-                            {savedAddresses.map((addr) => (
-                              <div
-                                key={addr.id}
-                                className="flex flex-col gap-2 rounded-lg border border-[#2e402a] bg-black/30 p-3 sm:flex-row sm:items-center sm:justify-between"
-                              >
-                                <p className="text-white/85">
-                                  <span className="font-semibold">{addr.label}: </span>
-                                  {addr.street}, {addr.postal ? `${addr.postal} ` : ""}
-                                  {addr.city}
-                                </p>
-                                <button
-                                  type="button"
-                                  disabled={activateBusy}
-                                  onClick={() => void applySavedAddress(addr)}
-                                  className="min-h-11 shrink-0 rounded-full px-5 py-2.5 text-sm font-bold text-[#0a0a0a] disabled:opacity-50"
-                                  style={{ backgroundColor: "#c49746" }}
-                                >
-                                  {t("cart.useThisAddress")}
-                                </button>
-                              </div>
-                            ))}
-                            <label className="block text-xs text-white/55">
-                              {t("delivery.phone")}
-                              <input
-                                type="tel"
-                                value={phoneInput}
-                                onChange={(e) => setPhoneInput(e.target.value)}
-                                className="mt-1 w-full rounded-lg border border-[#2e402a] bg-[#111] px-3 py-2 text-white"
-                              />
-                            </label>
-                          </div>
-                        ) : null}
-                        <div className="mt-3">
-                          <Link
-                            href="/lieferung"
-                            className="inline-flex rounded-full px-5 py-2 text-xs font-bold text-[#0a0a0a]"
-                            style={{ backgroundColor: "#c49746" }}
+                      <div className="rounded-xl border-2 border-[#c49746]/50 bg-[#c49746]/10 p-4">
+                        <p className="text-xs font-semibold uppercase tracking-widest text-[#c49746]">
+                          {t("cart.deliverySelected")}
+                        </p>
+                        <p className="mt-2 text-sm text-white">
+                          {delivery.street}, {delivery.postal ? `${delivery.postal} ` : ""}
+                          {delivery.city}
+                        </p>
+                        <p className="mt-1 text-xs text-white/45">{delivery.branchName}</p>
+                      </div>
+                    ) : savedAddresses.length > 0 ? (
+                      <div className="space-y-2">
+                        <p className="text-xs font-semibold uppercase tracking-widest text-white/45">
+                          {t("cart.savedAddresses")}
+                        </p>
+                        {savedAddresses.map((addr) => (
+                          <button
+                            key={addr.id}
+                            type="button"
+                            disabled={activateBusy}
+                            onClick={() => void applySavedAddress(addr)}
+                            className="flex w-full flex-col gap-1 rounded-xl border border-[#2e402a] bg-[#0f0f0f] p-4 text-left transition hover:border-[#c49746]/50 disabled:opacity-50"
                           >
-                            {t("cart.goDelivery")}
-                          </Link>
-                        </div>
+                            <span className="font-semibold text-[#c49746]">{addr.label}</span>
+                            <span className="text-sm text-white/85">
+                              {addr.street}, {addr.postal ? `${addr.postal} ` : ""}
+                              {addr.city}
+                            </span>
+                          </button>
+                        ))}
+                        {showPhoneInput ? (
+                          <label className="mt-3 block text-xs text-white/55">
+                            {t("delivery.phone")}
+                            <input
+                              type="tel"
+                              value={phoneInput}
+                              onChange={(e) => setPhoneInput(e.target.value)}
+                              className="mt-1 w-full rounded-lg border border-[#2e402a] bg-[#111] px-3 py-2.5 text-white"
+                            />
+                          </label>
+                        ) : null}
+                        <Link
+                          href="/lieferung"
+                          className="mt-2 inline-block text-xs text-[#c49746] underline"
+                        >
+                          {t("cart.goDelivery")}
+                        </Link>
+                      </div>
+                    ) : (
+                      <div className="rounded-xl border border-[#2e402a] bg-[#0f0f0f] p-4">
+                        <p className="text-sm text-white/70">{t("cart.needDeliveryHint")}</p>
+                        <Link
+                          href="/lieferung"
+                          className="mt-4 inline-flex min-h-11 items-center rounded-full px-5 text-sm font-bold text-[#0a0a0a]"
+                          style={{ backgroundColor: "#c49746" }}
+                        >
+                          {t("cart.goDelivery")}
+                        </Link>
                       </div>
                     )}
                   </div>
                 ) : (
-                  <div className="mb-4">
+                  <div className="mb-5">
                     {pickup ? (
-                      <p className="text-sm text-[#c49746]">
-                        {t("pickup.banner")} {pickup.branchName}
-                      </p>
+                      <div className="rounded-xl border-2 border-[#c49746]/50 bg-[#c49746]/10 p-4">
+                        <p className="text-xs font-semibold uppercase tracking-widest text-[#c49746]">
+                          {t("cart.pickupSelected")}
+                        </p>
+                        <p className="mt-2 text-sm font-semibold text-white">{pickup.branchName}</p>
+                      </div>
                     ) : (
-                      <div className="space-y-3 rounded-xl border border-[#c49746]/35 bg-[#c49746]/10 p-4 text-sm text-white/75">
-                        <p>{t("cart.pickupHint")}</p>
-                        <label className="block text-xs text-white/55">
+                      <div className="space-y-3 rounded-xl border border-[#2e402a] bg-[#0f0f0f] p-4">
+                        <p className="text-sm text-white/70">
+                          {user ? t("cart.pickupLoggedInHint") : t("cart.pickupHint")}
+                        </p>
+                        <label className="block text-xs font-semibold uppercase tracking-widest text-white/45">
                           {t("cart.pickupBranchLabel")}
                           <select
                             value={pickupBranchId}
-                            onChange={(e) => setPickupBranchId(e.target.value)}
-                            className="mt-1 w-full rounded-lg border border-[#2e402a] bg-[#111] px-3 py-2 text-white"
+                            onChange={(e) => handlePickupBranchChange(e.target.value)}
+                            className="mt-2 w-full rounded-lg border border-[#2e402a] bg-[#111] px-3 py-3 text-base text-white"
                           >
                             {branches.map((b) => (
                               <option key={b.id} value={b.id}>
@@ -602,44 +625,44 @@ export function WarenkorbClient() {
                             ))}
                           </select>
                         </label>
-                        <label className="block text-xs text-white/55">
-                          {t("auth.name")}
-                          <input
-                            value={pickupName}
-                            onChange={(e) => setPickupName(e.target.value)}
-                            className="mt-1 w-full rounded-lg border border-[#2e402a] bg-[#111] px-3 py-2 text-white"
-                          />
-                        </label>
-                        <label className="block text-xs text-white/55">
-                          {t("delivery.phone")}
-                          <input
-                            type="tel"
-                            value={pickupPhone}
-                            onChange={(e) => setPickupPhone(e.target.value)}
-                            className="mt-1 w-full rounded-lg border border-[#2e402a] bg-[#111] px-3 py-2 text-white"
-                          />
-                        </label>
-                        <button
-                          type="button"
-                          onClick={() => confirmPickupOnCart()}
-                          className="w-full rounded-full py-2.5 text-xs font-bold text-[#0a0a0a]"
-                          style={{ backgroundColor: "#c49746" }}
-                        >
-                          {t("cart.pickupSave")}
-                        </button>
-                        <p className="text-center text-xs text-white/40">
-                          <Link href="/abholung" className="text-[#c49746] underline">
-                            {t("cart.goPickup")}
-                          </Link>
-                        </p>
+                        {!user ? (
+                          <>
+                            <label className="block text-xs text-white/55">
+                              {t("auth.name")}
+                              <input
+                                value={pickupName}
+                                onChange={(e) => setPickupName(e.target.value)}
+                                className="mt-1 w-full rounded-lg border border-[#2e402a] bg-[#111] px-3 py-2.5 text-white"
+                              />
+                            </label>
+                            <label className="block text-xs text-white/55">
+                              {t("delivery.phone")}
+                              <input
+                                type="tel"
+                                value={pickupPhone}
+                                onChange={(e) => setPickupPhone(e.target.value)}
+                                className="mt-1 w-full rounded-lg border border-[#2e402a] bg-[#111] px-3 py-2.5 text-white"
+                              />
+                            </label>
+                            <button
+                              type="button"
+                              onClick={() => confirmPickupOnCart()}
+                              className="w-full min-h-11 rounded-full text-sm font-bold text-[#0a0a0a]"
+                              style={{ backgroundColor: "#c49746" }}
+                            >
+                              {t("cart.pickupSave")}
+                            </button>
+                          </>
+                        ) : null}
                       </div>
                     )}
                   </div>
                 )}
               </>
             )}
+
             {canCheckout ? (
-              <div className="mb-4">
+              <div className="mb-4 border-t border-[#2e402a]/60 pt-5">
                 <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-white/45">
                   {t("cart.paymentMethod")}
                 </p>
