@@ -113,16 +113,19 @@ function PastaBoxPreview({
   const showPastaStream = pouring?.kind === "pasta";
   const showToppingStream = pouring?.kind === "topping";
 
+  const pourOverlay = (
+    <AnimatePresence>
+      {showPastaStream ? <PastaPourStream pastaId={pastaId} /> : null}
+      {showSauceStream ? <SaucePourStream color={sauceColor(pouring.id)} /> : null}
+      {showToppingStream ? <ToppingPourStream layerId={pouring.id} /> : null}
+    </AnimatePresence>
+  );
+
   if (isFab) {
     return (
       <div className="pointer-events-none relative h-full w-full overflow-hidden">
-        <AnimatePresence>
-          {showPastaStream ? <PastaPourStream pastaId={pastaId} /> : null}
-          {showSauceStream ? <SaucePourStream color={sauceColor(pouring.id)} /> : null}
-          {showToppingStream ? <ToppingPourStream layerId={pouring.id} /> : null}
-        </AnimatePresence>
         <div className="absolute left-1/2 top-1/2 w-[260px] -translate-x-1/2 -translate-y-[42%] scale-[0.28]">
-          <PasteraIsometricBox>
+          <PasteraIsometricBox pourOverlay={pourOverlay}>
             <BoxInterior pastaId={pastaId} layers={layers} pouring={pouring} />
           </PasteraIsometricBox>
         </div>
@@ -153,13 +156,7 @@ function PastaBoxPreview({
       </AnimatePresence>
 
       <div className={`relative w-full ${isCompact ? "scale-[0.92] origin-top" : ""}`}>
-        <AnimatePresence>
-          {showPastaStream ? <PastaPourStream pastaId={pastaId} /> : null}
-          {showSauceStream ? <SaucePourStream color={sauceColor(pouring.id)} /> : null}
-          {showToppingStream ? <ToppingPourStream layerId={pouring.id} /> : null}
-        </AnimatePresence>
-
-        <PasteraIsometricBox>
+        <PasteraIsometricBox pourOverlay={pourOverlay}>
           <BoxInterior pastaId={pastaId} layers={layers} pouring={pouring} />
         </PasteraIsometricBox>
 
