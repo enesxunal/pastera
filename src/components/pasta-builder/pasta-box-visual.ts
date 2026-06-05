@@ -29,19 +29,50 @@ export function sauceColor(id: string): string {
 /** Sos opaklığı — krema daha açık, domates daha yoğun. */
 export function sauceOpacity(id: string): number {
   if (id.includes("krema") || id.includes("sahne") || id.includes("choc-white") || id.includes("rahm"))
-    return 0.62;
-  if (id.includes("pesto")) return 0.58;
-  return 0.72;
+    return 0.78;
+  if (id.includes("pesto")) return 0.72;
+  return 0.85;
 }
 
-export function pastaTint(pastaId?: string): { noodle: string; glow: string; shadow: string } {
+export function pastaTint(pastaId?: string): {
+  noodle: string;
+  glow: string;
+  shadow: string;
+  flour: string;
+  edge: string;
+} {
   if (pastaId?.includes("vegan"))
-    return { noodle: "#c8d4a0", glow: "#8faa6a", shadow: "#5a7040" };
+    return {
+      noodle: "#d4ddb8",
+      glow: "#e8efd0",
+      shadow: "#9aaa78",
+      flour: "#f6f9ee",
+      edge: "#b8c898",
+    };
   if (pastaId?.includes("nero") || pastaId === "noodle-black")
-    return { noodle: "#2a2a2a", glow: "#111", shadow: "#000" };
+    return {
+      noodle: "#2a2a2a",
+      glow: "#3d3d3d",
+      shadow: "#111",
+      flour: "#555",
+      edge: "#1a1a1a",
+    };
   if (pastaId?.includes("chocolate") || pastaId?.includes("choc"))
-    return { noodle: "#8b5a3c", glow: "#5c3820", shadow: "#3d2314" };
-  return { noodle: "#f0d898", glow: "#d4b060", shadow: "#a08040" };
+    return {
+      noodle: "#9a6848",
+      glow: "#b88058",
+      shadow: "#5c3820",
+      flour: "#c8a080",
+      edge: "#6b4428",
+    };
+  /* Taze yumurtalı fettuccine — krem sarı + unlu mat yüzey */
+  return {
+    noodle: "#ebe0c4",
+    glow: "#f5eed8",
+    shadow: "#c4b490",
+    flour: "#faf7ef",
+    edge: "#d8ccb0",
+  };
 }
 
 export type ToppingPieceKind =

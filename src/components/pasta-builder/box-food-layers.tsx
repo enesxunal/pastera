@@ -2,11 +2,12 @@
 
 import { motion } from "framer-motion";
 import {
+  clampToMouth,
   MOUTH_BOTTOM,
   MOUTH_TOP,
+  mouthSpanAtY,
   PASTA_CENTER,
-  PASTA_PILE_LEFT,
-  PASTA_PILE_RIGHT,
+  PASTA_MOUND,
   scatterToppingPieces,
 } from "./box-layout";
 import {
@@ -28,109 +29,247 @@ type Pouring =
 
 type Layer = { id: string };
 
-/** Makarna — fettuccine şeritleri, daha dolu ve gerçekçi. */
+type FettuccineRibbon = {
+  d: string;
+  width: number;
+  fill: string;
+  edge: string;
+  layer: number;
+  i: number;
+};
+
+function ribbonHash(i: number, salt: number): number {
+  return Math.abs(((i * 7919 + salt * 997) ^ (i << 3)) % 1000) / 1000;
+}
+
+function rotPoint(
+  x: number,
+  y: number,
+  pivotX: number,
+  pivotY: number,
+  rad: number,
+): { x: number; y: number } {
+  const cos = Math.cos(rad);
+  const sin = Math.sin(rad);
+  const dx = x - pivotX;
+  const dy = y - pivotY;
+  return {
+    x: pivotX + dx * cos - dy * sin,
+    y: pivotY + dx * sin + dy * cos,
+  };
+}
+
+/** Geniş fettuccine — kutu ağzını baştan sona doldurur, ortası boş kalmaz. */
+function buildFettuccineRibbons(centerX: number, colors: ReturnType<typeof pastaTint>): FettuccineRibbon[] {
+  const count = 78;
+  const ribbons: FettuccineRibbon[] = [];
+
+  for (let i = 0; i < count; i++) {
+    const t = i / (count - 1);
+    const h1 = ribbonHash(i, 1);
+    const h2 = ribbonHash(i, 2);
+    const h3 = ribbonHash(i, 3);
+    const h4 = ribbonHash(i, 4);
+
+    const baseY = MOUTH_BOTTOM - 6 - t * (MOUTH_BOTTOM - MOUTH_TOP - 8);
+    const span = mouthSpanAtY(baseY);
+    const inset = 28 + t * 12;
+    const usableLeft = span.left + inset;
+    const usableRight = span.right - inset;
+    const usableW = Math.max(40, usableRight - usableLeft);
+
+    const centered = i < count * 0.5;
+    const cx = centered
+      ? centerX + (h1 - 0.5) * usableW * 0.18
+      : usableLeft + h1 * usableW;
+    const len = usableW * (0.38 + h2 * 0.28);
+    const bend = 8 + h3 * 14;
+    const twist = (h4 - 0.5) * 10;
+    const angle = (-18 + h1 * 36 + (i % 2 ? 6 : -6)) * (Math.PI / 180);
+    const depth = Math.floor(t * 4);
+    const width = 20 + h2 * 10 - depth * 1.5;
+
+    const x0 = cx - len * 0.52;
+    const x1 = cx - len * 0.12;
+    const x2 = cx + len * 0.18;
+    const x3 = cx + len * 0.52;
+    const r0 = rotPoint(x0, baseY + twist * 0.15, cx, baseY, angle);
+    const r1 = rotPoint(x1, baseY - bend, cx, baseY, angle);
+    const r2 = rotPoint(x2, baseY + bend * 0.55, cx, baseY, angle);
+    const r3 = rotPoint(x3, baseY - twist * 0.4, cx, baseY, angle);
+    const p0 = clampToMouth(r0.x, r0.y);
+    const p1 = clampToMouth(r1.x, r1.y);
+    const p2 = clampToMouth(r2.x, r2.y);
+    const p3 = clampToMouth(r3.x, r3.y);
+
+    const d = `M ${p0.x.toFixed(1)} ${p0.y.toFixed(1)} C ${p1.x.toFixed(1)} ${p1.y.toFixed(1)}, ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}, ${p3.x.toFixed(1)} ${p3.y.toFixed(1)}`;
+
+    ribbons.push({
+      d,
+      width,
+      fill: i % 3 === 0 ? colors.glow : colors.noodle,
+      edge: colors.edge,
+      layer: depth,
+      i,
+    });
+  }
+
+  return ribbons.sort((a, b) => a.layer - b.layer);
+}
+
+function buildFlourDust(centerX: number): { cx: number; cy: number; r: number; o: number }[] {
+  return Array.from({ length: 90 }, (_, i) => {
+    const h1 = ribbonHash(i, 11);
+    const h2 = ribbonHash(i, 12);
+    const h3 = ribbonHash(i, 13);
+    const y = MOUTH_TOP + 10 + h3 * (MOUTH_BOTTOM - MOUTH_TOP - 16);
+    const span = mouthSpanAtY(y);
+    const cx = span.left + 20 + h2 * (span.width - 40);
+    return {
+      cx: i % 3 === 0 ? centerX + (h1 - 0.5) * span.width * 0.35 : cx,
+      cy: y,
+      r: 0.9 + (h1 % 0.8) * 2.4,
+      o: 0.3 + h2 * 0.4,
+    };
+  });
+}
+
+/** Yığılmış hacim katmanları — boşluk bırakmaz. */
+function buildVolumeLayers(centerX: number): string[] {
+  return Array.from({ length: 10 }, (_, i) => {
+    const t = i / 9;
+    const y = MOUTH_BOTTOM - 8 - t * (MOUTH_BOTTOM - MOUTH_TOP - 6);
+    const span = mouthSpanAtY(y);
+    const inset = 8 + t * 22;
+    const l = span.left + inset;
+    const r = span.right - inset;
+    const peak = MOUTH_TOP + 4 + (1 - t) * 6;
+    return `M ${l} ${y + 6} Q ${centerX} ${peak} ${r} ${y + 6} L ${r - 20} ${y + 14} Q ${centerX} ${peak + 10} ${l + 20} ${y + 14} Z`;
+  });
+}
+
+/** Makarna — taze fettuccine yığını (geniş şerit, unlu mat yüzey). */
 export function PastaPileSvg({
   pastaId,
   pouring,
+  uid = "pasta",
 }: {
   pastaId?: string;
   pouring?: boolean;
+  uid?: string;
 }) {
-  const { noodle, glow, shadow } = pastaTint(pastaId);
+  const colors = pastaTint(pastaId);
   const { cx: centerX } = PASTA_CENTER;
-
-  const ribbons = Array.from({ length: 32 }, (_, i) => {
-    const t = i / 31;
-    const cy = MOUTH_BOTTOM - 6 - t * (MOUTH_BOTTOM - MOUTH_TOP - 20);
-    const spread = 1 - t * 0.55;
-    const rx = (300 - t * 130) * spread + (i % 4) * 6;
-    const ry = 7 + (i % 3) * 2 - t * 3;
-    const rot = -18 + (i % 9) * 5 + (i % 2 ? 8 : -6);
-    const cx = centerX + ((i % 7) - 3) * 14;
-    const curve = i % 2 ? 1 : -1;
-    return { cx, cy, rx, ry, rot, curve, i };
-  });
+  const ribbons = buildFettuccineRibbons(centerX, colors);
+  const flour = buildFlourDust(centerX);
+  const volumes = buildVolumeLayers(centerX);
 
   return (
     <g>
-      {/* Gölge tabanı */}
-      <path
-        d={`M ${PASTA_PILE_LEFT} ${MOUTH_BOTTOM} Q ${centerX} ${MOUTH_TOP + 28} ${PASTA_PILE_RIGHT} ${MOUTH_BOTTOM} Z`}
-        fill={shadow}
-        opacity={0.35}
-      />
-      {/* Hacim */}
-      <path
-        d={`M ${PASTA_PILE_LEFT + 20} ${MOUTH_BOTTOM - 2} Q ${centerX} ${MOUTH_TOP + 18} ${PASTA_PILE_RIGHT - 20} ${MOUTH_BOTTOM - 2} Z`}
-        fill={noodle}
-        opacity={0.45}
-      />
+      <defs>
+        <radialGradient id={`pasta-mound-${uid}`} cx="50%" cy="72%" r="88%">
+          <stop offset="0%" stopColor={colors.glow} stopOpacity="0.95" />
+          <stop offset="55%" stopColor={colors.noodle} stopOpacity="0.92" />
+          <stop offset="100%" stopColor={colors.shadow} stopOpacity="0.75" />
+        </radialGradient>
+      </defs>
 
-      {ribbons.map((s) => {
-        const x1 = s.cx - s.rx * 0.85;
-        const x2 = s.cx + s.rx * 0.85;
-        const y = s.cy;
-        const bulge = s.curve * 6;
-        const d = `M ${x1} ${y} Q ${s.cx} ${y - bulge} ${x2} ${y}`;
+      {/* Ana kütle — kutu ağzının tamamını doldurur */}
+      <path d={PASTA_MOUND} fill={`url(#pasta-mound-${uid})`} />
+      <path d={PASTA_MOUND} fill={colors.noodle} opacity={0.35} />
 
-        return (
-          <motion.g
-            key={s.i}
-            initial={pouring ? { opacity: 0, y: -40 } : false}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-              type: "spring",
-              stiffness: 190,
-              damping: 16,
-              delay: pouring ? s.i * 0.02 : 0,
-            }}
-          >
-            <ellipse
-              cx={s.cx}
-              cy={s.cy + 2}
-              rx={s.rx}
-              ry={s.ry + 1}
-              fill={shadow}
-              opacity={0.25}
-              transform={`rotate(${s.rot} ${s.cx} ${s.cy})`}
-            />
-            <path
-              d={d}
-              fill="none"
-              stroke={s.i % 3 === 0 ? glow : noodle}
-              strokeWidth={s.ry * 1.6}
-              strokeLinecap="round"
-              opacity={0.92}
-              transform={`rotate(${s.rot} ${s.cx} ${s.cy})`}
-            />
-            <path
-              d={d}
-              fill="none"
-              stroke="rgba(255,255,255,0.18)"
-              strokeWidth={s.ry * 0.5}
-              strokeLinecap="round"
-              transform={`rotate(${s.rot} ${s.cx} ${s.cy})`}
-            />
-          </motion.g>
-        );
-      })}
+      {volumes.map((d, i) => (
+        <path
+          key={`vol-${i}`}
+          d={d}
+          fill={i % 2 ? colors.glow : colors.noodle}
+          opacity={0.38 + (i / volumes.length) * 0.2}
+        />
+      ))}
+
+      {ribbons.map((s) => (
+        <motion.g
+          key={s.i}
+          initial={pouring ? { opacity: 0, y: -50 } : false}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{
+            type: "spring",
+            stiffness: 175,
+            damping: 17,
+            delay: pouring ? s.i * 0.018 : 0,
+          }}
+        >
+          <path
+            d={s.d}
+            fill="none"
+            stroke={colors.shadow}
+            strokeWidth={s.width + 3}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            opacity={0.35}
+          />
+          <path
+            d={s.d}
+            fill="none"
+            stroke={s.fill}
+            strokeWidth={s.width}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            opacity={0.94}
+          />
+          <path
+            d={s.d}
+            fill="none"
+            stroke={s.edge}
+            strokeWidth={1.2}
+            strokeLinecap="round"
+            opacity={0.35}
+          />
+          <path
+            d={s.d}
+            fill="none"
+            stroke={colors.flour}
+            strokeWidth={s.width * 0.35}
+            strokeLinecap="round"
+            opacity={0.55}
+          />
+        </motion.g>
+      ))}
+
+      {flour.map((f, i) => (
+        <ellipse
+          key={`flour-${i}`}
+          cx={f.cx}
+          cy={f.cy}
+          rx={f.r}
+          ry={f.r * 0.7}
+          fill={colors.flour}
+          opacity={f.o}
+        />
+      ))}
     </g>
   );
 }
 
-/** Sos — makarna üstüne ince tabaka, ortadan yukarı yayılır. */
-function sauceDrapePath(cx: number, baseY: number, spread: number, rise: number): string {
-  const top = baseY - rise;
-  const w = spread;
-  return [
-    `M ${cx - w * 0.15} ${baseY + 6}`,
-    `C ${cx - w * 0.55} ${baseY - 4} ${cx - w * 0.95} ${top + rise * 0.55} ${cx - w * 0.82} ${top + rise * 0.2}`,
-    `Q ${cx - w * 0.2} ${top - 2} ${cx} ${top - 5}`,
-    `Q ${cx + w * 0.2} ${top - 2} ${cx + w * 0.82} ${top + rise * 0.2}`,
-    `C ${cx + w * 0.95} ${top + rise * 0.55} ${cx + w * 0.55} ${baseY - 4} ${cx + w * 0.15} ${baseY + 6}`,
-    `Q ${cx} ${baseY + 10} ${cx - w * 0.15} ${baseY + 6}`,
-    "Z",
-  ].join(" ");
+function sauceHash(id: string, salt: number): number {
+  let h = salt * 997;
+  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i) * (i + 5)) | 0;
+  return Math.abs(h);
+}
+
+/** Sos havuzu — hep ortadan, boyut/oval oranı sos id'sine göre değişir. */
+function saucePoolSize(id: string): { cx: number; cy: number; rx: number; ry: number } {
+  const { cx } = PASTA_CENTER;
+  const h1 = sauceHash(id, 1);
+  const h2 = sauceHash(id, 2);
+  const cy = 84;
+
+  return {
+    cx,
+    cy,
+    rx: 268 + (h1 % 32),
+    ry: 54 + (h2 % 26),
+  };
 }
 
 export function SauceSpreadSvg({
@@ -155,19 +294,19 @@ export function SauceSpreadSvg({
               key={layer.id}
               id={`sauce-pool-${uid}-${index}`}
               cx="50%"
-              cy="78%"
+              cy="40%"
               fx="50%"
-              fy="90%"
-              r="68%"
+              fy="36%"
+              r="78%"
             >
-              <stop offset="0%" stopColor={color} stopOpacity={op * 0.55} />
-              <stop offset="45%" stopColor={color} stopOpacity={op * 0.85} />
+              <stop offset="0%" stopColor={color} stopOpacity={op * 0.92} />
+              <stop offset="55%" stopColor={color} stopOpacity={op * 0.82} />
               <stop offset="100%" stopColor={color} stopOpacity={op * 0.35} />
             </radialGradient>
           );
         })}
-        <filter id={`sauce-blur-${uid}`} x="-8%" y="-8%" width="116%" height="116%">
-          <feGaussianBlur stdDeviation="2.5" />
+        <filter id={`sauce-blur-${uid}`} x="-5%" y="-5%" width="110%" height="110%">
+          <feGaussianBlur stdDeviation="1.2" />
         </filter>
       </defs>
 
@@ -202,60 +341,83 @@ function SauceLayer({
   pouring?: boolean;
 }) {
   const color = sauceColor(id);
-  const { cx } = PASTA_CENTER;
-  const baseY = 138 + index * 2;
-  const spread = 240 - index * 18;
-  const rise = 72 + index * 5;
-  const pool = sauceDrapePath(cx, baseY, spread, rise);
+  const pool = saucePoolSize(id);
 
   return (
-    <motion.g
-      style={{ transformOrigin: `${cx}px ${baseY}px` }}
-      initial={pouring ? { scale: 0.08, opacity: 0 } : { scale: 0.3, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      transition={{
-        type: "spring",
-        stiffness: 130,
-        damping: 18,
-        delay: pouring ? 0.2 : index * 0.06,
-      }}
-    >
-      <path d={pool} fill={`url(#${gradientId})`} filter={`url(#${blurId})`} />
-      <path
-        d={pool}
-        fill="none"
-        stroke={color}
-        strokeWidth={1.5}
-        opacity={0.25}
+    <g>
+      <motion.ellipse
+        cx={pool.cx}
+        cy={pool.cy}
+        fill={`url(#${gradientId})`}
+        filter={`url(#${blurId})`}
+        initial={
+          pouring
+            ? { rx: 6, ry: 3, opacity: 0 }
+            : { rx: pool.rx * 0.12, ry: pool.ry * 0.12, opacity: 0 }
+        }
+        animate={{ rx: pool.rx, ry: pool.ry, opacity: 0.92 - index * 0.04 }}
+        transition={{
+          type: "spring",
+          stiffness: 120,
+          damping: 17,
+          delay: pouring ? 0.35 + index * 0.05 : index * 0.06,
+        }}
       />
       <ellipse
-        cx={cx - spread * 0.22}
-        cy={baseY - rise * 0.45}
-        rx={spread * 0.14}
-        ry={rise * 0.07}
+        cx={pool.cx - pool.rx * 0.2}
+        cy={pool.cy - pool.ry * 0.25}
+        rx={pool.rx * 0.17}
+        ry={pool.ry * 0.19}
         fill="rgba(255,255,255,0.12)"
       />
-    </motion.g>
+      <ellipse
+        cx={pool.cx}
+        cy={pool.cy}
+        rx={pool.rx}
+        ry={pool.ry}
+        fill="none"
+        stroke={color}
+        strokeWidth={1}
+        opacity={0.15}
+      />
+    </g>
   );
 }
 
 function SaucePourStream({ id, color }: { id: string; color: string }) {
-  const { cx, cy } = PASTA_CENTER;
+  const pool = saucePoolSize(id);
   const op = sauceOpacity(id);
+  const streamTop = 6;
+  const streamEnd = pool.cy - pool.ry * 0.12;
 
   return (
     <g>
-      <motion.path
-        d={`M ${cx} ${MOUTH_TOP + 4} Q ${cx + 8} ${cy * 0.6} ${cx} ${cy + 14}`}
-        pathLength={1}
-        stroke={color}
-        strokeWidth={12}
-        strokeLinecap="round"
-        fill="none"
+      <motion.rect
+        x={pool.cx - 5}
+        width={10}
+        rx={5}
+        fill={color}
         opacity={op}
-        initial={{ pathLength: 0, opacity: 0 }}
-        animate={{ pathLength: [0, 1, 1], opacity: [0, op, 0] }}
-        transition={{ duration: 0.9, times: [0, 0.42, 1], ease: EASE }}
+        initial={{ y: streamTop, height: 0 }}
+        animate={{
+          y: [streamTop, streamTop, streamEnd],
+          height: [0, streamEnd - streamTop, 0],
+          opacity: [0, op * 0.95, 0],
+        }}
+        transition={{ duration: 0.85, times: [0, 0.4, 1], ease: EASE }}
+      />
+      <motion.ellipse
+        cx={pool.cx}
+        cy={pool.cy}
+        fill={color}
+        opacity={op}
+        initial={{ rx: 4, ry: 2, opacity: 0 }}
+        animate={{
+          rx: [4, pool.rx * 1.08, pool.rx],
+          ry: [2, pool.ry * 1.08, pool.ry],
+          opacity: [0, op * 0.85, 0],
+        }}
+        transition={{ duration: 0.9, delay: 0.28, ease: EASE }}
       />
     </g>
   );
@@ -552,7 +714,7 @@ export function BoxFoodSvg({
 }) {
   return (
     <g>
-      <PastaPileSvg pastaId={pastaId} pouring={pouring?.kind === "pasta"} />
+      <PastaPileSvg pastaId={pastaId} pouring={pouring?.kind === "pasta"} uid={uid} />
       <SauceSpreadSvg layers={layers} pouring={pouring} uid={uid} />
       <ToppingScatterSvg layers={layers} pouring={pouring} />
     </g>

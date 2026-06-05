@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 import {
   clearCartSnapshot,
   loadCartSnapshot,
+  removeBowlFromCart,
   removeExtraFromCart,
   resolveCartLines,
   resolveCartSections,
@@ -29,7 +30,6 @@ import type { PaymentType } from "@/lib/order-types";
 import { formatEur } from "@/lib/format";
 import { publicMenuImageSrc } from "@/lib/normalize-menu-image";
 import { MobileActionBar } from "@/components/layout/MobileActionBar";
-import { PastaBox } from "@/components/pasta-builder/PastaBox";
 
 type BranchOption = { id: string; slug: string; name: string };
 
@@ -346,19 +346,18 @@ export function WarenkorbClient() {
   }
 
   const sections = resolveCartSections(cart, catalog, locale);
-  const { bowlLines, bowlSubtotal, boxLayers, extras, pastaName, total } = sections;
+  const { bowls, extras, total } = sections;
   const dineIn = mounted && deliveryReady ? loadDineInContext() : null;
   const delivery = mounted && deliveryReady ? loadDeliveryContext() : null;
   const pickup = mounted && deliveryReady ? loadPickupContext() : null;
   const canCheckout = !!(dineIn || delivery || pickup);
 
-  const bowlDetailLines = bowlLines.slice(1);
   const checkoutLabel = dineIn
     ? t("cart.checkoutDineIn")
     : pickup
       ? t("cart.checkoutPickup")
       : t("cart.checkoutDelivery");
-  const itemCount = (bowlLines.length > 0 ? 1 : 0) + extras.reduce((n, x) => n + x.qty, 0);
+  const itemCount = bowls.length + extras.reduce((n, x) => n + x.qty, 0);
   const showPhoneInput = !!user && !profilePhone;
 
   return (
@@ -371,8 +370,7 @@ export function WarenkorbClient() {
       </h1>
       <p className="mt-2 max-w-xl text-white/55">{t("cart.pageSubtitle")}</p>
 
-      <div className="mt-10 grid gap-8 lg:grid-cols-[1fr_320px] lg:items-start">
-        <div className="flex flex-col gap-6 pt-[10rem] lg:order-1 lg:pt-0">
+      <div className="mt-10 flex max-w-3xl flex-col gap-6">
           <motion.section
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
@@ -390,39 +388,67 @@ export function WarenkorbClient() {
             </div>
 
             <div className="divide-y divide-[#2e402a]/60">
-              {bowlLines.length > 0 ? (
-                <div className="p-5 sm:p-6">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className="font-semibold text-white">{pastaName}</p>
-                      <p className="mt-0.5 text-xs uppercase tracking-widest text-white/40">
-                        {t("cart.sectionBowl")}
-                      </p>
+              {bowls.map((bowl, bowlIndex) => {
+                const detailLines = bowl.bowlLines.slice(1);
+                const editHref = bowl.isChocolate
+                  ? `/builder/chocolate?edit=1&bowl=${encodeURIComponent(bowl.id)}`
+                  : `/builder?edit=1&bowl=${encodeURIComponent(bowl.id)}`;
+                return (
+                  <div key={bowl.id} className="p-5 sm:p-6">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="font-semibold text-white">
+                          {bowls.length > 1 ? `${bowlIndex + 1}. ${bowl.pastaName}` : bowl.pastaName}
+                        </p>
+                        <p className="mt-0.5 text-xs uppercase tracking-widest text-white/40">
+                          {t("cart.sectionBowl")}
+                        </p>
+                      </div>
+                      <span className="shrink-0 font-display text-lg font-bold text-[#c49746]">
+                        {formatEur(bowl.bowlSubtotal)}
+                      </span>
                     </div>
-                    <span className="shrink-0 font-display text-lg font-bold text-[#c49746]">
-                      {formatEur(bowlSubtotal)}
-                    </span>
+                    {detailLines.length > 0 ? (
+                      <ul className="mt-3 space-y-1.5 border-l-2 border-[#c49746]/30 pl-3">
+                        {detailLines.map((line, idx) => (
+                          <li
+                            key={`${bowl.id}-${line.kind}-${line.label}-${idx}`}
+                            className="flex justify-between gap-3 text-sm text-white/70"
+                          >
+                            <span>{line.label}</span>
+                            <span className="shrink-0 text-[#c49746]/90">{formatEur(line.amount)}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="mt-2 text-sm text-white/40">{t("cart.bowlEmptyHint")}</p>
+                    )}
+                    <div className="mt-4 flex flex-wrap items-center gap-2">
+                      <Link
+                        href={editHref}
+                        className="inline-flex min-h-11 items-center rounded-lg border border-[#c49746]/45 px-4 text-sm font-semibold text-[#c49746] transition hover:bg-[#c49746]/10"
+                      >
+                        {t("cart.editBowl")}
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={() => removeBowlFromCart(bowl.id)}
+                        className="text-xs font-semibold text-red-300/80 hover:text-red-300"
+                      >
+                        {t("cart.remove")}
+                      </button>
+                    </div>
                   </div>
-                  {bowlDetailLines.length > 0 ? (
-                    <ul className="mt-3 space-y-1.5 border-l-2 border-[#c49746]/30 pl-3">
-                      {bowlDetailLines.map((line, idx) => (
-                        <li
-                          key={`${line.kind}-${line.label}-${idx}`}
-                          className="flex justify-between gap-3 text-sm text-white/70"
-                        >
-                          <span>{line.label}</span>
-                          <span className="shrink-0 text-[#c49746]/90">{formatEur(line.amount)}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p className="mt-2 text-sm text-white/40">{t("cart.bowlEmptyHint")}</p>
-                  )}
+                );
+              })}
+
+              {bowls.length > 0 ? (
+                <div className="border-t border-[#2e402a]/60 bg-[#0f0f0f]/50 px-5 py-4 sm:px-6">
                   <Link
-                    href="/builder"
-                    className="mt-4 inline-flex min-h-11 items-center rounded-lg border border-[#c49746]/45 px-4 text-sm font-semibold text-[#c49746] transition hover:bg-[#c49746]/10"
+                    href="/builder?new=1"
+                    className="inline-flex min-h-11 items-center rounded-lg border border-[#2e402a] px-4 text-sm font-semibold text-white/70 transition hover:border-[#c49746]/35 hover:text-white"
                   >
-                    {t("cart.editBowl")}
+                    {t("cart.newBowl")}
                   </Link>
                 </div>
               ) : null}
@@ -712,11 +738,6 @@ export function WarenkorbClient() {
               </button>
             </div>
           </div>
-        </div>
-
-        <div className="lg:order-2">
-          <PastaBox pastaId={cart.pastaId} pastaName={pastaName} layers={boxLayers} />
-        </div>
       </div>
 
       {canCheckout ? (

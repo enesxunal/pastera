@@ -28,6 +28,8 @@
     "emptyBody": "Stelle zuerst deine Pasta zusammen oder füge Extras aus dem Menü hinzu.",
     "emptyCta": "Zum Konfigurator",
     "editBowl": "Schale bearbeiten",
+    "newBowl": "Neue Schale erstellen",
+    "maxBowlsReached": "Maximal 5 eigene Pastas — entferne eine aus dem Warenkorb und versuche es erneut.",
     "pageTitle": "Deine Auswahl",
     "pageSubtitle": "Übersicht vor der Bestellung. Zahlung und Küche werden später angebunden.",
     "loading": "Warenkorb wird geladen …",
@@ -100,7 +102,8 @@
     "stepChocolateTitle": "Schritt 2 — Früchte & Schokolade",
     "stepChocolateHint": "Toppings für Schokoladen-Pasta.",
     "total": "Summe",
-    "toCart": "Weiter zum Warenkorb",
+    "toCart": "In den Warenkorb",
+    "updateCart": "Im Warenkorb aktualisieren",
     "previewHint": "Vorschau: gewählte Saucen und Toppings in der Schüssel."
   },
   "chocolateBuilder": {

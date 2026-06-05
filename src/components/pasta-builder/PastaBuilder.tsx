@@ -4,10 +4,11 @@ import { motion } from "framer-motion";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { useI18n } from "@/components/providers/I18nProvider";
-import { loadCartSnapshot, saveCartSnapshot } from "@/lib/cart";
+import { addBowlToCart, getBowlFromCart, updateBowlInCart } from "@/lib/cart";
 import { pageIntro, staggerGrid } from "@/lib/motion-variants";
 import {
   BUILDER_PASTAS,
+  isChocolateBowl,
   normalizeBuilderPastaId,
   saucesForBuilder,
   TOPPINGS_EXTRA,
@@ -62,6 +63,7 @@ export function PastaBuilder() {
   const [pastaId, setPastaId] = useState(BUILDER_PASTAS[0].id);
   const [sauceIds, setSauceIds] = useState<string[]>([]);
   const [ingredientIds, setIngredientIds] = useState<string[]>([]);
+  const [cartErr, setCartErr] = useState("");
 
   const pasta = BUILDER_PASTAS.find((p) => p.id === pastaId) ?? BUILDER_PASTAS[0];
   const sauces = saucesForBuilder();
@@ -69,21 +71,43 @@ export function PastaBuilder() {
   const toppingGroups = { main: TOPPINGS_MAIN, extra: TOPPINGS_EXTRA };
 
   useEffect(() => {
-    const saved = loadCartSnapshot();
+    const isEdit = searchParams.get("edit") === "1";
+    const isNew = searchParams.get("new") === "1";
+    const bowlId = searchParams.get("bowl");
     const urlPasta = searchParams.get("pasta");
     const urlOk = urlPasta ? normalizeBuilderPastaId(urlPasta) : null;
 
-    if (!saved && !urlOk) return;
-
-    const pid = urlOk ?? normalizeBuilderPastaId(saved!.pastaId);
-    setPastaId(pid);
-    if (saved) {
-      setSauceIds(saved.sauceIds);
-      setIngredientIds(saved.ingredientIds);
-    } else {
+    if (isNew) {
+      setPastaId(urlOk ?? BUILDER_PASTAS[0].id);
       setSauceIds([]);
       setIngredientIds([]);
+      setCartErr("");
+      return;
     }
+
+    if (isEdit && bowlId) {
+      const bowl = getBowlFromCart(bowlId);
+      if (bowl && !isChocolateBowl(bowl)) {
+        setPastaId(normalizeBuilderPastaId(bowl.pastaId));
+        setSauceIds(bowl.sauceIds);
+        setIngredientIds(bowl.ingredientIds);
+        setCartErr("");
+        return;
+      }
+    }
+
+    if (urlOk) {
+      setPastaId(urlOk);
+      setSauceIds([]);
+      setIngredientIds([]);
+      setCartErr("");
+      return;
+    }
+
+    setPastaId(BUILDER_PASTAS[0].id);
+    setSauceIds([]);
+    setIngredientIds([]);
+    setCartErr("");
   }, [searchParams]);
 
   const sauceItems = sauces.filter((x) => sauceIds.includes(x.id));
@@ -116,17 +140,31 @@ export function PastaBuilder() {
   }
 
   function goToWarenkorb() {
-    const prev = loadCartSnapshot();
-    saveCartSnapshot({
-      veganOnly: pasta.vegan,
+    setCartErr("");
+    const bowlPayload = {
       pastaId,
       sauceIds,
-      specialIds: [],
       ingredientIds,
-      extras: prev?.extras ?? [],
-    });
+      specialIds: [] as string[],
+    };
+    const isEdit = searchParams.get("edit") === "1";
+    const bowlId = searchParams.get("bowl");
+
+    if (isEdit && bowlId && updateBowlInCart(bowlId, bowlPayload)) {
+      router.push("/warenkorb");
+      return;
+    }
+
+    const result = addBowlToCart(bowlPayload);
+    if (!result.ok) {
+      setCartErr(t("cart.maxBowlsReached"));
+      return;
+    }
     router.push("/warenkorb");
   }
+
+  const editingBowl = searchParams.get("edit") === "1" && searchParams.get("bowl");
+  const cartButtonLabel = editingBowl ? t("builder.updateCart") : t("builder.toCart");
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 pb-28 sm:px-6 lg:py-14 lg:pb-14">
@@ -244,9 +282,10 @@ export function PastaBuilder() {
                 className="rounded-full px-6 py-3 font-display text-sm font-bold text-matte transition hover:brightness-110"
                 style={{ backgroundColor: "#c49746" }}
               >
-                {t("builder.toCart")}
+                {cartButtonLabel}
               </button>
             </div>
+            {cartErr ? <p className="mt-3 text-sm text-red-400">{cartErr}</p> : null}
             <p className="mt-3 text-xs text-white/45">{t("builder.previewHint")}</p>
           </motion.div>
         </div>
@@ -263,7 +302,7 @@ export function PastaBuilder() {
       <MobileActionBar
         totalLabel={t("builder.total")}
         total={formatEur(total)}
-        buttonLabel={t("builder.toCart")}
+        buttonLabel={cartButtonLabel}
         onAction={goToWarenkorb}
       />
     </div>

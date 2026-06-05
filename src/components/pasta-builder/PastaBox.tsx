@@ -236,7 +236,29 @@ function MobileBoxFloater(props: PastaBoxProps & { pouring: Pouring }) {
   );
 }
 
-/** Builder / sepet: mobilde yüzen kutu, masaüstünde yapışkan panel. */
+function DesktopBoxPanel({
+  props,
+  pouring,
+}: {
+  props: PastaBoxProps;
+  pouring: Pouring;
+}) {
+  return (
+    <div className="rounded-2xl border border-[#2e402a]/50 bg-matte/95 px-3 py-3 shadow-[0_8px_32px_rgba(0,0,0,0.35)] backdrop-blur-sm">
+      <BoxScene
+        {...props}
+        pouring={pouring}
+        showTitle
+        showPastaName
+        showLayerTags
+        showEmptyHint
+        boxWidth="w-full max-w-[240px]"
+      />
+    </div>
+  );
+}
+
+/** Builder: mobilde sağ altta yüzen kutu; masaüstünde sağ üstte sabit önizleme. */
 export function PastaBox(props: PastaBoxProps) {
   const pouring = useBoxPouring(props.pastaId, props.layers);
 
@@ -244,18 +266,20 @@ export function PastaBox(props: PastaBoxProps) {
     <>
       <MobileBoxFloater {...props} pouring={pouring} />
 
-      <div className="hidden w-full lg:block lg:sticky lg:top-20 lg:z-10 lg:self-start">
-        <div className="rounded-2xl border border-[#2e402a]/50 bg-matte/90 px-3 py-3 shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
-          <BoxScene
-            {...props}
-            pouring={pouring}
-            showTitle
-            showPastaName
-            showLayerTags
-            showEmptyHint
-            boxWidth="w-full max-w-[240px]"
-          />
-        </div>
+      {/* Grid sütununu korur — metin sabit kutunun altına girmesin */}
+      <div
+        className="pointer-events-none hidden w-full min-h-[300px] max-w-[300px] lg:block"
+        aria-hidden
+      />
+
+      <div
+        className="pointer-events-auto fixed z-30 hidden w-[min(300px,calc(100vw-2rem))] max-h-[calc(100dvh-5.5rem)] overflow-y-auto lg:block"
+        style={{
+          top: "calc(4px + 4rem + 0.75rem)",
+          right: "max(1rem, calc((100vw - min(72rem, 100vw - 3rem)) / 2 + 1.5rem))",
+        }}
+      >
+        <DesktopBoxPanel props={props} pouring={pouring} />
       </div>
     </>
   );

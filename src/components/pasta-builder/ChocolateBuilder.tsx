@@ -1,10 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { useI18n } from "@/components/providers/I18nProvider";
-import { loadCartSnapshot, saveCartSnapshot } from "@/lib/cart";
+import { addBowlToCart, getBowlFromCart, updateBowlInCart } from "@/lib/cart";
 import { pageIntro, staggerGrid } from "@/lib/motion-variants";
 import {
   CHOCOLATE_BOWL_MARKER,
@@ -56,9 +56,11 @@ function ToppingGrid({
 
 export function ChocolateBuilder() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { t, locale } = useI18n();
   const [sauceIds, setSauceIds] = useState<string[]>([]);
   const [ingredientIds, setIngredientIds] = useState<string[]>([]);
+  const [cartErr, setCartErr] = useState("");
 
   const pastaItem = useMemo(
     () => ({
@@ -72,14 +74,23 @@ export function ChocolateBuilder() {
   const toppings = useMemo(() => toppingsForChocolateBowl(), []);
 
   useEffect(() => {
-    const saved = loadCartSnapshot();
-    if (!saved) return;
+    const isEdit = searchParams.get("edit") === "1";
+    const bowlId = searchParams.get("bowl");
 
-    if (isChocolateBowl(saved) || saved.pastaId === CHOCOLATE_PASTA.id) {
-      setSauceIds(saved.sauceIds);
-      setIngredientIds(saved.ingredientIds);
+    if (isEdit && bowlId) {
+      const bowl = getBowlFromCart(bowlId);
+      if (bowl && isChocolateBowl(bowl)) {
+        setSauceIds(bowl.sauceIds);
+        setIngredientIds(bowl.ingredientIds);
+        setCartErr("");
+        return;
+      }
     }
-  }, []);
+
+    setSauceIds([]);
+    setIngredientIds([]);
+    setCartErr("");
+  }, [searchParams]);
 
   const sauceItems = sauces.filter((x) => sauceIds.includes(x.id));
   const ingredientItems = toppings.filter((x) => ingredientIds.includes(x.id));
@@ -107,17 +118,31 @@ export function ChocolateBuilder() {
   );
 
   function goToWarenkorb() {
-    const prev = loadCartSnapshot();
-    saveCartSnapshot({
-      veganOnly: false,
+    setCartErr("");
+    const bowlPayload = {
       pastaId: CHOCOLATE_PASTA.id,
       sauceIds,
       specialIds: [CHOCOLATE_BOWL_MARKER],
       ingredientIds,
-      extras: prev?.extras ?? [],
-    });
+    };
+    const isEdit = searchParams.get("edit") === "1";
+    const bowlId = searchParams.get("bowl");
+
+    if (isEdit && bowlId && updateBowlInCart(bowlId, bowlPayload)) {
+      router.push("/warenkorb");
+      return;
+    }
+
+    const result = addBowlToCart(bowlPayload);
+    if (!result.ok) {
+      setCartErr(t("cart.maxBowlsReached"));
+      return;
+    }
     router.push("/warenkorb");
   }
+
+  const editingBowl = searchParams.get("edit") === "1" && searchParams.get("bowl");
+  const cartButtonLabel = editingBowl ? t("builder.updateCart") : t("builder.toCart");
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 pb-28 sm:px-6 lg:py-14 lg:pb-14">
@@ -215,9 +240,10 @@ export function ChocolateBuilder() {
                 className="rounded-full px-6 py-3 font-display text-sm font-bold text-matte transition hover:brightness-110"
                 style={{ backgroundColor: "#c49746" }}
               >
-                {t("builder.toCart")}
+                {cartButtonLabel}
               </button>
             </div>
+            {cartErr ? <p className="mt-3 text-sm text-red-400">{cartErr}</p> : null}
           </motion.div>
         </div>
 
@@ -233,7 +259,7 @@ export function ChocolateBuilder() {
       <MobileActionBar
         totalLabel={t("builder.total")}
         total={formatEur(total)}
-        buttonLabel={t("builder.toCart")}
+        buttonLabel={cartButtonLabel}
         onAction={goToWarenkorb}
       />
     </div>

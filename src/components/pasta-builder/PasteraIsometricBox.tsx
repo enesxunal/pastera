@@ -2,7 +2,7 @@
 
 import { useEffect, useId, useState } from "react";
 import { BoxFoodSvg } from "./box-food-layers";
-import { BOX_MOUTH, BOX_VIEWBOX } from "./box-layout";
+import { BOX_VIEWBOX, KRAFT_INTERIOR, KRAFT_MOUND_CAP } from "./box-layout";
 import { loadKutuSvg, prefixSvgIds, type KutuSvgParts } from "./box-kutu-svg";
 
 type Pouring =
@@ -18,7 +18,7 @@ type PasteraIsometricBoxProps = {
 };
 
 /**
- * Illustrator SVG — arka katman → yemek → ön (yeşil) katman.
+ * Illustrator SVG — arka → karton → yemek (üstte clip yok) → ön yüz.
  */
 export function PasteraIsometricBox({ pastaId, layers, pouring }: PasteraIsometricBoxProps) {
   const uid = useId().replace(/:/g, "");
@@ -38,8 +38,6 @@ export function PasteraIsometricBox({ pastaId, layers, pouring }: PasteraIsometr
     };
   }, []);
 
-  const foodClip = `food-${uid}`;
-
   return (
     <div
       className="relative mx-auto w-full max-w-[320px]"
@@ -56,19 +54,20 @@ export function PasteraIsometricBox({ pastaId, layers, pouring }: PasteraIsometr
               dangerouslySetInnerHTML={{
                 __html:
                   prefixSvgIds(parts.defs, uid) +
-                  `<clipPath id="${foodClip}"><polygon points="${BOX_MOUTH}"/></clipPath>`,
+                  `<linearGradient id="kraft-fill-${uid}" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#ece0cc"/>
+                    <stop offset="100%" stop-color="#c8b898"/>
+                  </linearGradient>`,
               }}
             />
 
-            {/* 1) Arka — sarı/karton iç */}
             <g id="arka" dangerouslySetInnerHTML={{ __html: prefixSvgIds(parts.arka, uid) }} />
 
-            {/* 2) Yemek — iki katman arasında */}
-            <g clipPath={`url(#${foodClip})`}>
-              <BoxFoodSvg pastaId={pastaId} layers={layers} pouring={pouring} uid={uid} />
-            </g>
+            <path d={KRAFT_INTERIOR} fill={`url(#kraft-fill-${uid})`} opacity={0.92} />
+            <path d={KRAFT_MOUND_CAP} fill={`url(#kraft-fill-${uid})`} />
 
-            {/* 3) Ön — yeşil yüz + logo */}
+            <BoxFoodSvg pastaId={pastaId} layers={layers} pouring={pouring} uid={uid} />
+
             <g id="on" dangerouslySetInnerHTML={{ __html: prefixSvgIds(parts.on, uid) }} />
           </>
         ) : (

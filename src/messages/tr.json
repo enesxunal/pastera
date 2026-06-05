@@ -28,6 +28,8 @@
     "emptyBody": "Önce makarnanı oluştur veya menüden ekstra ürün ekle.",
     "emptyCta": "Oluşturucuya git",
     "editBowl": "Kaseyi düzenle",
+    "newBowl": "Yeni kutu oluştur",
+    "maxBowlsReached": "En fazla 5 özel makarna ekleyebilirsin. Sepetten birini kaldırıp tekrar dene.",
     "pageTitle": "Sepetin",
     "pageSubtitle": "Sipariş öncesi özet. Ödeme ve mutfak bağlantısı sonra eklenecek.",
     "loading": "Sepet yükleniyor …",
@@ -100,7 +102,8 @@
     "stepChocolateTitle": "Adım 2 — Meyve & çikolata",
     "stepChocolateHint": "Çikolatalı makarnaya eklentiler.",
     "total": "Toplam",
-    "toCart": "Sepete devam",
+    "toCart": "Sepete ekle",
+    "updateCart": "Sepette güncelle",
     "previewHint": "Önizleme: seçilen sos ve toppingler kasede."
   },
   "chocolateBuilder": {
