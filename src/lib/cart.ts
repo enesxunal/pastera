@@ -9,10 +9,10 @@ import {
   normalizeBuilderPastaId,
   normalizePastaId,
   PASTAS,
+  saucesForBuilder,
   saucesForChocolateBowl,
-  saucesForPasta,
+  toppingsForBuilder,
   toppingsForChocolateBowl,
-  toppingsForPasta,
   type MenuItem,
 } from "@/lib/menu-data";
 
@@ -255,8 +255,8 @@ function buildBowlParts(
       }
     : { ...pastaStatic, name: label(pastaStatic, locale) };
 
-  const aS = allowedIds(saucesForPasta(pastaId));
-  const aT = allowedIds(toppingsForPasta(pastaId));
+  const aS = allowedIds(saucesForBuilder());
+  const aT = allowedIds(toppingsForBuilder());
 
   const sauceItems = pickMenuItems(snapshot.sauceIds, aS, catalog, locale);
   const ingItems = pickMenuItems(snapshot.ingredientIds, aT, catalog, locale);

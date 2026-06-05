@@ -79,8 +79,8 @@ export function normalizePastaId(raw: string): string {
 export const SAUCES: MenuItem[] = [
   {
     id: "s-domates-vegan",
-    name: "Tomatensauce (vegan)",
-    price: 1.0,
+    name: "Tomatensauce",
+    price: 0,
     vegan: true,
     image: img("s-vegane-tomatensauce"),
   },
@@ -229,12 +229,20 @@ export const SUPPEN: MenuItem[] = [];
 export const VORSPEISEN: MenuItem[] = [];
 export const DRINKS: MenuItem[] = [];
 
+/** Kendin yap — soslar makarna çeşidine göre değişmez */
+export function saucesForBuilder(): MenuItem[] {
+  return SAUCES;
+}
+
+/** Kendin yap — toppingler makarna çeşidine göre değişmez */
+export function toppingsForBuilder(): MenuItem[] {
+  return [...TOPPINGS_MAIN, ...TOPPINGS_EXTRA];
+}
+
 export function saucesForPasta(pastaId: string): MenuItem[] {
   const id = normalizePastaId(pastaId);
   if (id === "noodle-chocolate") return [];
-  const pasta = PASTAS.find((p) => p.id === id) ?? PASTAS[0];
-  if (pasta.vegan) return SAUCES.filter((s) => s.vegan);
-  return SAUCES.filter((s) => !s.vegan || s.id === "s-arrabbiata");
+  return saucesForBuilder();
 }
 
 export type ToppingGroups = {
@@ -248,19 +256,17 @@ export function toppingGroupsForPasta(pastaId: string): ToppingGroups {
   if (id === "noodle-chocolate") {
     return { main: [], extra: [], chocolate: TOPPINGS_CHOCOLATE_FRUITS };
   }
-  const pasta = PASTAS.find((p) => p.id === id) ?? PASTAS[0];
-  const veganOk = (i: MenuItem) => !pasta.vegan || i.vegan;
   return {
-    main: TOPPINGS_MAIN.filter(veganOk),
-    extra: TOPPINGS_EXTRA.filter(veganOk),
+    main: TOPPINGS_MAIN,
+    extra: TOPPINGS_EXTRA,
     chocolate: [],
   };
 }
 
 export function toppingsForPasta(pastaId: string): MenuItem[] {
-  const g = toppingGroupsForPasta(pastaId);
-  if (g.chocolate.length) return g.chocolate;
-  return [...g.main, ...g.extra];
+  const id = normalizePastaId(pastaId);
+  if (id === "noodle-chocolate") return TOPPINGS_CHOCOLATE_FRUITS;
+  return toppingsForBuilder();
 }
 
 export function filterVegan<T extends MenuItem>(items: T[]): T[] {

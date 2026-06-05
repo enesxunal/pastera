@@ -9,8 +9,10 @@ import { pageIntro, staggerGrid } from "@/lib/motion-variants";
 import {
   BUILDER_PASTAS,
   normalizeBuilderPastaId,
-  saucesForPasta,
-  toppingGroupsForPasta,
+  saucesForBuilder,
+  TOPPINGS_EXTRA,
+  TOPPINGS_MAIN,
+  toppingsForBuilder,
   type MenuItem,
 } from "@/lib/menu-data";
 import { formatEur } from "@/lib/format";
@@ -60,12 +62,9 @@ export function PastaBuilder() {
   const [ingredientIds, setIngredientIds] = useState<string[]>([]);
 
   const pasta = BUILDER_PASTAS.find((p) => p.id === pastaId) ?? BUILDER_PASTAS[0];
-  const sauces = useMemo(() => saucesForPasta(pastaId), [pastaId]);
-  const toppingGroups = useMemo(() => toppingGroupsForPasta(pastaId), [pastaId]);
-  const allToppings = useMemo(
-    () => [...toppingGroups.main, ...toppingGroups.extra],
-    [toppingGroups],
-  );
+  const sauces = saucesForBuilder();
+  const allToppings = toppingsForBuilder();
+  const toppingGroups = { main: TOPPINGS_MAIN, extra: TOPPINGS_EXTRA };
 
   useEffect(() => {
     const saved = loadCartSnapshot();
@@ -84,13 +83,6 @@ export function PastaBuilder() {
       setIngredientIds([]);
     }
   }, [searchParams]);
-
-  useEffect(() => {
-    const sauceAllow = new Set(sauces.map((s) => s.id));
-    const topAllow = new Set(allToppings.map((x) => x.id));
-    setSauceIds((ids) => ids.filter((id) => sauceAllow.has(id)));
-    setIngredientIds((ids) => ids.filter((id) => topAllow.has(id)));
-  }, [pastaId, sauces, allToppings]);
 
   const sauceItems = sauces.filter((x) => sauceIds.includes(x.id));
   const ingredientItems = allToppings.filter((x) => ingredientIds.includes(x.id));
