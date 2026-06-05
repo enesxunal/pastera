@@ -4,6 +4,7 @@ import {
   DESSERTS,
   PASTAS,
   SAUCES,
+  SAUCES_CHOCOLATE,
   STANDARD_PASTAS,
   TOPPINGS,
 } from "@/lib/menu-data";
@@ -30,7 +31,7 @@ export function getStaticCatalog(): CatalogItem[] {
   let o = 0;
   const blocks: { items: MenuItem[]; cat: CatalogCategory }[] = [
     { items: PASTAS, cat: "pasta_base" },
-    { items: SAUCES, cat: "sauce" },
+    { items: [...SAUCES, ...SAUCES_CHOCOLATE], cat: "sauce" },
     { items: TOPPINGS, cat: "topping" },
     { items: STANDARD_PASTAS, cat: "chef_special" },
     // dessert kategorisi yoksa starter ile uyumlu (id: d-*)

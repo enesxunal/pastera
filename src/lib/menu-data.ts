@@ -11,7 +11,7 @@ export type MenuItem = {
 
 const img = (id: string): string => menuPhotoForId(id);
 
-const PASTA_BASE = 6.9;
+export const PASTA_BASE = 6.9;
 
 /** Kendin yap — tuzlu makarna (oluşturucu) */
 export const BUILDER_PASTAS: MenuItem[] = [
@@ -125,16 +125,28 @@ export const TOPPINGS_EXTRA: MenuItem[] = [
   { id: "t-kaju", name: "Cashewkerne", price: 1.0, vegan: true, image: "" },
 ];
 
-/** Çikolatalı makarna toppingleri */
-export const TOPPINGS_CHOCOLATE: MenuItem[] = [
+/** Çikolatalı makarna — soslar */
+export const SAUCES_CHOCOLATE: MenuItem[] = [
+  { id: "s-choc-dark", name: "Schokolade", price: 1.0, vegan: false, image: "" },
+  { id: "s-choc-white", name: "Weiße Schokolade", price: 1.0, vegan: false, image: "" },
+];
+
+/** Çikolatalı makarna — meyve toppingleri */
+export const TOPPINGS_CHOCOLATE_FRUITS: MenuItem[] = [
   { id: "t-choc-muz", name: "Banane", price: 1.0, vegan: true, image: "" },
   { id: "t-choc-cilek", name: "Erdbeeren", price: 1.0, vegan: true, image: "" },
   { id: "t-choc-kiwi", name: "Kiwi", price: 1.0, vegan: true, image: "" },
   { id: "t-choc-birne", name: "Birne", price: 1.0, vegan: true, image: "" },
   { id: "t-choc-passion", name: "Passionsfrucht", price: 2.0, vegan: true, image: "" },
-  { id: "t-choc-schoko", name: "Schokolade", price: 1.0, vegan: false, image: "" },
-  { id: "t-choc-weiss", name: "Weiße Schokolade", price: 1.0, vegan: false, image: "" },
 ];
+
+export const TOPPINGS_CHOCOLATE = [...SAUCES_CHOCOLATE, ...TOPPINGS_CHOCOLATE_FRUITS];
+
+export const CHOCOLATE_BOWL_MARKER = "chocolate-bowl";
+
+export function isChocolateBowl(snapshot: { specialIds: string[] }): boolean {
+  return snapshot.specialIds.includes(CHOCOLATE_BOWL_MARKER);
+}
 
 /** Standart makarna (sabit fiyat) */
 export const STANDARD_PASTAS: MenuItem[] = [
@@ -207,7 +219,11 @@ export const CHEF_SPECIALS_VEGAN: MenuItem[] = [];
 export const SPECIALS: MenuItem[] = [];
 export const SAUCEN_KLASSISCH = SAUCES.filter((s) => !s.vegan);
 export const SAUCEN_VEGAN = SAUCES.filter((s) => s.vegan);
-export const TOPPINGS: MenuItem[] = [...TOPPINGS_MAIN, ...TOPPINGS_EXTRA, ...TOPPINGS_CHOCOLATE];
+export const TOPPINGS: MenuItem[] = [
+  ...TOPPINGS_MAIN,
+  ...TOPPINGS_EXTRA,
+  ...TOPPINGS_CHOCOLATE_FRUITS,
+];
 export const INGREDIENTS = TOPPINGS;
 export const SUPPEN: MenuItem[] = [];
 export const VORSPEISEN: MenuItem[] = [];
@@ -230,7 +246,7 @@ export type ToppingGroups = {
 export function toppingGroupsForPasta(pastaId: string): ToppingGroups {
   const id = normalizePastaId(pastaId);
   if (id === "noodle-chocolate") {
-    return { main: [], extra: [], chocolate: TOPPINGS_CHOCOLATE };
+    return { main: [], extra: [], chocolate: TOPPINGS_CHOCOLATE_FRUITS };
   }
   const pasta = PASTAS.find((p) => p.id === id) ?? PASTAS[0];
   const veganOk = (i: MenuItem) => !pasta.vegan || i.vegan;
@@ -251,9 +267,18 @@ export function filterVegan<T extends MenuItem>(items: T[]): T[] {
   return items.filter((i) => i.vegan);
 }
 
+export function saucesForChocolateBowl(): MenuItem[] {
+  return SAUCES_CHOCOLATE;
+}
+
+export function toppingsForChocolateBowl(): MenuItem[] {
+  return TOPPINGS_CHOCOLATE_FRUITS;
+}
+
 const ALL: MenuItem[] = [
   ...PASTAS,
   ...SAUCES,
+  ...SAUCES_CHOCOLATE,
   ...TOPPINGS,
   ...STANDARD_PASTAS,
   ...DESSERTS,

@@ -1,10 +1,17 @@
 import { catalogItemById } from "@/lib/catalog-static";
 import type { CatalogItem } from "@/lib/catalog-types";
+import { catalogNameTr } from "@/lib/catalog-name-tr";
 import {
+  BUILDER_PASTAS,
+  CHOCOLATE_PASTA,
   getMenuItem,
+  isChocolateBowl,
+  normalizeBuilderPastaId,
   normalizePastaId,
   PASTAS,
+  saucesForChocolateBowl,
   saucesForPasta,
+  toppingsForChocolateBowl,
   toppingsForPasta,
   type MenuItem,
 } from "@/lib/menu-data";
@@ -185,6 +192,56 @@ function buildBowlParts(
   catalog: CatalogItem[],
   locale: SupportedLocale,
 ): Pick<ResolvedCartSections, "pastaName" | "bowlLines" | "bowlSubtotal" | "boxLayers"> {
+  const chocolate = isChocolateBowl(snapshot);
+
+  if (chocolate) {
+    const doughId = normalizeBuilderPastaId(snapshot.pastaId);
+    const dough = BUILDER_PASTAS.find((p) => p.id === doughId) ?? BUILDER_PASTAS[0];
+    const doughCat = catalogItemById(catalog, doughId);
+    const doughLabel = doughCat
+      ? label(doughCat, locale)
+      : locale === "tr"
+        ? catalogNameTr(dough.id, dough.name)
+        : dough.name;
+    const baseLabel =
+      locale === "tr"
+        ? catalogNameTr(CHOCOLATE_PASTA.id, CHOCOLATE_PASTA.name)
+        : CHOCOLATE_PASTA.name;
+    const pastaName = `${baseLabel} · ${doughLabel}`;
+    const pastaPrice = CHOCOLATE_PASTA.price;
+
+    const aS = allowedIds(saucesForChocolateBowl());
+    const aT = allowedIds(toppingsForChocolateBowl());
+    const sauceItems = pickMenuItems(snapshot.sauceIds, aS, catalog, locale);
+    const ingItems = pickMenuItems(snapshot.ingredientIds, aT, catalog, locale);
+
+    const bowlLines: BowlLine[] = [
+      { kind: "pasta", label: pastaName, amount: pastaPrice },
+      ...sauceItems.map((i) => ({
+        kind: "sauce" as const,
+        label: i.name,
+        amount: i.price,
+      })),
+      ...ingItems.map((i) => ({
+        kind: "topping" as const,
+        label: i.name,
+        amount: i.price,
+      })),
+    ];
+
+    const bowlSubtotal =
+      pastaPrice +
+      sauceItems.reduce((s, i) => s + i.price, 0) +
+      ingItems.reduce((s, i) => s + i.price, 0);
+
+    const boxLayers = [
+      ...sauceItems.map((i) => ({ id: i.id, name: i.name, image: i.image })),
+      ...ingItems.map((i) => ({ id: i.id, name: i.name, image: i.image })),
+    ];
+
+    return { pastaName, bowlLines, bowlSubtotal, boxLayers };
+  }
+
   const pastaId = normalizePastaId(snapshot.pastaId);
   const pastaStatic = PASTAS.find((p) => p.id === pastaId) ?? PASTAS[0];
   const pastaCat = catalogItemById(catalog, pastaId);

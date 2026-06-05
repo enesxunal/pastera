@@ -7,6 +7,12 @@ import type { SupportedLocale } from "@/lib/cart";
 import { addExtraToCart } from "@/lib/cart";
 import type { CatalogItem } from "@/lib/catalog-types";
 import { formatEur } from "@/lib/format";
+import {
+  isMenuBuilderItem,
+  isMenuCartItem,
+  menuBuilderHref,
+  MENU_KENDIN_YAP_ID,
+} from "@/lib/menu-hub-items";
 import { getMenuItem } from "@/lib/menu-data";
 import { publicMenuImageSrc } from "@/lib/normalize-menu-image";
 import { useI18n } from "@/components/providers/I18nProvider";
@@ -20,7 +26,8 @@ export type MenuGridCategory =
   | "topping"
   | "chef_special"
   | "dessert"
-  | "drink";
+  | "drink"
+  | "menu_mixed";
 
 type MenuGridProps = {
   title: string;
@@ -60,12 +67,21 @@ export function MenuGrid({
     };
   }, [picker]);
 
-  const canAddCart =
-    category === "chef_special" ||
-    category === "dessert" ||
-    category === "soup" ||
-    category === "starter" ||
-    category === "drink";
+  function itemCanAddCart(item: CatalogItem): boolean {
+    if (category === "menu_mixed") return isMenuCartItem(item.id);
+    return (
+      category === "chef_special" ||
+      category === "dessert" ||
+      category === "soup" ||
+      category === "starter" ||
+      category === "drink"
+    );
+  }
+
+  function itemIsBuilder(item: CatalogItem): boolean {
+    if (category === "menu_mixed") return isMenuBuilderItem(item.id);
+    return category === "pasta";
+  }
 
   function openPicker(item: CatalogItem) {
     setQty(1);
@@ -86,34 +102,46 @@ export function MenuGrid({
         const label = nameOf(item, locale);
         const imageSrc = publicMenuImageSrc(item.image);
         const chefDesc =
-          category === "chef_special" ? getMenuItem(item.id)?.description : undefined;
-        const cardInner = (
-          <>
-            <div className="relative aspect-[4/3] w-full">
-              {imageSrc ? (
-                <Image
-                  src={imageSrc}
-                  alt=""
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 768px) 45vw, 220px"
-                  unoptimized
-                />
-              ) : (
-                <div
-                  className="absolute inset-0 bg-gradient-to-br from-[#1a2218] via-[#0f140d] to-[#0a0a0a]"
-                  aria-hidden
-                />
-              )}
-            </div>
-            <div className="p-3">
-              <p className="font-medium text-white">{label}</p>
-              {chefDesc ? (
-                <p className="mt-1 line-clamp-2 text-xs text-white/45">{chefDesc}</p>
-              ) : null}
-              <p className="mt-1 text-sm font-semibold text-[#c49746]">{formatEur(item.price)}</p>
-              {item.vegan && <p className="mt-1 text-xs text-white/40">vegan</p>}
-              {canAddCart && (
+          category === "chef_special" || item.id.startsWith("std-")
+            ? getMenuItem(item.id)?.description
+            : undefined;
+        const showAdd = itemCanAddCart(item);
+        const showBuilder = itemIsBuilder(item);
+        const priceText =
+          item.id === MENU_KENDIN_YAP_ID
+            ? `${t("home.priceFrom")} ${formatEur(item.price)}`
+            : formatEur(item.price);
+
+        if (showAdd) {
+          return (
+            <div
+              key={item.id}
+              className="overflow-hidden rounded-xl border-2 border-[#2e402a] bg-[#0f0f0f] shadow-md"
+            >
+              <div className="relative aspect-[4/3] w-full">
+                {imageSrc ? (
+                  <Image
+                    src={imageSrc}
+                    alt=""
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 45vw, 220px"
+                    unoptimized
+                  />
+                ) : (
+                  <div
+                    className="absolute inset-0 bg-gradient-to-br from-[#1a2218] via-[#0f140d] to-[#0a0a0a]"
+                    aria-hidden
+                  />
+                )}
+              </div>
+              <div className="p-3">
+                <p className="font-medium text-white">{label}</p>
+                {chefDesc ? (
+                  <p className="mt-1 line-clamp-2 text-xs text-white/45">{chefDesc}</p>
+                ) : null}
+                <p className="mt-1 text-sm font-semibold text-[#c49746]">{priceText}</p>
+                {item.vegan && <p className="mt-1 text-xs text-white/40">vegan</p>}
                 <button
                   type="button"
                   onClick={() => openPicker(item)}
@@ -121,24 +149,16 @@ export function MenuGrid({
                 >
                   {flash === item.id ? t("cart.added") : t("cart.add")}
                 </button>
-              )}
-            </div>
-          </>
-        );
-
-        if (canAddCart) {
-          return (
-            <div
-              key={item.id}
-              className="overflow-hidden rounded-xl border-2 border-[#2e402a] bg-[#0f0f0f] shadow-md"
-            >
-              {cardInner}
+              </div>
             </div>
           );
         }
 
-        if (category === "pasta") {
-          const builderHref = `/builder?pasta=${encodeURIComponent(item.id)}`;
+        if (showBuilder) {
+          const builderHref =
+            category === "menu_mixed"
+              ? menuBuilderHref(item.id)
+              : `/builder?pasta=${encodeURIComponent(item.id)}`;
           return (
             <div
               key={item.id}
@@ -164,7 +184,7 @@ export function MenuGrid({
                 </div>
                 <div className="p-3">
                   <p className="font-medium text-white">{label}</p>
-                  <p className="mt-1 text-sm font-semibold text-[#c49746]">{formatEur(item.price)}</p>
+                  <p className="mt-1 text-sm font-semibold text-[#c49746]">{priceText}</p>
                   {item.vegan && <p className="mt-1 text-xs text-white/40">vegan</p>}
                 </div>
               </Link>
@@ -173,7 +193,7 @@ export function MenuGrid({
                   href={builderHref}
                   className="flex w-full items-center justify-center rounded-lg border border-[#c49746]/50 bg-[#2e402a]/40 py-2 text-xs font-semibold text-[#c49746] hover:bg-[#2e402a]/70"
                 >
-                  {t("cart.add")}
+                  {t("menu.configure")}
                 </Link>
               </div>
             </div>
@@ -186,7 +206,27 @@ export function MenuGrid({
             href="/builder"
             className="overflow-hidden rounded-xl border-2 border-[#2e402a] bg-[#0f0f0f] shadow-md transition hover:border-[#c49746]/60"
           >
-            {cardInner}
+            <div className="relative aspect-[4/3] w-full">
+              {imageSrc ? (
+                <Image
+                  src={imageSrc}
+                  alt=""
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 45vw, 220px"
+                  unoptimized
+                />
+              ) : (
+                <div
+                  className="absolute inset-0 bg-gradient-to-br from-[#1a2218] via-[#0f140d] to-[#0a0a0a]"
+                  aria-hidden
+                />
+              )}
+            </div>
+            <div className="p-3">
+              <p className="font-medium text-white">{label}</p>
+              <p className="mt-1 text-sm font-semibold text-[#c49746]">{priceText}</p>
+            </div>
           </Link>
         );
       })}

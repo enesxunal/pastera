@@ -99,10 +99,12 @@
   "chocolateBuilder": {
     "kicker": "Tatlı · Kendin yap",
     "title": "Çikolatalı makarna oluştur",
-    "intro": "6,90 € çikolatalı taban — muz, çilek, çikolata ve diğer toppingleri seç.",
+    "intro": "Hamur seç, çikolata sosu ekle, üzerine meyve koy — 3 adımda.",
     "base": "Taban",
-    "toppingsTitle": "Meyve & çikolata",
-    "toppingsHint": "İstediğin kadar ekle."
+    "saucesTitle": "Çikolata sosu",
+    "saucesHint": "Çikolata ve/veya beyaz çikolata seç.",
+    "toppingsTitle": "Meyveler",
+    "toppingsHint": "Muz, çilek, kivi ve diğer meyvelerden istediğin kadar ekle."
   },
   "menuPages": {
     "pastaTitle": "Makarna",
@@ -140,7 +142,8 @@
     "sectionStandard": "Standart makarna",
     "sectionStandardHint": "Hazır isimli tabaklar — sabit fiyat, sepete ekle.",
     "sectionDessert": "Tatlı",
-    "sectionDessertHint": "Hazır tatlılar sepete eklenir; çikolatalı makarna için ayrı kendin yap.",
+    "sectionDessertHint": "3 ürün — hazır tatlılar sepete eklenir, çikolatalı makarnayı kendin oluşturursun.",
+    "configure": "Oluştur",
     "subChocolatePasta": "Çikolatalı makarna",
     "subChocolatePastaHint": "6,90 € + meyve/çikolata topping — oluşturucuda.",
     "sectionChefSpecials": "Standart makarna",

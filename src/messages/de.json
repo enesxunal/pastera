@@ -99,10 +99,12 @@
   "chocolateBuilder": {
     "kicker": "Dessert · Selbst zusammenstellen",
     "title": "Schokoladen-Pasta erstellen",
-    "intro": "6,90 € Schoko-Basis — Banane, Erdbeere, Schokolade und mehr wählen.",
+    "intro": "Pastasorte wählen, Schokosauce, dann Früchte — in 3 Schritten.",
     "base": "Basis",
-    "toppingsTitle": "Früchte & Schokolade",
-    "toppingsHint": "Beliebig viele Toppings."
+    "saucesTitle": "Schokosauce",
+    "saucesHint": "Schokolade und/oder weiße Schokolade wählen.",
+    "toppingsTitle": "Früchte",
+    "toppingsHint": "Banane, Erdbeere, Kiwi und mehr — beliebig viele."
   },
   "menuPages": {
     "pastaTitle": "Pasta",
@@ -140,7 +142,8 @@
     "sectionStandard": "Standard-Pasta",
     "sectionStandardHint": "Fertige Gerichte — Festpreis, in den Warenkorb.",
     "sectionDessert": "Dessert",
-    "sectionDessertHint": "Fertige Desserts in den Warenkorb; Schoko-Pasta separat selbst zusammenstellen.",
+    "sectionDessertHint": "3 Artikel — fertige Desserts in den Warenkorb, Schoko-Pasta selbst zusammenstellen.",
+    "configure": "Konfigurieren",
     "subChocolatePasta": "Schokoladen-Pasta",
     "subChocolatePastaHint": "6,90 € + Toppings im Konfigurator.",
     "sectionChefSpecials": "Standard-Pasta",
