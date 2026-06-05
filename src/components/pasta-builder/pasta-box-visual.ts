@@ -36,11 +36,52 @@ export function toppingPosition(id: string, index: number): { left: number; top:
   return { left, top };
 }
 
-export function toppingAccent(id: string): string {
-  if (id.includes("choc") || id.includes("muz") || id.includes("cilek")) return "#e8a0a8";
-  if (id.includes("mantar") || id.includes("brokkoli") || id.includes("spinat")) return "#6b9e5c";
-  if (id.includes("julienne") || id.includes("tenders") || id.includes("rind")) return "#c48a5a";
-  if (id.includes("garnelen")) return "#f4a89a";
-  if (id.includes("falafel") || id.includes("tofu") || id.includes("seitan")) return "#d4b86a";
-  return "#c49746";
+export type ToppingPieceKind =
+  | "meat"
+  | "shrimp"
+  | "olive"
+  | "corn"
+  | "mushroom"
+  | "green"
+  | "cheese"
+  | "fruit"
+  | "chunk";
+
+/** Topping parça görünümü — ikon değil, gerçek yiyecek şekli. */
+export function toppingPieceType(id: string): ToppingPieceKind {
+  if (id.includes("garnelen")) return "shrimp";
+  if (id.includes("zeytin") || id.includes("oliven")) return "olive";
+  if (id.includes("mais")) return "corn";
+  if (id.includes("mantar") || id.includes("champignon")) return "mushroom";
+  if (
+    id.includes("spinat") ||
+    id.includes("rucola") ||
+    id.includes("brokkoli") ||
+    id.includes("rosmarin") ||
+    id.includes("jalapeno") ||
+    id.includes("taze-sogan")
+  )
+    return "green";
+  if (id.includes("mozzarella") || id.includes("gorgonzola")) return "cheese";
+  if (
+    id.includes("choc") ||
+    id.includes("muz") ||
+    id.includes("cilek") ||
+    id.includes("kiwi") ||
+    id.includes("birne") ||
+    id.includes("passion") ||
+    id.includes("cherry")
+  )
+    return "fruit";
+  if (
+    id.includes("julienne") ||
+    id.includes("tenders") ||
+    id.includes("rind") ||
+    id.includes("haehnchen") ||
+    id.includes("falafel") ||
+    id.includes("tofu") ||
+    id.includes("seitan")
+  )
+    return "meat";
+  return "chunk";
 }

@@ -1,88 +1,111 @@
 "use client";
 
+import Image from "next/image";
 import type { ReactNode } from "react";
 
-/** Marka kutusu — isometrik görünüm, üstten açık. */
+/**
+ * Referans görsele uygun isometrik yeşil Pastera kutusu.
+ * İç kısım kraft kağıdı rengi; malzemeler üst açıklıktan görünür.
+ */
 export function PasteraIsometricBox({ children }: { children: ReactNode }) {
   return (
-    <div className="relative mx-auto w-full max-w-[300px]" style={{ aspectRatio: "6/5" }}>
+    <div className="relative mx-auto w-full max-w-[320px]" style={{ aspectRatio: "1/1" }}>
       <svg
-        viewBox="0 0 300 250"
-        className="h-full w-full drop-shadow-[0_16px_32px_rgba(0,0,0,0.5)]"
+        viewBox="0 0 400 400"
+        className="h-full w-full drop-shadow-[0_20px_40px_rgba(0,0,0,0.45)]"
         aria-hidden
       >
         <defs>
-          <linearGradient id="pbox-front" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#3a5232" />
-            <stop offset="100%" stopColor="#243323" />
+          <linearGradient id="pbox-green-front" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#2e4a32" />
+            <stop offset="100%" stopColor="#1e3320" />
           </linearGradient>
-          <linearGradient id="pbox-side" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#2e402a" />
-            <stop offset="100%" stopColor="#1e2e1a" />
+          <linearGradient id="pbox-green-left" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="#243525" />
+            <stop offset="100%" stopColor="#1a2818" />
           </linearGradient>
-          <linearGradient id="pbox-top" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#4a6240" />
-            <stop offset="100%" stopColor="#364a2e" />
+          <linearGradient id="pbox-green-right" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="#1e3320" />
+            <stop offset="100%" stopColor="#152418" />
           </linearGradient>
-          <clipPath id="pbox-interior">
-            <polygon points="95,52 205,52 235,82 65,82" />
-          </clipPath>
+          <linearGradient id="pbox-kraft" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#e8dcc8" />
+            <stop offset="100%" stopColor="#c9b89a" />
+          </linearGradient>
         </defs>
 
-        {/* Gölge */}
-        <ellipse cx="150" cy="238" rx="100" ry="10" fill="rgba(0,0,0,0.35)" />
+        <ellipse cx="200" cy="372" rx="130" ry="14" fill="rgba(0,0,0,0.28)" />
 
-        {/* Sol yan yüz */}
-        <polygon points="30,95 95,52 95,195 30,218" fill="url(#pbox-side)" stroke="#1a2418" strokeWidth="1" />
+        {/* Sol yan */}
+        <polygon points="48,148 128,88 128,308 48,348" fill="url(#pbox-green-left)" stroke="#152418" strokeWidth="1" />
 
         {/* Ön yüz */}
-        <polygon points="95,52 205,52 205,195 95,195" fill="url(#pbox-front)" stroke="#1a2418" strokeWidth="1" />
+        <polygon points="128,88 272,88 272,308 128,308" fill="url(#pbox-green-front)" stroke="#152418" strokeWidth="1" />
 
-        {/* Sağ yan yüz */}
-        <polygon points="205,52 270,95 270,218 205,195" fill="#243323" stroke="#1a2418" strokeWidth="1" />
+        {/* Sağ yan */}
+        <polygon points="272,88 352,148 352,348 272,308" fill="url(#pbox-green-right)" stroke="#152418" strokeWidth="1" />
 
-        {/* Üst kapak kenarı (sol) */}
-        <polygon points="30,95 95,52 65,22 0,52" fill="url(#pbox-top)" stroke="#c49746" strokeWidth="1.5" opacity="0.9" />
+        {/* Üst sol kapak */}
+        <polygon points="48,148 128,88 88,48 8,98" fill="#3a5a3e" stroke="#c49746" strokeWidth="1.2" opacity="0.95" />
 
-        {/* Üst kapak kenarı (sağ) */}
-        <polygon points="95,52 205,52 235,22 65,22" fill="#4a6240" stroke="#c49746" strokeWidth="1.5" />
+        {/* Üst sağ kapak */}
+        <polygon points="128,88 272,88 312,48 88,48" fill="#3d6240" stroke="#c49746" strokeWidth="1.2" />
 
-        {/* İç boşluk (koyu) */}
-        <polygon points="95,52 205,52 235,82 65,82" fill="#0a0a0a" opacity="0.95" />
+        {/* İç kraft duvar — derinlik */}
+        <polygon points="128,88 272,88 302,128 98,128" fill="url(#pbox-kraft)" stroke="#b8a888" strokeWidth="0.8" />
 
-        {/* Altın şerit — ön */}
-        <line x1="95" y1="120" x2="205" y2="120" stroke="#c49746" strokeWidth="2" opacity="0.7" />
+        {/* Altın süs — spiral köşeler */}
+        {[
+          [145, 115],
+          [255, 115],
+          [145, 265],
+          [255, 265],
+        ].map(([cx, cy], i) => (
+          <g key={i} opacity="0.35">
+            <circle cx={cx} cy={cy} r="18" fill="none" stroke="#c49746" strokeWidth="1" />
+            <circle cx={cx} cy={cy} r="12" fill="none" stroke="#c49746" strokeWidth="0.6" />
+          </g>
+        ))}
 
-        {/* Logo alanı */}
-        <text
-          x="150"
-          y="155"
-          textAnchor="middle"
-          fill="#c49746"
-          fontSize="18"
-          fontWeight="700"
-          fontFamily="var(--font-syne), sans-serif"
-          opacity="0.85"
-        >
-          PASTERA
-        </text>
-        <text x="150" y="172" textAnchor="middle" fill="rgba(255,255,255,0.35)" fontSize="9" letterSpacing="3">
-          PASTA BOX
-        </text>
+        {/* Altın yaprak noktaları */}
+        {[
+          [160, 200],
+          [240, 190],
+          [175, 250],
+          [230, 270],
+        ].map(([cx, cy], i) => (
+          <ellipse key={`leaf-${i}`} cx={cx} cy={cy} rx="4" ry="6" fill="#c49746" opacity="0.25" transform={`rotate(${i * 30} ${cx} ${cy})`} />
+        ))}
       </svg>
 
-      {/* Malzemeler — kutunun açık üst kısmında */}
+      {/* Logo — ön yüz */}
+      <div
+        className="pointer-events-none absolute flex flex-col items-center justify-center"
+        style={{ left: "32%", top: "52%", width: "36%", height: "22%" }}
+      >
+        <Image
+          src="/pastera-Logo.png"
+          alt=""
+          width={120}
+          height={40}
+          className="h-auto w-full object-contain opacity-90"
+          unoptimized
+        />
+      </div>
+
+      {/* Yiyecek katmanları — kutu açıklığı */}
       <div
         className="pointer-events-none absolute overflow-hidden"
         style={{
-          left: "21.5%",
-          right: "21.5%",
-          top: "14%",
-          height: "28%",
-          clipPath: "polygon(12% 0%, 88% 0%, 100% 100%, 0% 100%)",
+          left: "24%",
+          right: "24%",
+          top: "18%",
+          height: "26%",
+          clipPath: "polygon(8% 0%, 92% 0%, 100% 100%, 0% 100%)",
+          background: "linear-gradient(180deg, #e8dcc8 0%, #d4c4a8 100%)",
         }}
       >
-        {children}
+        <div className="relative h-full w-full">{children}</div>
       </div>
     </div>
   );

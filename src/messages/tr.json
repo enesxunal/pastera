@@ -215,7 +215,7 @@
   },
   "pastaBox": {
     "preview": "Pastera kutun",
-    "empty": "Malzeme seçince kutunun içine dökülecek.",
+    "empty": "Önce makarna, sonra sos ve malzemeler kutuya dökülür.",
     "selected": "Seçildi"
   },
   "dineIn": {
