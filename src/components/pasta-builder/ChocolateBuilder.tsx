@@ -141,7 +141,7 @@ export function ChocolateBuilder() {
 
       <div className="grid gap-10 lg:grid-cols-[1fr_minmax(0,300px)] lg:items-start">
         <motion.aside
-          className="order-1 lg:order-2 lg:sticky lg:top-24"
+          className="order-1 w-full lg:order-2 lg:w-auto"
           initial={{ opacity: 0, x: 28 }}
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true, amount: 0.2 }}

@@ -714,8 +714,8 @@ export function WarenkorbClient() {
           </div>
         </div>
 
-        <div className="order-1 flex flex-col items-center gap-4 lg:order-2 lg:sticky lg:top-24">
-          <PastaBox pastaId={cart.pastaId} pastaName={pastaName} layers={boxLayers} />
+        <div className="order-1 flex w-full flex-col items-center gap-4 lg:order-2 lg:w-auto">
+          <PastaBox pastaId={cart.pastaId} pastaName={pastaName} layers={boxLayers} sticky />
         </div>
       </div>
 

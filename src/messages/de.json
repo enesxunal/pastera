@@ -214,8 +214,8 @@
     }
   },
   "pastaBox": {
-    "preview": "Dein Teller",
-    "empty": "Sauce und Toppings werden auf den Teller geschüttet.",
+    "preview": "Deine Pastera-Box",
+    "empty": "Zutaten werden in die Box geschüttet.",
     "selected": "Ausgewählt"
   },
   "dineIn": {

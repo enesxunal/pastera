@@ -214,8 +214,8 @@
     }
   },
   "pastaBox": {
-    "preview": "Tabağın",
-    "empty": "Sos ve malzeme seçince tabağa dökülecek.",
+    "preview": "Pastera kutun",
+    "empty": "Malzeme seçince kutunun içine dökülecek.",
     "selected": "Seçildi"
   },
   "dineIn": {
