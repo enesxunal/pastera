@@ -14,6 +14,7 @@ import {
   MENU_KENDIN_YAP_ID,
 } from "@/lib/menu-hub-items";
 import { getMenuItem } from "@/lib/menu-data";
+import { menuItemDescription } from "@/lib/menu-i18n";
 import { publicMenuImageSrc } from "@/lib/normalize-menu-image";
 import { useI18n } from "@/components/providers/I18nProvider";
 import { VeganBadge } from "@/components/menu/VeganBadge";
@@ -149,9 +150,10 @@ export function MenuGrid({
       {items.map((item) => {
         const label = nameOf(item, locale);
         const imageSrc = publicMenuImageSrc(item.image);
+        const staticItem = getMenuItem(item.id);
         const chefDesc =
           category === "chef_special" || item.id.startsWith("std-")
-            ? getMenuItem(item.id)?.description
+            ? menuItemDescription(item.id, locale, staticItem?.description)
             : item.id === MENU_KENDIN_YAP_ID
               ? t("menu.buildYourOwnHint")
               : item.id === "noodle-chocolate"

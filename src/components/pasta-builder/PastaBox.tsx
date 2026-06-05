@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
+import { useI18n } from "@/components/providers/I18nProvider";
 import { publicMenuImageSrc } from "@/lib/normalize-menu-image";
 
 export type BoxLayer = { id: string; name: string; image?: string };
@@ -12,10 +13,12 @@ type PastaBoxProps = {
 };
 
 export function PastaBox({ pastaName, layers }: PastaBoxProps) {
+  const { t } = useI18n();
+
   return (
     <div className="perspective-box flex w-full max-w-sm flex-col items-center">
       <p className="mb-1 font-display text-xs font-semibold uppercase tracking-[0.2em] text-[#c49746]">
-        Vorschau
+        {t("pastaBox.preview")}
       </p>
       <AnimatePresence mode="wait">
         <motion.p
@@ -53,15 +56,13 @@ export function PastaBox({ pastaName, layers }: PastaBoxProps) {
           <div className="absolute inset-x-4 top-6 flex h-[calc(100%-3rem)] flex-col rounded-xl border border-[#2e402a]/90 bg-black/40 p-3 shadow-inner">
             <div className="flex-1 overflow-hidden">
               {layers.length === 0 ? (
-                <p className="mt-3 text-center text-sm text-white/40">
-                  Saucen ve malzeme seçince burada görünecek.
-                </p>
+                <p className="mt-3 text-center text-sm text-white/40">{t("pastaBox.empty")}</p>
               ) : (
                 <div className="h-full overflow-auto pr-1">
                   <AnimatePresence initial={false} mode="popLayout">
-                    {layers.map((t) => (
+                    {layers.map((layer) => (
                       <motion.div
-                        key={t.id}
+                        key={layer.id}
                         layout
                         initial={{ opacity: 0, y: 8 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -70,9 +71,9 @@ export function PastaBox({ pastaName, layers }: PastaBoxProps) {
                         className="mb-2 flex items-center gap-2 rounded-xl border border-[#2e402a] bg-black/30 p-2"
                       >
                         <div className="relative h-9 w-9 overflow-hidden rounded-lg border border-[#c49746]/50 bg-[#111]">
-                          {publicMenuImageSrc(t.image) ? (
+                          {publicMenuImageSrc(layer.image) ? (
                             <Image
-                              src={publicMenuImageSrc(t.image)}
+                              src={publicMenuImageSrc(layer.image)}
                               alt=""
                               fill
                               className="object-cover"
@@ -86,8 +87,8 @@ export function PastaBox({ pastaName, layers }: PastaBoxProps) {
                           )}
                         </div>
                         <div className="min-w-0">
-                          <p className="truncate text-sm font-semibold text-white">{t.name}</p>
-                          <p className="text-xs text-white/45">Seçildi</p>
+                          <p className="truncate text-sm font-semibold text-white">{layer.name}</p>
+                          <p className="text-xs text-white/45">{t("pastaBox.selected")}</p>
                         </div>
                       </motion.div>
                     ))}

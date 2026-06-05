@@ -4,6 +4,7 @@ import Image from "next/image";
 import { motion, type Variants } from "framer-motion";
 import type { MenuItem } from "@/lib/menu-data";
 import { formatEur } from "@/lib/format";
+import { menuItemDescription, menuItemLabel } from "@/lib/menu-i18n";
 import { fadeUpCard } from "@/lib/motion-variants";
 import { publicMenuImageSrc } from "@/lib/normalize-menu-image";
 import { VeganBadge } from "@/components/menu/VeganBadge";
@@ -18,8 +19,10 @@ type Props = {
 };
 
 export function MenuPickCard({ item, selected, onSelect, mode, variants = fadeUpCard }: Props) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const imageSrc = publicMenuImageSrc(item.image);
+  const label = menuItemLabel(item.id, locale, item.name);
+  const desc = menuItemDescription(item.id, locale, item.description);
   return (
     <motion.button
       type="button"
@@ -71,9 +74,9 @@ export function MenuPickCard({ item, selected, onSelect, mode, variants = fadeUp
         </motion.span>
       )}
       <div className="absolute bottom-0 left-0 right-0 p-3">
-        <p className="font-display text-sm font-bold leading-tight text-white">{item.name}</p>
-        {item.description ? (
-          <p className="mt-0.5 line-clamp-2 text-[10px] leading-snug text-white/55">{item.description}</p>
+        <p className="font-display text-sm font-bold leading-tight text-white">{label}</p>
+        {desc ? (
+          <p className="mt-0.5 line-clamp-2 text-[10px] leading-snug text-white/55">{desc}</p>
         ) : null}
         <p className="mt-0.5 text-xs font-semibold text-[#c49746]">
           {mode === "single" ? formatEur(item.price) : `+${formatEur(item.price)}`}

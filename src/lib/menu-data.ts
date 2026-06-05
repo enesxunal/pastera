@@ -312,40 +312,28 @@ export function getMenuItem(id: string): MenuItem | undefined {
 }
 
 export type MenuHighlight = {
-  id: string;
-  name: string;
-  description: string;
+  id: "builder" | "standard" | "dessert";
   priceFrom: number;
-  badge?: string;
   image: string;
   href?: string;
 };
 
 export const MENU_HIGHLIGHTS: MenuHighlight[] = [
   {
-    id: "highlight-builder",
-    name: "Kreiere deine Pasta",
-    description: "Makarna, sos ve topping — 3 adımda.",
+    id: "builder",
     priceFrom: PASTA_BASE,
-    badge: "3 Schritte",
     image: img("pasta-klassisch"),
     href: "/builder",
   },
   {
-    id: "highlight-standard",
-    name: "Standart Makarna",
-    description: "Hazır tabaklar — sabit fiyat.",
+    id: "standard",
     priceFrom: 6.5,
-    badge: "Favorit",
     image: img("sp-curry-sahne-haehnchen"),
     href: "/menu#makarnalar",
   },
   {
-    id: "highlight-dessert",
-    name: "Tatlı & Schoko",
-    description: "Tiramisu, Crème brûlée & Schokoladen-Pasta.",
+    id: "dessert",
     priceFrom: 6.5,
-    badge: "Süß",
     image: img("pasta-klassisch"),
     href: "/builder/chocolate",
   },

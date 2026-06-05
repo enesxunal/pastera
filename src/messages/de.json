@@ -83,7 +83,7 @@
     "title": "Kreiere deine Pasta",
     "intro": "Schritt 1: Nudel wählen. Schritt 2: Sauce(n). Schritt 3: Toppings. Der Preis wird live berechnet.",
     "step1Title": "Schritt 1 — Pastasorte",
-    "step1Hint": "Classic, Vegan, Schwarz oder Schokolade — 6,90 €",
+    "step1Hint": "Classic, Vegan oder Schwarz — 6,90 €",
     "step2Title": "Schritt 2 — Saucen",
     "step2Hint": "Mehrere Saucen möglich.",
     "step3Title": "Schritt 3 — Toppings",
@@ -187,12 +187,35 @@
     "highlightsTitle": "Empfehlungen",
     "highlightsIntro": "Unsere Highlights – dazu Saucen und Extras im Konfigurator.",
     "highlightsLink": "Komplette Speisekarte →",
-    "priceFrom": "ab"
+    "priceFrom": "ab",
+    "highlights": {
+      "builder": {
+        "name": "Pasta selbst zusammenstellen",
+        "description": "Nudeln, Saucen und Toppings — in 3 Schritten.",
+        "badge": "3 Schritte"
+      },
+      "standard": {
+        "name": "Fertige Gerichte",
+        "description": "Benannte Teller — Festpreis.",
+        "badge": "Favorit"
+      },
+      "dessert": {
+        "name": "Dessert & Schokolade",
+        "description": "Tiramisu, Crème brûlée und Schokoladen-Pasta.",
+        "badge": "Süß"
+      }
+    }
+  },
+  "pastaBox": {
+    "preview": "Vorschau",
+    "empty": "Saucen und Zutaten erscheinen hier nach der Auswahl.",
+    "selected": "Ausgewählt"
   },
   "dineIn": {
     "banner": "Bestellung am Tisch",
     "table": "Tisch",
-    "menu": "Speisekarte"
+    "menu": "Speisekarte",
+    "loading": "Tisch wird geladen …"
   },
   "display": {
     "loginTitle": "Küchenbildschirm",
@@ -440,17 +463,17 @@
     "perBranch": "Pro Filiale",
     "branchTitle": "Statistik",
     "backToOrders": "← Bestellungen",
-    "todayRevenue": "Ciro heute",
+    "todayRevenue": "Umsatz heute",
     "todayGross": "Bestellwert heute",
     "todayOrders": "Bestellungen heute",
-    "monthRevenue": "Ciro diesen Monat",
+    "monthRevenue": "Umsatz diesen Monat",
     "monthGross": "Bestellwert Monat",
     "activeOrders": "Aktive Bestellungen",
     "deliveredOnly": "Nur abgeschlossene",
     "allOrdersToday": "Alle heutigen Bestellungen",
     "thisMonth": "Aktueller Monat",
     "inKitchen": "Neu + in Arbeit + fertig",
-    "last7Days": "Letzte 7 Tage (Ciro)",
+    "last7Days": "Letzte 7 Tage (Umsatz)",
     "deliveredToday": "Heute abgeschlossen",
     "deliveryToday": "Lieferungen heute",
     "dineInToday": "Im Restaurant heute",

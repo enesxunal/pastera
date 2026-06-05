@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useI18n } from "@/components/providers/I18nProvider";
 import { saveDineInContext } from "@/lib/dine-in-context";
 
 type Props = {
@@ -13,6 +14,7 @@ type Props = {
 
 export function MasaEntryClient({ branchId, branchSlug, branchName, tableNumber }: Props) {
   const router = useRouter();
+  const { t } = useI18n();
 
   useEffect(() => {
     saveDineInContext({
@@ -26,7 +28,7 @@ export function MasaEntryClient({ branchId, branchSlug, branchName, tableNumber 
 
   return (
     <div className="mx-auto max-w-lg px-4 py-24">
-      <p className="text-center text-white/50">Masa yükleniyor… / Tisch wird geladen …</p>
+      <p className="text-center text-white/50">{t("dineIn.loading")}</p>
     </div>
   );
 }

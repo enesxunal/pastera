@@ -15,6 +15,7 @@ import {
   type MenuItem,
 } from "@/lib/menu-data";
 import { formatEur } from "@/lib/format";
+import { menuItemLabel } from "@/lib/menu-i18n";
 import { MenuPickCard } from "@/components/menu/MenuPickCard";
 import { PastaBox } from "./PastaBox";
 
@@ -61,7 +62,7 @@ export function ChocolateBuilder() {
   const pastaItem = useMemo(
     () => ({
       ...CHOCOLATE_PASTA,
-      name: locale === "tr" ? "Çikolatalı makarna" : CHOCOLATE_PASTA.name,
+      name: menuItemLabel(CHOCOLATE_PASTA.id, locale, CHOCOLATE_PASTA.name),
     }),
     [locale],
   );
@@ -90,10 +91,18 @@ export function ChocolateBuilder() {
 
   const boxLayers = useMemo(
     () => [
-      ...sauceItems.map((x) => ({ id: x.id, name: x.name, image: x.image })),
-      ...ingredientItems.map((x) => ({ id: x.id, name: x.name, image: x.image })),
+      ...sauceItems.map((x) => ({
+        id: x.id,
+        name: menuItemLabel(x.id, locale, x.name),
+        image: x.image,
+      })),
+      ...ingredientItems.map((x) => ({
+        id: x.id,
+        name: menuItemLabel(x.id, locale, x.name),
+        image: x.image,
+      })),
     ],
-    [sauceItems, ingredientItems],
+    [sauceItems, ingredientItems, locale],
   );
 
   function goToWarenkorb() {

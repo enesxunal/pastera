@@ -1,6 +1,6 @@
 import { catalogItemById } from "@/lib/catalog-static";
 import type { CatalogItem } from "@/lib/catalog-types";
-import { catalogNameTr } from "@/lib/catalog-name-tr";
+import { menuItemLabel } from "@/lib/menu-i18n";
 import {
   CHOCOLATE_PASTA,
   getMenuItem,
@@ -32,7 +32,7 @@ export type SupportedLocale = "de" | "tr";
 
 function label(item: CatalogItem | MenuItem, locale: SupportedLocale): string {
   if ("name_de" in item) return locale === "tr" ? item.name_tr : item.name_de;
-  return item.name;
+  return menuItemLabel(item.id, locale, item.name);
 }
 
 export function saveCartSnapshot(snapshot: Omit<CartSnapshot, "v">): void {
@@ -154,7 +154,12 @@ function pickMenuItems(
           vegan: c.vegan,
           image: c.image,
         } satisfies MenuItem;
-      return getMenuItem(id);
+      const staticItem = getMenuItem(id);
+      if (!staticItem) return null;
+      return {
+        ...staticItem,
+        name: menuItemLabel(id, locale, staticItem.name),
+      } satisfies MenuItem;
     })
     .filter((x): x is MenuItem => Boolean(x));
 }
@@ -196,9 +201,7 @@ function buildBowlParts(
     const pastaCat = catalogItemById(catalog, CHOCOLATE_PASTA.id);
     const pastaName = pastaCat
       ? label(pastaCat, locale)
-      : locale === "tr"
-        ? catalogNameTr(CHOCOLATE_PASTA.id, CHOCOLATE_PASTA.name)
-        : CHOCOLATE_PASTA.name;
+      : menuItemLabel(CHOCOLATE_PASTA.id, locale, CHOCOLATE_PASTA.name);
     const pastaPrice = CHOCOLATE_PASTA.price;
 
     const aS = allowedIds(saucesForChocolateBowl());

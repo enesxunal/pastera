@@ -83,7 +83,7 @@
     "title": "Kendi makarnanı oluştur",
     "intro": "1. adım: noodle. 2. adım: sos(lar). 3. adım: toppingler. Fiyat anında güncellenir.",
     "step1Title": "Adım 1 — Makarna çeşidi",
-    "step1Hint": "Classic, Vegan, Siyah veya Çikolatalı — 6,90 €",
+    "step1Hint": "Klasik, Vegan veya Siyah — 6,90 €",
     "step2Title": "Adım 2 — Soslar",
     "step2Hint": "Birden fazla sos seçilebilir.",
     "step3Title": "Adım 3 — Toppingler",
@@ -140,7 +140,7 @@
   },
   "menu": {
     "sectionNoodles": "Makarna çeşidi",
-    "sectionNoodlesHint": "Classic, Vegan, Siyah — 6,90 €. Sos ve topping oluşturucuda.",
+    "sectionNoodlesHint": "Klasik, Vegan, Siyah — 6,90 €. Sos ve topping oluşturucuda.",
     "sectionStandard": "Standart makarna",
     "sectionStandardHint": "Hazır isimli tabaklar — sabit fiyat, sepete ekle.",
     "sectionDessert": "Tatlı",
@@ -157,7 +157,7 @@
     "sectionPastaChoiceHint": "Kendin yap veya hazır tabaklardan birini seç.",
     "buildYourOwn": "Kendin yap",
     "buildYourOwnBadge": "3 adım",
-    "buildYourOwnHint": "Classic, Vegan veya Siyah — sos ve topping seç.",
+    "buildYourOwnHint": "Klasik, Vegan veya Siyah — sos ve topping seç.",
     "chocolateSectionHint": "Hazır tatlılar veya çikolatalı makarnanı kendin oluştur.",
     "chocolateBuildYourOwnHint": "Çikolatalı makarna tabanı + meyve ve çikolata toppingleri.",
     "readyPastas": "Hazır makarnalar",
@@ -187,12 +187,35 @@
     "highlightsTitle": "Öne çıkanlar",
     "highlightsIntro": "Favoriler — sos ve ekstraları oluşturucuda tamamlarsın.",
     "highlightsLink": "Tüm menü →",
-    "priceFrom": "başlangıç"
+    "priceFrom": "başlangıç",
+    "highlights": {
+      "builder": {
+        "name": "Kendi makarnanı oluştur",
+        "description": "Makarna, sos ve topping — 3 adımda.",
+        "badge": "3 adım"
+      },
+      "standard": {
+        "name": "Hazır makarnalar",
+        "description": "Hazır tabaklar — sabit fiyat.",
+        "badge": "Favori"
+      },
+      "dessert": {
+        "name": "Tatlı ve çikolata",
+        "description": "Tiramisu, crème brûlée ve çikolatalı makarna.",
+        "badge": "Tatlı"
+      }
+    }
+  },
+  "pastaBox": {
+    "preview": "Önizleme",
+    "empty": "Sos ve malzeme seçince burada görünecek.",
+    "selected": "Seçildi"
   },
   "dineIn": {
     "banner": "Masadan sipariş",
     "table": "Masa",
-    "menu": "Menü"
+    "menu": "Menü",
+    "loading": "Masa yükleniyor…"
   },
   "display": {
     "loginTitle": "Salon ekranı",

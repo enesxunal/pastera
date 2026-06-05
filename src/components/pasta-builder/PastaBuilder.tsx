@@ -16,6 +16,7 @@ import {
   type MenuItem,
 } from "@/lib/menu-data";
 import { formatEur } from "@/lib/format";
+import { menuItemLabel } from "@/lib/menu-i18n";
 import { MenuPickCard } from "@/components/menu/MenuPickCard";
 import { PastaBox } from "./PastaBox";
 
@@ -56,7 +57,7 @@ function ToppingGrid({
 export function PastaBuilder() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const [pastaId, setPastaId] = useState(BUILDER_PASTAS[0].id);
   const [sauceIds, setSauceIds] = useState<string[]>([]);
   const [ingredientIds, setIngredientIds] = useState<string[]>([]);
@@ -95,10 +96,18 @@ export function PastaBuilder() {
 
   const boxLayers = useMemo(
     () => [
-      ...sauceItems.map((x) => ({ id: x.id, name: x.name, image: x.image })),
-      ...ingredientItems.map((x) => ({ id: x.id, name: x.name, image: x.image })),
+      ...sauceItems.map((x) => ({
+        id: x.id,
+        name: menuItemLabel(x.id, locale, x.name),
+        image: x.image,
+      })),
+      ...ingredientItems.map((x) => ({
+        id: x.id,
+        name: menuItemLabel(x.id, locale, x.name),
+        image: x.image,
+      })),
     ],
-    [sauceItems, ingredientItems],
+    [sauceItems, ingredientItems, locale],
   );
 
   function selectPasta(id: string) {
@@ -248,7 +257,10 @@ export function PastaBuilder() {
           viewport={{ once: true, amount: 0.2 }}
           transition={{ type: "spring", stiffness: 180, damping: 22 }}
         >
-          <PastaBox pastaName={pasta.name} layers={boxLayers} />
+          <PastaBox
+            pastaName={menuItemLabel(pasta.id, locale, pasta.name)}
+            layers={boxLayers}
+          />
         </motion.aside>
       </div>
     </div>

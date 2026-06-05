@@ -55,18 +55,18 @@ export function MenuHighlights() {
               <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
             </div>
             <div className="flex flex-1 flex-col p-5">
-              {item.badge && (
-                <span
-                  className="mb-2 inline-flex w-fit rounded-full px-2.5 py-0.5 text-xs font-semibold"
-                  style={{ backgroundColor: "#2e402a", color: "#c49746" }}
-                >
-                  {item.badge}
-                </span>
-              )}
+              <span
+                className="mb-2 inline-flex w-fit rounded-full px-2.5 py-0.5 text-xs font-semibold"
+                style={{ backgroundColor: "#2e402a", color: "#c49746" }}
+              >
+                {t(`home.highlights.${item.id}.badge`)}
+              </span>
               <h3 className="font-display text-xl font-bold text-white group-hover:text-[#c49746]">
-                {item.name}
+                {t(`home.highlights.${item.id}.name`)}
               </h3>
-              <p className="mt-2 flex-1 text-sm leading-relaxed text-white/55">{item.description}</p>
+              <p className="mt-2 flex-1 text-sm leading-relaxed text-white/55">
+                {t(`home.highlights.${item.id}.description`)}
+              </p>
               <p className="mt-4 font-display text-lg font-bold" style={{ color: "#c49746" }}>
                 {t("home.priceFrom")} {formatEur(item.priceFrom)}
               </p>
