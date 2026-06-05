@@ -1,24 +1,13 @@
-import { menuPhotoForId } from "@/lib/menu-photo-map";
+/** SVG ağız (viewBox 200×250) — boş grafik kutu. */
+export const BOX_MOUTH_SVG = "52,28 148,28 172,82 28,82";
 
-/** Menü kartlarıyla aynı kutu fotoğrafı. */
-export function pastaBoxPhoto(pastaId?: string): string {
-  if (pastaId === "noodle-vegan") return menuPhotoForId("pasta-vegan");
-  return menuPhotoForId("pasta-klassisch");
-}
-
-export function pastaBoxFilter(pastaId?: string): string | undefined {
-  if (pastaId === "noodle-black") return "brightness(0.42) contrast(1.15) saturate(0.7)";
-  if (pastaId === "noodle-chocolate") return "sepia(0.45) brightness(0.82) saturate(1.1)";
-  return undefined;
-}
-
-/** Fotoğraftaki ağız alanı (menü görseliyle hizalı). */
+/** HTML overlay — SVG ağzıyla aynı oran. */
 export const BOX_OPENING = {
-  left: "13%",
-  top: "5%",
-  width: "74%",
-  height: "36%",
-  clipPath: "polygon(11% 2%, 89% 2%, 97% 96%, 3% 96%)",
+  left: "14%",
+  top: "11%",
+  width: "72%",
+  height: "22%",
+  clipPath: "polygon(12% 0%, 88% 0%, 100% 100%, 0% 100%)",
 } as const;
 
 export type ScatterPoint = {
@@ -38,33 +27,42 @@ function dist(a: ScatterPoint, b: ScatterPoint): number {
   return Math.hypot(a.left - b.left, a.top - b.top);
 }
 
-/** Her malzeme farklı noktada — üst üste binmesin. */
+/** Sos/topping — her biri farklı noktada. */
 export function scatterForLayers(ids: string[]): ScatterPoint[] {
   const out: ScatterPoint[] = [];
-  const minGap = 14;
+  const minGap = 16;
 
   for (let i = 0; i < ids.length; i++) {
     let best: ScatterPoint | null = null;
-    for (let attempt = 0; attempt < 32; attempt++) {
-      const h = hash(ids[i], i * 17 + attempt * 53);
+    for (let attempt = 0; attempt < 40; attempt++) {
+      const h = hash(ids[i], i * 19 + attempt * 61);
       const angle = ((h % 360) * Math.PI) / 180;
-      const radius = 18 + ((h >> 4) % 28);
+      const radius = 12 + ((h >> 3) % 32);
       const candidate: ScatterPoint = {
-        left: 50 + Math.cos(angle) * radius * 0.85,
-        top: 52 + Math.sin(angle) * radius * 0.55,
-        rot: -28 + (h % 56),
-        scale: 0.82 + ((h >> 8) % 28) / 100,
+        left: 28 + ((h >> 5) % 44),
+        top: 22 + ((h >> 7) % 38),
+        rot: -22 + (h % 44),
+        scale: 0.75 + ((h >> 9) % 22) / 100,
       };
+      if (Math.cos(angle) > -0.2) {
+        candidate.left = 50 + Math.cos(angle) * radius * 0.9;
+        candidate.top = 38 + Math.sin(angle) * radius * 0.65;
+      }
       const ok = out.every((p) => dist(p, candidate) >= minGap);
       if (ok) {
         best = candidate;
         break;
       }
-      if (!best || dist(candidate, { left: 50, top: 52, rot: 0, scale: 1 }) > dist(best, { left: 50, top: 52, rot: 0, scale: 1 })) {
-        best = candidate;
-      }
+      if (!best) best = candidate;
     }
-    out.push(best ?? { left: 38 + i * 11, top: 48 + (i % 3) * 8, rot: i * 12, scale: 0.9 });
+    out.push(
+      best ?? {
+        left: 30 + (i % 4) * 14,
+        top: 28 + Math.floor(i / 4) * 14,
+        rot: i * 11,
+        scale: 0.85,
+      },
+    );
   }
   return out;
 }

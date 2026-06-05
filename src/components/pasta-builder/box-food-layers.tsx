@@ -5,7 +5,7 @@ import Image from "next/image";
 import { menuPhotoForId } from "@/lib/menu-photo-map";
 import { publicMenuImageSrc } from "@/lib/normalize-menu-image";
 import { scatterForLayers } from "./box-layout";
-import { sauceColor } from "./pasta-box-visual";
+import { pastaTint, sauceColor } from "./pasta-box-visual";
 
 type Layer = { id: string; image?: string };
 
@@ -13,15 +13,67 @@ function layerPhoto(layer: Layer): string {
   return publicMenuImageSrc(layer.image) || publicMenuImageSrc(menuPhotoForId(layer.id));
 }
 
-const EASE = [0.22, 1, 0.36, 1] as const;
-
 type Pouring =
   | { kind: "pasta" }
   | { kind: "sauce"; id: string }
   | { kind: "topping"; id: string }
   | null;
 
-/** Sos + topping — menü fotoğrafının ağzına bindirilir. */
+const MOUTH_BOTTOM = 80;
+const MOUTH_TOP = 30;
+
+/** Makarna yığını — boş kutunun içini doldurur (grafik). */
+export function PastaPileSvg({
+  pastaId,
+  pouring,
+}: {
+  pastaId?: string;
+  pouring?: boolean;
+}) {
+  const { noodle, glow } = pastaTint(pastaId);
+  const count = 18;
+
+  const strands = Array.from({ length: count }, (_, i) => {
+    const t = i / (count - 1);
+    const cy = MOUTH_BOTTOM - 3 - t * (MOUTH_BOTTOM - MOUTH_TOP - 4);
+    const rx = 58 - t * 24 + (i % 3) * 2;
+    const ry = 4.2 - t * 1.4;
+    const rot = -5 + (i % 7) * 2.5;
+    const cx = 100 + (i % 5) * 3 - 6;
+    return { cx, cy, rx, ry, rot, i };
+  });
+
+  return (
+    <g>
+      <path
+        d={`M 36 ${MOUTH_BOTTOM} Q 100 ${MOUTH_TOP + 12} 164 ${MOUTH_BOTTOM} Z`}
+        fill={noodle}
+        opacity={0.25}
+      />
+      {strands.map((s) => (
+        <motion.ellipse
+          key={s.i}
+          cx={s.cx}
+          cy={s.cy}
+          rx={s.rx}
+          ry={s.ry}
+          fill={s.i % 2 ? noodle : glow}
+          transform={`rotate(${s.rot} ${s.cx} ${s.cy})`}
+          initial={pouring ? { cy: MOUTH_TOP, opacity: 0, rx: s.rx * 0.1 } : false}
+          animate={{ cy: s.cy, opacity: 0.95, rx: s.rx }}
+          transition={{
+            type: "spring",
+            stiffness: 210,
+            damping: 16,
+            delay: pouring ? s.i * 0.03 : 0,
+          }}
+        />
+      ))}
+    </g>
+  );
+}
+
+/** Sos + topping — makarnanın üstünde, dağınık. */
 export function BoxFoodOverlay({
   layers,
   pouring,
@@ -31,8 +83,10 @@ export function BoxFoodOverlay({
 }) {
   const sauces = layers.filter((l) => l.id.startsWith("s-"));
   const toppings = layers.filter((l) => l.id.startsWith("t-"));
-  const allIds = [...sauces.map((s) => s.id), ...toppings.map((t) => t.id)];
-  const spots = scatterForLayers(allIds);
+  const spots = scatterForLayers([
+    ...sauces.map((s) => s.id),
+    ...toppings.map((t) => t.id),
+  ]);
 
   return (
     <>
@@ -66,29 +120,24 @@ function SauceSpot({
   pouring?: boolean;
 }) {
   const color = sauceColor(layer.id);
-  const photo = layerPhoto(layer);
 
   return (
     <motion.div
-      className="absolute overflow-hidden rounded-[50%] shadow-inner"
+      className="absolute rounded-[50%]"
       style={{
         left: `${spot.left}%`,
         top: `${spot.top}%`,
-        width: "38%",
-        height: "32%",
+        width: "22%",
+        height: "18%",
         transform: `translate(-50%, -50%) rotate(${spot.rot}deg) scale(${spot.scale})`,
         backgroundColor: color,
-        opacity: 0.72,
-        mixBlendMode: "multiply",
+        opacity: 0.82,
+        boxShadow: "inset 0 -2px 4px rgba(0,0,0,0.2)",
       }}
-      initial={pouring ? { scale: 0, opacity: 0 } : { scale: 0.6, opacity: 0 }}
-      animate={{ scale: spot.scale, opacity: 0.72 }}
-      transition={{ type: "spring", stiffness: 200, damping: 18 }}
-    >
-      {photo ? (
-        <Image src={photo} alt="" fill className="object-cover opacity-50 mix-blend-overlay" sizes="80px" unoptimized />
-      ) : null}
-    </motion.div>
+      initial={pouring ? { scale: 0, opacity: 0 } : { scale: 0.5, opacity: 0 }}
+      animate={{ scale: spot.scale, opacity: 0.82 }}
+      transition={{ type: "spring", stiffness: 220, damping: 17 }}
+    />
   );
 }
 
@@ -105,36 +154,23 @@ function ToppingSpot({
 
   return (
     <motion.div
-      className="absolute overflow-hidden rounded-lg border border-white/20 shadow-md"
+      className="absolute overflow-hidden rounded-md border border-white/25 shadow-sm"
       style={{
         left: `${spot.left}%`,
         top: `${spot.top}%`,
-        width: "22%",
-        height: "22%",
+        width: "18%",
+        height: "18%",
         transform: `translate(-50%, -50%) rotate(${spot.rot}deg)`,
       }}
-      initial={pouring ? { y: -40, opacity: 0, scale: 0.2 } : false}
+      initial={pouring ? { y: -30, opacity: 0, scale: 0.15 } : false}
       animate={{ y: 0, opacity: 1, scale: spot.scale }}
-      transition={{ type: "spring", stiffness: 280, damping: 16 }}
+      transition={{ type: "spring", stiffness: 280, damping: 15 }}
     >
       {photo ? (
-        <Image src={photo} alt="" fill className="object-cover" sizes="64px" unoptimized />
+        <Image src={photo} alt="" fill className="object-cover" sizes="48px" unoptimized />
       ) : (
         <div className="h-full w-full bg-[#9a7048]" />
       )}
     </motion.div>
-  );
-}
-
-/** Makarna değişince kısa parlama. */
-export function PastaChangeFlash({ active }: { active?: boolean }) {
-  if (!active) return null;
-  return (
-    <motion.div
-      className="pointer-events-none absolute inset-0 rounded-lg bg-white/15"
-      initial={{ opacity: 0.4 }}
-      animate={{ opacity: 0 }}
-      transition={{ duration: 0.5, ease: EASE }}
-    />
   );
 }
