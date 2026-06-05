@@ -46,6 +46,24 @@ export function getStaticCatalog(): CatalogItem[] {
   return out;
 }
 
+/** DB kayıtları üzerine kodda tanımlı standart makarna alanlarını yazar (eski görsel geri dönmesin). */
+export function applyStaticCatalogOverrides(items: CatalogItem[]): CatalogItem[] {
+  const staticById = new Map(getStaticCatalog().map((x) => [x.id, x]));
+  return items.map((item) => {
+    if (!item.id.startsWith("std-")) return item;
+    const stat = staticById.get(item.id);
+    if (!stat) return item;
+    return {
+      ...item,
+      category: stat.category,
+      name_de: stat.name_de,
+      name_tr: stat.name_tr,
+      image: stat.image,
+      vegan: stat.vegan,
+    };
+  });
+}
+
 export function catalogItemById(catalog: CatalogItem[], id: string): CatalogItem | undefined {
   return catalog.find((x) => x.id === id);
 }

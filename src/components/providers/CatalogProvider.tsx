@@ -1,7 +1,7 @@
 "use client";
 
 import type { CatalogItem } from "@/lib/catalog-types";
-import { getStaticCatalog } from "@/lib/catalog-static";
+import { applyStaticCatalogOverrides, getStaticCatalog } from "@/lib/catalog-static";
 import { loadDeliveryContext } from "@/lib/delivery-context";
 import { loadDineInContext } from "@/lib/dine-in-context";
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
@@ -21,7 +21,9 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
       void fetch(`/api/catalog${q}`)
         .then((r) => r.json())
         .then((data: CatalogItem[]) => {
-          if (Array.isArray(data) && data.length) setCatalog(data);
+          if (Array.isArray(data) && data.length) {
+            setCatalog(applyStaticCatalogOverrides(data));
+          }
         })
         .catch(() => {});
     },

@@ -1,7 +1,7 @@
 import type { CatalogItem } from "@/lib/catalog-types";
 import { applyBranchPrices, getBranchPriceOverrides } from "@/lib/branch-catalog-prices";
 import { filterToCurrentMenu } from "@/lib/catalog-sync";
-import { getStaticCatalog } from "@/lib/catalog-static";
+import { applyStaticCatalogOverrides, getStaticCatalog } from "@/lib/catalog-static";
 import { catalogNameTr } from "@/lib/catalog-name-tr";
 import { normalizeMenuImagePath } from "@/lib/normalize-menu-image";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -49,7 +49,7 @@ export async function getCatalogFromDb(branchId?: string | null): Promise<Catalo
       const overrides = await getBranchPriceOverrides(branchId);
       items = applyBranchPrices(items, overrides);
     }
-    return items;
+    return applyStaticCatalogOverrides(items);
   } catch {
     return getStaticCatalog();
   }
