@@ -9,79 +9,102 @@ export function layerKind(id: string): LayerKind {
 export function sauceColor(id: string): string {
   const map: Record<string, string> = {
     "s-domates-vegan": "#c73e2e",
+    "s-tomatensauce": "#c73e2e",
     "s-bolognese": "#7a3428",
-    "s-curry": "#e8a317",
-    "s-krema": "#f3efe4",
+    "s-curry": "#d4a017",
+    "s-krema": "#f5f0e4",
+    "s-sahnesauce": "#f5f0e4",
     "s-pesto": "#4a7c3f",
+    "s-veganes-pesto": "#4a7c3f",
     "s-arrabbiata": "#d4382a",
     "s-choc-dark": "#3d2314",
     "s-choc-white": "#f2e8d8",
+    "s-pesto-genovese": "#4a7c3f",
+    "s-champignon-rahm": "#e8e0d0",
+    "s-paprika-geroestet": "#c45a2a",
   };
   return map[id] ?? "#c49746";
 }
 
-export function pastaTint(pastaId?: string): { noodle: string; glow: string } {
-  if (pastaId === "noodle-vegan") return { noodle: "#9eb87a", glow: "#4a6b38" };
-  if (pastaId === "noodle-black") return { noodle: "#1f1f1f", glow: "#0a0a0a" };
-  if (pastaId === "noodle-chocolate") return { noodle: "#6b4423", glow: "#3d2314" };
-  return { noodle: "#e8c882", glow: "#c49746" };
+/** Sos opaklığı — krema daha açık, domates daha yoğun. */
+export function sauceOpacity(id: string): number {
+  if (id.includes("krema") || id.includes("sahne") || id.includes("choc-white") || id.includes("rahm"))
+    return 0.62;
+  if (id.includes("pesto")) return 0.58;
+  return 0.72;
 }
 
-/** Tutarlı topping konumu (id hash). */
-export function toppingPosition(id: string, index: number): { left: number; top: number } {
-  let h = index * 17;
-  for (let i = 0; i < id.length; i++) h = (h + id.charCodeAt(i) * 13) % 100;
-  const left = 22 + (h % 56);
-  const top = 18 + ((h * 3) % 42);
-  return { left, top };
+export function pastaTint(pastaId?: string): { noodle: string; glow: string; shadow: string } {
+  if (pastaId?.includes("vegan"))
+    return { noodle: "#c8d4a0", glow: "#8faa6a", shadow: "#5a7040" };
+  if (pastaId?.includes("nero") || pastaId === "noodle-black")
+    return { noodle: "#2a2a2a", glow: "#111", shadow: "#000" };
+  if (pastaId?.includes("chocolate") || pastaId?.includes("choc"))
+    return { noodle: "#8b5a3c", glow: "#5c3820", shadow: "#3d2314" };
+  return { noodle: "#f0d898", glow: "#d4b060", shadow: "#a08040" };
 }
 
 export type ToppingPieceKind =
-  | "meat"
+  | "tomato"
+  | "chicken"
+  | "beef"
   | "shrimp"
   | "olive"
   | "corn"
   | "mushroom"
   | "green"
+  | "broccoli"
   | "cheese"
-  | "fruit"
+  | "falafel"
+  | "tofu"
+  | "seitan"
+  | "onion"
+  | "garlic"
+  | "nut"
+  | "banana"
+  | "strawberry"
+  | "kiwi"
+  | "pear"
+  | "passion"
   | "chunk";
 
-/** Topping parça görünümü — ikon değil, gerçek yiyecek şekli. */
+/** Her malzeme kendi görünümüne map edilir — domates asla sarı olmaz. */
 export function toppingPieceType(id: string): ToppingPieceKind {
-  if (id.includes("garnelen")) return "shrimp";
-  if (id.includes("zeytin") || id.includes("oliven")) return "olive";
-  if (id.includes("mais")) return "corn";
-  if (id.includes("mantar") || id.includes("champignon")) return "mushroom";
+  const k = id.toLowerCase();
+
+  if (k.includes("cherry") || k.includes("tomaten") || k.includes("domates")) return "tomato";
+  if (k.includes("haehnchen") || k.includes("tenders") || k.includes("tavuk")) return "chicken";
+  if (k.includes("rind") || k.includes("dana") || k.includes("filet")) return "beef";
+  if (k.includes("garnelen")) return "shrimp";
+  if (k.includes("zeytin") || k.includes("oliven")) return "olive";
+  if (k.includes("mais")) return "corn";
+  if (k.includes("mantar") || k.includes("champignon")) return "mushroom";
+  if (k.includes("brokkoli")) return "broccoli";
+  if (k.includes("mozzarella") || k.includes("gorgonzola")) return "cheese";
+  if (k.includes("falafel")) return "falafel";
+  if (k.includes("tofu")) return "tofu";
+  if (k.includes("seitan")) return "seitan";
+  if (k.includes("zwiebel") || k.includes("sogan") || k.includes("roest")) return "onion";
+  if (k.includes("sarimsak") || k.includes("knoblauch")) return "garlic";
+  if (k.includes("ceviz") || k.includes("kaju") || k.includes("walnuss") || k.includes("cashew"))
+    return "nut";
+  if (k.includes("choc-muz") || k.includes("banane")) return "banana";
+  if (k.includes("choc-cilek") || k.includes("erdbeer")) return "strawberry";
+  if (k.includes("choc-kiwi") || k === "t-choc-kiwi") return "kiwi";
+  if (k.includes("birne")) return "pear";
+  if (k.includes("passion")) return "passion";
   if (
-    id.includes("spinat") ||
-    id.includes("rucola") ||
-    id.includes("brokkoli") ||
-    id.includes("rosmarin") ||
-    id.includes("jalapeno") ||
-    id.includes("taze-sogan")
+    k.includes("spinat") ||
+    k.includes("rucola") ||
+    k.includes("rosmarin") ||
+    k.includes("jalapeno")
   )
     return "green";
-  if (id.includes("mozzarella") || id.includes("gorgonzola")) return "cheese";
-  if (
-    id.includes("choc") ||
-    id.includes("muz") ||
-    id.includes("cilek") ||
-    id.includes("kiwi") ||
-    id.includes("birne") ||
-    id.includes("passion") ||
-    id.includes("cherry")
-  )
-    return "fruit";
-  if (
-    id.includes("julienne") ||
-    id.includes("tenders") ||
-    id.includes("rind") ||
-    id.includes("haehnchen") ||
-    id.includes("falafel") ||
-    id.includes("tofu") ||
-    id.includes("seitan")
-  )
-    return "meat";
+
   return "chunk";
+}
+
+/** Zeytin rengi — id'ye göre. */
+export function oliveColor(id: string): "black" | "green" {
+  return id.includes("siyah") || id.includes("schwarz") ? "black" : "green";
 }
