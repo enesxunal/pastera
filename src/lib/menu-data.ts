@@ -45,7 +45,7 @@ export const CHOCOLATE_PASTA: MenuItem = {
   name: "Schokoladen-Pasta",
   price: PASTA_BASE,
   vegan: false,
-  image: img("pasta-klassisch"),
+  image: img("noodle-chocolate"),
 };
 
 export const PASTAS: MenuItem[] = [...BUILDER_PASTAS, CHOCOLATE_PASTA];
@@ -210,8 +210,8 @@ export const STANDARD_PASTAS: MenuItem[] = [
 
 /** Tatlılar */
 export const DESSERTS: MenuItem[] = [
-  { id: "d-tiramisu", name: "Tiramisu", price: 6.5, vegan: false, image: "" },
-  { id: "d-creme-brulee", name: "Crème brûlée", price: 6.5, vegan: false, image: "" },
+  { id: "d-tiramisu", name: "Tiramisu", price: 6.5, vegan: false, image: img("d-tiramisu") },
+  { id: "d-creme-brulee", name: "Crème brûlée", price: 6.5, vegan: false, image: img("d-creme-brulee") },
 ];
 
 export const CHEF_SPECIALS_CLASSIC = STANDARD_PASTAS;
@@ -334,7 +334,7 @@ export const MENU_HIGHLIGHTS: MenuHighlight[] = [
   {
     id: "dessert",
     priceFrom: 6.5,
-    image: img("pasta-klassisch"),
+    image: img("noodle-chocolate"),
     href: "/builder/chocolate",
   },
 ];
