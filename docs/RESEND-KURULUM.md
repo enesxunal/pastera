@@ -56,6 +56,10 @@ Vercel’e ekle:
 
 Supabase SQL Editor’da bir kez çalıştır: `supabase/migrations/20250606_order_email_followup.sql`
 
+### Yorum maili (Google + Instagram) — sonra
+
+Vercel **Hobby** planda cron en fazla **günde 1 kez** çalışır. Teslimden 1 saat sonra yorum maili için Pro plan veya harici cron gerekir. Kod hazır: `/api/cron/order-followup` — şimdilik `vercel.json`’da kapalı.
+
 ## Sorun çıkarsa
 
 - Domain Verified değil → DNS kayıtlarını kontrol et

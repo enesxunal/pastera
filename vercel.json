@@ -3,10 +3,6 @@
     {
       "path": "/api/cron/backup",
       "schedule": "0 22 * * *"
-    },
-    {
-      "path": "/api/cron/order-followup",
-      "schedule": "*/15 * * * *"
     }
   ]
 }
