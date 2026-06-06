@@ -43,11 +43,11 @@ export function pastaTint(pastaId?: string): {
 } {
   if (pastaId?.includes("vegan"))
     return {
-      noodle: "#d4ddb8",
-      glow: "#e8efd0",
-      shadow: "#9aaa78",
-      flour: "#f6f9ee",
-      edge: "#b8c898",
+      noodle: "#b8cc78",
+      glow: "#d4e898",
+      shadow: "#7a9458",
+      flour: "#ecf2d8",
+      edge: "#98b868",
     };
   if (pastaId?.includes("nero") || pastaId === "noodle-black")
     return {
@@ -65,13 +65,13 @@ export function pastaTint(pastaId?: string): {
       flour: "#c8a080",
       edge: "#6b4428",
     };
-  /* Taze yumurtalı fettuccine — krem sarı + unlu mat yüzey */
+  /* Taze yumurtalı fettuccine — daha sarı, unlu mat yüzey */
   return {
-    noodle: "#ebe0c4",
-    glow: "#f5eed8",
-    shadow: "#c4b490",
-    flour: "#faf7ef",
-    edge: "#d8ccb0",
+    noodle: "#e8d490",
+    glow: "#f2e4a8",
+    shadow: "#c4a868",
+    flour: "#faf4dc",
+    edge: "#d4bc80",
   };
 }
 
