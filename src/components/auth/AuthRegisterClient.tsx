@@ -7,6 +7,7 @@ import { useI18n } from "@/components/providers/I18nProvider";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { useSupabasePublicConfig } from "@/lib/supabase/public-config-context";
+import { authCallbackUrl } from "@/lib/site-url";
 
 export function AuthRegisterClient() {
   const { t } = useI18n();
@@ -36,7 +37,7 @@ export function AuthRegisterClient() {
         password,
         options: {
           data: { full_name: name },
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          emailRedirectTo: authCallbackUrl(),
         },
       });
       if (error) {

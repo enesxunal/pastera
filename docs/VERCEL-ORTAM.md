@@ -21,8 +21,23 @@ Giriş ve veritabanı çalışması için bilgisayarınızdaki `.env.local` içe
 | `DISPLAY_ACCESS_KEY` | Mutfak ekranı anahtarı |
 | `BRANCH_PANEL_BRANCH_ID` | Varsayılan şube UUID |
 | `CRON_SECRET` | Yedekleme cron güvenliği |
+| `NEXT_PUBLIC_SITE_URL` | Canlı site adresi — **https://pastera.de** (kayıt onay maili için zorunlu) |
 
-İsteğe bağlı: `LOBBY_ACCESS_KEY`, `NEXT_PUBLIC_RECEIPT_WIDTH_MM`
+İsteğe bağlı: `LOBBY_ACCESS_KEY`, `NEXT_PUBLIC_RECEIPT_WIDTH_MM`, PayPal değişkenleri
+
+## Supabase — kayıt onay maili (localhost gelmesin)
+
+Supabase Dashboard → **Authentication** → **URL Configuration**:
+
+| Alan | Değer |
+|------|--------|
+| **Site URL** | `https://pastera.de` |
+| **Redirect URLs** | `https://pastera.de/auth/callback` |
+| | `http://localhost:3000/auth/callback` (yerel geliştirme) |
+
+Kaydettikten sonra Vercel’de `NEXT_PUBLIC_SITE_URL=https://pastera.de` ekleyip **Redeploy** edin.
+
+Eski onay maillerindeki localhost linki çalışmaz — **yeniden kayıt olun** veya Supabase’den kullanıcıyı silip tekrar deneyin.
 
 ## Kontrol
 
