@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useI18n } from "@/components/providers/I18nProvider";
 import { PasteraIsometricBox } from "./PasteraIsometricBox";
 import { layerKind } from "./pasta-box-visual";
@@ -21,33 +21,46 @@ type Pouring =
   | null;
 
 function useBoxPouring(pastaId: string | undefined, layers: BoxLayer[]) {
-  const [pouring, setPouring] = useState<Pouring>(null);
   const prevLayerIds = useRef<string[]>([]);
   const prevPastaId = useRef<string | undefined>(undefined);
+  const [heldPour, setHeldPour] = useState<Pouring>(null);
 
-  useEffect(() => {
-    const ids = layers.map((l) => l.id);
+  const ids = layers.map((l) => l.id);
+
+  let syncPour: Pouring = null;
+  if (ids.length === prevLayerIds.current.length + 1) {
     const added = ids.find((id) => !prevLayerIds.current.includes(id));
+    if (added) {
+      const kind = layerKind(added);
+      if (kind === "sauce") syncPour = { kind: "sauce", id: added };
+      else if (kind === "topping") syncPour = { kind: "topping", id: added };
+    }
+  }
+
+  if (
+    prevPastaId.current !== undefined &&
+    prevPastaId.current !== pastaId &&
+    pastaId !== undefined
+  ) {
+    syncPour = { kind: "pasta" };
+  }
+
+  const pouring = syncPour ?? heldPour;
+
+  useLayoutEffect(() => {
     prevLayerIds.current = ids;
-    if (!added) return;
-    const kind = layerKind(added);
-    if (kind === "sauce") setPouring({ kind: "sauce", id: added });
-    else if (kind === "topping") setPouring({ kind: "topping", id: added });
-    const timer = window.setTimeout(() => setPouring(null), 1100);
-    return () => window.clearTimeout(timer);
-  }, [layers]);
+    prevPastaId.current = pastaId;
+  });
 
   useEffect(() => {
-    if (prevPastaId.current === undefined) {
-      prevPastaId.current = pastaId;
-      return;
-    }
-    if (prevPastaId.current === pastaId) return;
-    prevPastaId.current = pastaId;
-    setPouring({ kind: "pasta" });
-    const timer = window.setTimeout(() => setPouring(null), 1200);
+    if (!syncPour) return;
+    setHeldPour(syncPour);
+    const ms = syncPour.kind === "pasta" ? 1200 : 1100;
+    const timer = window.setTimeout(() => setHeldPour(null), ms);
     return () => window.clearTimeout(timer);
-  }, [pastaId]);
+    // syncPour intentionally captured when ids/pastaId change — not listed as dep
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ids.join("|"), pastaId]);
 
   return pouring;
 }
