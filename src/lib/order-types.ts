@@ -34,6 +34,9 @@ export type OrderRow = {
   delivery_lng?: number | null;
   delivery_distance_km?: number | null;
   items: { lines?: { label: string; amount: number }[]; cart?: unknown } | null;
+  ready_at?: string | null;
+  delivered_at?: string | null;
+  review_email_sent_at?: string | null;
   created_at: string;
 };
 

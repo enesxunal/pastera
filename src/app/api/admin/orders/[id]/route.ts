@@ -1,8 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { createSupabaseServiceClient } from "@/lib/supabase/service";
+import { patchOrderStatus } from "@/lib/order-status-server";
 import type { OrderStatus } from "@/lib/order-types";
-
-const VALID: OrderStatus[] = ["pending", "preparing", "ready", "delivered"];
+import { createSupabaseServiceClient } from "@/lib/supabase/service";
 
 function isAdmin(req: NextRequest): boolean {
   return req.cookies.get("pastera_admin")?.value === "1";
@@ -18,18 +17,14 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
     return NextResponse.json({ ok: false }, { status: 400 });
   }
 
-  if (!body.status || !VALID.includes(body.status as OrderStatus)) {
-    return NextResponse.json({ ok: false, error: "Invalid status" }, { status: 400 });
-  }
-
   const svc = createSupabaseServiceClient();
   if (!svc) return NextResponse.json({ ok: false, error: "no_service" }, { status: 503 });
 
-  const patch: { status: string; ready_at?: string } = { status: body.status };
-  if (body.status === "ready") patch.ready_at = new Date().toISOString();
-
-  const { error } = await svc.from("orders").update(patch).eq("id", params.id);
-  if (error) return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
+  const result = await patchOrderStatus(svc, params.id, body.status as OrderStatus);
+  if (!result.ok) {
+    const status = result.error === "Not found" ? 404 : result.error === "Invalid status" ? 400 : 500;
+    return NextResponse.json({ ok: false, error: result.error }, { status });
+  }
 
   return NextResponse.json({ ok: true });
 }
