@@ -127,15 +127,15 @@ export const TOPPINGS_EXTRA: MenuItem[] = [
 
 /** Çikolatalı makarna — soslar */
 export const SAUCES_CHOCOLATE: MenuItem[] = [
-  { id: "s-choc-dark", name: "Schokolade", price: 1.0, vegan: false, image: "" },
-  { id: "s-choc-white", name: "Weiße Schokolade", price: 1.0, vegan: false, image: "" },
+  { id: "s-choc-dark", name: "Schokolade", price: 1.0, vegan: false, image: img("s-choc-dark") },
+  { id: "s-choc-white", name: "Weiße Schokolade", price: 1.0, vegan: false, image: img("s-choc-white") },
 ];
 
 /** Çikolatalı makarna — meyve toppingleri */
 export const TOPPINGS_CHOCOLATE_FRUITS: MenuItem[] = [
-  { id: "t-choc-muz", name: "Banane", price: 1.0, vegan: true, image: "" },
-  { id: "t-choc-cilek", name: "Erdbeeren", price: 1.0, vegan: true, image: "" },
-  { id: "t-choc-kiwi", name: "Kiwi", price: 1.0, vegan: true, image: "" },
+  { id: "t-choc-muz", name: "Banane", price: 1.0, vegan: true, image: img("t-choc-muz") },
+  { id: "t-choc-cilek", name: "Erdbeeren", price: 1.0, vegan: true, image: img("t-choc-cilek") },
+  { id: "t-choc-kiwi", name: "Kiwi", price: 1.0, vegan: true, image: img("t-choc-kiwi") },
   { id: "t-choc-birne", name: "Birne", price: 1.0, vegan: true, image: img("t-choc-birne") },
   { id: "t-choc-passion", name: "Passionsfrucht", price: 2.0, vegan: true, image: img("t-choc-passion") },
 ];
@@ -328,7 +328,7 @@ export const MENU_HIGHLIGHTS: MenuHighlight[] = [
   {
     id: "standard",
     priceFrom: 6.5,
-    image: img("sp-curry-sahne-haehnchen"),
+    image: img("std-bolognese"),
     href: "/menu#makarnalar",
   },
   {

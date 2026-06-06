@@ -78,6 +78,11 @@ const PUBLIC_IMAGES: Partial<Record<string, string>> = {
   "d-tiramisu": "tiramusu.png",
   "d-creme-brulee": "Creme brulee.png",
   "noodle-chocolate": "cikolata-makarna.jpg",
+  "s-choc-dark": "cikolata-sos.png",
+  "s-choc-white": "beyaz-cikolata.png",
+  "t-choc-muz": "muz.png",
+  "t-choc-cilek": "cilek.png",
+  "t-choc-kiwi": "kiwi.png",
 };
 
 export function menuPhotoForId(id: string): string {
