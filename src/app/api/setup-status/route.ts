@@ -11,5 +11,7 @@ export async function GET() {
     displayKey: Boolean(process.env.DISPLAY_ACCESS_KEY?.length),
     branchId: Boolean(process.env.BRANCH_PANEL_BRANCH_ID?.length),
     cronSecret: Boolean(process.env.CRON_SECRET?.length),
+    resendApiKey: Boolean(process.env.RESEND_API_KEY?.length),
+    siteUrl: Boolean(process.env.NEXT_PUBLIC_SITE_URL?.length),
   });
 }

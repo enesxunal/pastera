@@ -132,7 +132,7 @@ export async function submitOrder(body: SubmitOrderPayload): Promise<SubmitOrder
   if (userId) {
     const authClient = createSupabaseServerClient();
     const { data: authData } = await authClient.auth.getUser();
-    const email = authData.user?.email ?? null;
+    const email = authData.user?.email?.trim() ?? null;
     const fullName = String(authData.user?.user_metadata?.full_name ?? "");
     const phone = body.customerPhone?.trim() || null;
     await svc.from("profiles").upsert(
