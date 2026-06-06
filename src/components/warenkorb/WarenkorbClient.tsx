@@ -30,8 +30,14 @@ import type { PaymentType } from "@/lib/order-types";
 import { formatEur } from "@/lib/format";
 import { publicMenuImageSrc } from "@/lib/normalize-menu-image";
 import { MobileActionBar } from "@/components/layout/MobileActionBar";
+import {
+  isPayPalEnabled,
+  PayPalCheckoutButtons,
+} from "@/components/warenkorb/PayPalCheckoutButtons";
+import type { SubmitOrderPayload } from "@/lib/submit-order";
 
 type BranchOption = { id: string; slug: string; name: string };
+const paypalEnabled = isPayPalEnabled();
 
 export function WarenkorbClient() {
   const router = useRouter();
@@ -214,111 +220,119 @@ export function WarenkorbClient() {
     }
   }
 
-  async function completeDemoOrder() {
-    setCheckoutErr("");
+  function finishOrderSuccess(shortId: string, deliveryBranchName?: string) {
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("pastera-order-short-id", shortId);
+      if (deliveryBranchName) {
+        sessionStorage.setItem("pastera-order-branch-name", deliveryBranchName);
+      }
+    }
+    clearCartSnapshot();
+    router.push(`/bestellung/erfolg?id=${shortId}`);
+  }
+
+  function mapOrderApiError(json: { error?: string; distanceKm?: number; maxKm?: number }) {
+    if (json.error === "delivery_required" || json.error === "delivery_invalid") {
+      return t("cart.needDelivery");
+    }
+    if (json.error === "out_of_range") {
+      const dist = json.distanceKm != null ? `${json.distanceKm}` : "";
+      const max = json.maxKm != null ? `${json.maxKm}` : "";
+      return dist && max
+        ? `${t("cart.outOfRange")} (${dist} km / max ${max} km)`
+        : t("cart.outOfRange");
+    }
+    if (json.error?.includes("column") || json.error?.includes("schema")) {
+      return t("cart.dbSchemaError");
+    }
+    return json.error ? `${t("cart.checkoutFailed")} (${json.error})` : t("cart.checkoutFailed");
+  }
+
+  function buildOrderPayload():
+    | Omit<SubmitOrderPayload, "paymentType" | "paypalOrderId">
+    | null {
     const snap = loadCartSnapshot();
     const dineIn = loadDineInContext();
     const delivery = loadDeliveryContext();
     const pickup = loadPickupContext();
 
-    if (!dineIn && !delivery && !pickup) {
+    if (!snap || (!dineIn && !delivery && !pickup)) return null;
+
+    const resolved = resolveCartLines(snap, catalog, locale);
+    return {
+      total: resolved.total,
+      lines: resolved.lines,
+      cart: snap,
+      ...(dineIn
+        ? {
+            branchId: dineIn.branchId,
+            branchSlug: dineIn.branchSlug,
+            tableNumber: dineIn.tableNumber,
+            orderType: "dine_in" as const,
+          }
+        : pickup
+          ? {
+              branchId: pickup.branchId,
+              branchSlug: pickup.branchSlug,
+              orderType: "pickup" as const,
+              customerName: pickup.customerName,
+              customerPhone: pickup.customerPhone,
+            }
+          : delivery
+            ? {
+                branchId: delivery.branchId,
+                branchSlug: delivery.branchSlug,
+                orderType: "delivery" as const,
+                customerName: delivery.customerName,
+                customerPhone: delivery.customerPhone,
+                delivery: {
+                  street: delivery.street,
+                  city: delivery.city,
+                  postal: delivery.postal,
+                  lat: delivery.lat,
+                  lng: delivery.lng,
+                  distanceKm: delivery.distanceKm,
+                },
+              }
+            : {}),
+    };
+  }
+
+  async function completeDemoOrder() {
+    setCheckoutErr("");
+    if (paymentType === "online") return;
+
+    const payload = buildOrderPayload();
+    if (!payload) {
       setCheckoutErr(t("cart.needOrderContext"));
       return;
     }
 
-    let shortId: string | undefined;
-    if (snap) {
-      const resolved = resolveCartLines(snap, catalog, locale);
-      try {
-        const res = await fetch("/api/orders", {
-          method: "POST",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            total: resolved.total,
-            lines: resolved.lines,
-            cart: snap,
-            paymentType,
-            ...(dineIn
-              ? {
-                  branchId: dineIn.branchId,
-                  branchSlug: dineIn.branchSlug,
-                  tableNumber: dineIn.tableNumber,
-                  orderType: "dine_in",
-                }
-              : pickup
-                ? {
-                    branchId: pickup.branchId,
-                    branchSlug: pickup.branchSlug,
-                    orderType: "pickup",
-                    customerName: pickup.customerName,
-                    customerPhone: pickup.customerPhone,
-                  }
-                : delivery
-                  ? {
-                      branchId: delivery.branchId,
-                      branchSlug: delivery.branchSlug,
-                      orderType: "delivery",
-                      customerName: delivery.customerName,
-                      customerPhone: delivery.customerPhone,
-                      delivery: {
-                        street: delivery.street,
-                        city: delivery.city,
-                        postal: delivery.postal,
-                        lat: delivery.lat,
-                        lng: delivery.lng,
-                        distanceKm: delivery.distanceKm,
-                      },
-                    }
-                  : {}),
-          }),
-        });
-        const json = (await res.json()) as {
-          orderShortId?: string;
-          error?: string;
-          distanceKm?: number;
-          maxKm?: number;
-        };
-        if (!res.ok) {
-          if (json.error === "delivery_required" || json.error === "delivery_invalid") {
-            setCheckoutErr(t("cart.needDelivery"));
-          } else if (json.error === "out_of_range") {
-            const dist = json.distanceKm != null ? `${json.distanceKm}` : "";
-            const max = json.maxKm != null ? `${json.maxKm}` : "";
-            setCheckoutErr(
-              dist && max
-                ? `${t("cart.outOfRange")} (${dist} km / max ${max} km)`
-                : t("cart.outOfRange"),
-            );
-          } else if (json.error?.includes("column") || json.error?.includes("schema")) {
-            setCheckoutErr(t("cart.dbSchemaError"));
-          } else {
-            setCheckoutErr(json.error ? `${t("cart.checkoutFailed")} (${json.error})` : t("cart.checkoutFailed"));
-          }
-          return;
-        }
-        shortId = json.orderShortId;
-        if (!shortId) {
-          setCheckoutErr(t("cart.checkoutFailed"));
-          return;
-        }
-      } catch {
-        setCheckoutErr(t("cart.checkoutFailed"));
+    const delivery = loadDeliveryContext();
+    try {
+      const res = await fetch("/api/orders", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...payload,
+          paymentType,
+        }),
+      });
+      const json = (await res.json()) as {
+        orderShortId?: string;
+        error?: string;
+        distanceKm?: number;
+        maxKm?: number;
+      };
+      if (!res.ok || !json.orderShortId) {
+        setCheckoutErr(mapOrderApiError(json));
         return;
       }
-    }
-    if (!shortId) {
+      finishOrderSuccess(json.orderShortId, delivery?.branchName);
+    } catch {
       setCheckoutErr(t("cart.checkoutFailed"));
-      return;
     }
-    if (typeof window !== "undefined") {
-      sessionStorage.setItem("pastera-order-short-id", shortId);
-      if (delivery?.branchName) {
-        sessionStorage.setItem("pastera-order-branch-name", delivery.branchName);
-      }
-    }
-    clearCartSnapshot();
-    router.push(`/bestellung/erfolg?id=${shortId}`);
   }
 
   if (!mounted) {
@@ -695,7 +709,10 @@ export function WarenkorbClient() {
                 <div className="flex flex-wrap gap-2">
                   <button
                     type="button"
-                    onClick={() => setPaymentType("cash")}
+                    onClick={() => {
+                      setCheckoutErr("");
+                      setPaymentType("cash");
+                    }}
                     className={`min-h-11 rounded-full px-5 py-2.5 text-sm font-semibold ${
                       paymentType === "cash"
                         ? "bg-[#c49746] text-[#0a0a0a]"
@@ -706,7 +723,10 @@ export function WarenkorbClient() {
                   </button>
                   <button
                     type="button"
-                    onClick={() => setPaymentType("card")}
+                    onClick={() => {
+                      setCheckoutErr("");
+                      setPaymentType("card");
+                    }}
                     className={`min-h-11 rounded-full px-5 py-2.5 text-sm font-semibold ${
                       paymentType === "card"
                         ? "bg-[#c49746] text-[#0a0a0a]"
@@ -715,8 +735,44 @@ export function WarenkorbClient() {
                   >
                     {t("cart.payCard")}
                   </button>
+                  {paypalEnabled && !dineIn ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setCheckoutErr("");
+                        setPaymentType("online");
+                      }}
+                      className={`min-h-11 rounded-full px-5 py-2.5 text-sm font-semibold ${
+                        paymentType === "online"
+                          ? "bg-[#c49746] text-[#0a0a0a]"
+                          : "border border-[#2e402a] text-white/60"
+                      }`}
+                    >
+                      {t("cart.payPayPal")}
+                    </button>
+                  ) : null}
                 </div>
-                <p className="mt-2 text-xs text-white/35">{t("cart.paymentTestHint")}</p>
+                <p className="mt-2 text-xs text-white/35">
+                  {paymentType === "online"
+                    ? t("cart.paymentPayPalHint")
+                    : paypalEnabled && !dineIn
+                      ? t("cart.paymentMixedHint")
+                      : t("cart.paymentTestHint")}
+                </p>
+                {paymentType === "online" && paypalEnabled ? (
+                  <div className="mt-4 max-w-md">
+                    <PayPalCheckoutButtons
+                      total={total}
+                      disabled={!canCheckout}
+                      buildOrderPayload={buildOrderPayload}
+                      onSuccess={(orderShortId) => {
+                        setCheckoutErr("");
+                        finishOrderSuccess(orderShortId, delivery?.branchName);
+                      }}
+                      onError={setCheckoutErr}
+                    />
+                  </div>
+                ) : null}
               </div>
             ) : null}
             {checkoutErr ? <p className="mb-3 text-sm text-red-400">{checkoutErr}</p> : null}
@@ -730,7 +786,7 @@ export function WarenkorbClient() {
               <button
                 type="button"
                 onClick={completeDemoOrder}
-                disabled={!canCheckout}
+                disabled={!canCheckout || paymentType === "online"}
                 className="hidden items-center justify-center rounded-full px-8 py-3 font-display text-sm font-bold text-[#0a0a0a] transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-45 lg:inline-flex"
                 style={{ backgroundColor: "#c49746" }}
               >
@@ -740,13 +796,28 @@ export function WarenkorbClient() {
           </div>
       </div>
 
-      {canCheckout ? (
+      {canCheckout && paymentType !== "online" ? (
         <MobileActionBar
           totalLabel={t("cart.total")}
           total={formatEur(total)}
           buttonLabel={checkoutLabel}
           onAction={completeDemoOrder}
         />
+      ) : canCheckout && paymentType === "online" ? (
+        <div
+          className="fixed inset-x-0 bottom-0 z-50 border-t border-[#2e402a] bg-matte/95 backdrop-blur-md lg:hidden"
+          style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
+        >
+          <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
+            <div className="min-w-0">
+              <p className="text-[10px] font-semibold uppercase tracking-widest text-white/45">
+                {t("cart.total")}
+              </p>
+              <p className="font-display text-2xl font-bold text-white">{formatEur(total)}</p>
+            </div>
+            <p className="max-w-[11rem] text-right text-xs text-white/50">{t("cart.paypalMobileHint")}</p>
+          </div>
+        </div>
       ) : null}
     </div>
   );
