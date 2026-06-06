@@ -721,20 +721,6 @@ export function WarenkorbClient() {
                   >
                     {t("cart.payCash")}
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setCheckoutErr("");
-                      setPaymentType("card");
-                    }}
-                    className={`min-h-11 rounded-full px-5 py-2.5 text-sm font-semibold ${
-                      paymentType === "card"
-                        ? "bg-[#c49746] text-[#0a0a0a]"
-                        : "border border-[#2e402a] text-white/60"
-                    }`}
-                  >
-                    {t("cart.payCard")}
-                  </button>
                   {paypalEnabled && !dineIn ? (
                     <button
                       type="button"
