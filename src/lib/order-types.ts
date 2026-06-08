@@ -11,6 +11,10 @@ export type BranchRow = {
   lat: number | null;
   lng: number | null;
   is_active: boolean;
+  street?: string | null;
+  city?: string | null;
+  postal?: string | null;
+  phone?: string | null;
 };
 
 export type OrderRow = {
