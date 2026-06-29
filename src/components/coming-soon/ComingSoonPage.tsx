@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-const INSTAGRAM = "https://www.instagram.com/pastapastera/";
+const INSTAGRAM = "https://www.instagram.com/pastera.official/";
 
 export function ComingSoonPage() {
   return (

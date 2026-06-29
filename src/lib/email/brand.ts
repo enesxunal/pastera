@@ -9,7 +9,7 @@ export const PASTERA_EMAIL_COLORS = {
   muted: "#555555",
 } as const;
 
-export const PASTERA_INSTAGRAM_URL = "https://www.instagram.com/pastapastera/";
+export const PASTERA_INSTAGRAM_URL = "https://www.instagram.com/pastera.official/";
 
 export const PASTERA_GOOGLE_REVIEW_URL =
   process.env.PASTERA_GOOGLE_REVIEW_URL?.trim() ||
