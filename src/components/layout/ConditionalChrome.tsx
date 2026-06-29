@@ -8,9 +8,9 @@ import { DineInBanner } from "@/components/dine-in/DineInBanner";
 
 const HIDE_PREFIXES = ["/display", "/branch", "/admin", "/lobby"];
 
-export function ConditionalChrome() {
+export function ConditionalChrome({ hidden = false }: { hidden?: boolean }) {
   const pathname = usePathname();
-  const hide = HIDE_PREFIXES.some((p) => pathname.startsWith(p));
+  const hide = hidden || HIDE_PREFIXES.some((p) => pathname.startsWith(p));
   if (hide) return null;
   return (
     <>
@@ -21,9 +21,9 @@ export function ConditionalChrome() {
   );
 }
 
-export function ConditionalFooter() {
+export function ConditionalFooter({ hidden = false }: { hidden?: boolean }) {
   const pathname = usePathname();
-  const hide = HIDE_PREFIXES.some((p) => pathname.startsWith(p));
+  const hide = hidden || HIDE_PREFIXES.some((p) => pathname.startsWith(p));
   if (hide) return null;
   return <SiteFooter />;
 }

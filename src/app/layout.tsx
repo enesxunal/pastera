@@ -5,6 +5,7 @@ import { cookies } from "next/headers";
 import "./globals.css";
 import { AppProviders } from "@/components/providers/AppProviders";
 import { ConditionalChrome, ConditionalFooter } from "@/components/layout/ConditionalChrome";
+import { isComingSoonEnabled } from "@/lib/coming-soon";
 import type { SupportedLocale } from "@/lib/cart";
 
 const syne = Syne({
@@ -23,9 +24,10 @@ const dmSans = DM_Sans({
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Pastera · Pasta, Suppen & mehr",
-  description:
-    "Pasta-Basis mit Saucen, Specials und Toppings konfigurieren. Speisekarte mit Suppen, Vorspeisen und Getränken – Warenkorb inklusive.",
+  title: isComingSoonEnabled() ? "Pastera — Coming Soon" : "Pastera · Pasta, Suppen & mehr",
+  description: isComingSoonEnabled()
+    ? "Pastera öffnet bald — frische Pasta und mehr."
+    : "Pasta-Basis mit Saucen, Specials und Toppings konfigurieren. Speisekarte mit Suppen, Vorspeisen und Getränken – Warenkorb inklusive.",
 };
 
 export const viewport = {
@@ -49,6 +51,8 @@ export default function RootLayout({
     anonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "",
   };
 
+  const comingSoon = isComingSoonEnabled();
+
   return (
     <html lang={initialLocale === "tr" ? "tr" : "de"}>
       <body
@@ -70,9 +74,9 @@ export default function RootLayout({
               className="pointer-events-none fixed inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#c49746]/50 to-transparent"
               aria-hidden
             />
-            <ConditionalChrome />
+            <ConditionalChrome hidden={comingSoon} />
             <main className="relative z-10 flex-1">{children}</main>
-            <ConditionalFooter />
+            <ConditionalFooter hidden={comingSoon} />
           </div>
         </AppProviders>
       </body>

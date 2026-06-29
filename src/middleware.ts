@@ -1,9 +1,15 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
+import { isComingSoonBypassPath, isComingSoonEnabled } from "@/lib/coming-soon";
 import { updateSupabaseSession } from "@/lib/supabase/middleware";
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  if (isComingSoonEnabled() && !isComingSoonBypassPath(pathname) && pathname !== "/") {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
+
   const response = NextResponse.next({ request });
 
   if (pathname.startsWith("/admin")) {
