@@ -1,7 +1,6 @@
 import type { CatalogCategory, CatalogItem } from "@/lib/catalog-types";
 import type { MenuItem } from "@/lib/menu-data";
 import {
-  DESSERTS,
   DRINKS,
   PASTAS,
   SAUCES,
@@ -35,8 +34,6 @@ export function getStaticCatalog(): CatalogItem[] {
     { items: [...SAUCES, ...SAUCES_CHOCOLATE], cat: "sauce" },
     { items: TOPPINGS, cat: "topping" },
     { items: STANDARD_PASTAS, cat: "chef_special" },
-    // dessert kategorisi yoksa starter ile uyumlu (id: d-*)
-    { items: DESSERTS, cat: "starter" },
     { items: DRINKS, cat: "drink" },
   ];
   for (const { items, cat } of blocks) {
@@ -53,20 +50,15 @@ export function applyStaticCatalogOverrides(items: CatalogItem[]): CatalogItem[]
   const merged = items.map((item) => {
     const stat = staticById.get(item.id);
     if (!stat) return item;
-    if (item.id.startsWith("std-")) {
-      return {
-        ...item,
-        category: stat.category,
-        name_de: stat.name_de,
-        name_tr: stat.name_tr,
-        image: stat.image,
-        vegan: stat.vegan,
-      };
-    }
-    if (stat.image) {
-      return { ...item, image: stat.image };
-    }
-    return item;
+    return {
+      ...item,
+      category: stat.category,
+      name_de: stat.name_de,
+      name_tr: stat.name_tr,
+      price: stat.price,
+      vegan: stat.vegan,
+      image: stat.image || item.image,
+    };
   });
 
   const seen = new Set(merged.map((x) => x.id));
@@ -82,13 +74,3 @@ export function catalogByCategory(catalog: CatalogItem[], category: CatalogCateg
   return catalog.filter((x) => x.category === category && x.is_active).sort((a, b) => a.sort_order - b.sort_order);
 }
 
-/** Tatlılar — dessert veya starter içinde d-* id'li ürünler */
-export function catalogDesserts(catalog: CatalogItem[]): CatalogItem[] {
-  return catalog
-    .filter(
-      (x) =>
-        x.is_active &&
-        (x.category === "dessert" || (x.category === "starter" && x.id.startsWith("d-"))),
-    )
-    .sort((a, b) => a.sort_order - b.sort_order);
-}

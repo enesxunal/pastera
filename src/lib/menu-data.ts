@@ -55,7 +55,8 @@ export const CHOCOLATE_PASTA: MenuItem = {
   image: img("noodle-chocolate"),
 };
 
-export const PASTAS: MenuItem[] = [...BUILDER_PASTAS, CHOCOLATE_PASTA];
+/** Katalogda yalnızca tuzlu builder makarnaları; çikolatalı ayrı sayfada (menüde gösterilmez). */
+export const PASTAS: MenuItem[] = [...BUILDER_PASTAS];
 
 const LEGACY_PASTA_MAP: Record<string, string> = {
   "pasta-klassisch": "noodle-classic",
@@ -231,12 +232,6 @@ export const STANDARD_PASTAS: MenuItem[] = [
   },
 ];
 
-/** Tatlılar */
-export const DESSERTS: MenuItem[] = [
-  { id: "d-tiramisu", name: "Tiramisu", price: 6.5, vegan: false, image: img("d-tiramisu") },
-  { id: "d-creme-brulee", name: "Crème brûlée", price: 6.5, vegan: false, image: img("d-creme-brulee") },
-];
-
 export const CHEF_SPECIALS_CLASSIC = STANDARD_PASTAS;
 export const CHEF_SPECIALS_VEGAN: MenuItem[] = [];
 export const SPECIALS: MenuItem[] = [];
@@ -320,11 +315,11 @@ export function toppingsForChocolateBowl(): MenuItem[] {
 
 const ALL: MenuItem[] = [
   ...PASTAS,
+  CHOCOLATE_PASTA,
   ...SAUCES,
   ...SAUCES_CHOCOLATE,
   ...TOPPINGS,
   ...STANDARD_PASTAS,
-  ...DESSERTS,
   ...DRINKS,
 ];
 
@@ -333,7 +328,7 @@ export function getMenuItem(id: string): MenuItem | undefined {
 }
 
 export type MenuHighlight = {
-  id: "builder" | "standard" | "dessert";
+  id: "builder" | "standard";
   priceFrom: number;
   image: string;
   href?: string;
@@ -351,11 +346,5 @@ export const MENU_HIGHLIGHTS: MenuHighlight[] = [
     priceFrom: 9.4,
     image: img("std-bolognese-classico"),
     href: "/menu#makarnalar",
-  },
-  {
-    id: "dessert",
-    priceFrom: 6.5,
-    image: img("noodle-chocolate"),
-    href: "/builder/chocolate",
   },
 ];

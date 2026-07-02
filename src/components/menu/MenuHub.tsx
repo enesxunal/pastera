@@ -5,11 +5,10 @@ import { MenuGrid } from "@/components/menu/MenuGrid";
 import { useCatalog } from "@/components/providers/CatalogProvider";
 import { useI18n } from "@/components/providers/I18nProvider";
 import { catalogByCategory } from "@/lib/catalog-static";
-import { makarnaMenuItems, tatliMenuItems } from "@/lib/menu-hub-items";
+import { makarnaMenuItems } from "@/lib/menu-hub-items";
 
 const sections = [
   { id: "makarnalar", key: "sectionPasta" as const },
-  { id: "tatli", key: "sectionDessert" as const },
   { id: "icecekler", key: "sectionDrinks" as const },
 ];
 
@@ -18,7 +17,6 @@ export function MenuHub() {
   const { locale, t } = useI18n();
 
   const makarnalar = makarnaMenuItems(catalog);
-  const tatlilar = tatliMenuItems(catalog);
   const icecekler = catalogByCategory(catalog, "drink");
 
   return (
@@ -63,28 +61,6 @@ export function MenuHub() {
               title=""
               variant="embedded"
               items={makarnalar}
-              category="menu_mixed"
-              locale={locale}
-            />
-          </div>
-        )}
-      </section>
-
-      <section id="tatli" className="mt-16 scroll-mt-32" aria-labelledby="menu-dessert-heading">
-        <h2 id="menu-dessert-heading" className="font-display text-2xl font-bold text-[#c49746]">
-          {t("menu.sectionDessert")}
-        </h2>
-        <p className="mt-2 max-w-2xl text-sm text-white/50">{t("menu.sectionDessertHint")}</p>
-
-        {tatlilar.length === 0 ? (
-          <p className="mt-6 text-sm text-white/45">{t("menu.emptySection")}</p>
-        ) : (
-          <div className="mt-8">
-            <MenuGrid
-              hideHeading
-              title=""
-              variant="embedded"
-              items={tatlilar}
               category="menu_mixed"
               locale={locale}
             />

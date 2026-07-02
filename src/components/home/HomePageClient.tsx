@@ -8,7 +8,7 @@ import { MenuGrid } from "@/components/menu/MenuGrid";
 import { MenuHighlights } from "@/components/home/MenuHighlights";
 import { useCatalog } from "@/components/providers/CatalogProvider";
 import { useI18n } from "@/components/providers/I18nProvider";
-import { catalogByCategory, catalogDesserts } from "@/lib/catalog-static";
+import { catalogByCategory } from "@/lib/catalog-static";
 import { pageIntro } from "@/lib/motion-variants";
 
 const BANNER_IMAGES = ["/pastera.jpg", "/pastera-vegan.jpg"] as const;
@@ -27,7 +27,6 @@ export function HomePageClient() {
   }, []);
 
   const standardPastas = catalogByCategory(catalog, "chef_special");
-  const desserts = catalogDesserts(catalog);
 
   return (
     <div className="mx-auto max-w-6xl px-4 pb-16 pt-6 sm:px-6 sm:pb-20 sm:pt-8">
@@ -149,20 +148,6 @@ export function HomePageClient() {
             </div>
           ) : null}
 
-          {desserts.length > 0 ? (
-            <div>
-              <h3 className="font-display text-lg font-bold text-[#c49746]">{t("menu.sectionDessert")}</h3>
-              <p className="mt-1 text-sm text-white/45">{t("menu.sectionDessertHint")}</p>
-              <MenuGrid
-                variant="embedded"
-                hideHeading
-                title=""
-                items={desserts}
-                category="dessert"
-                locale={locale}
-              />
-            </div>
-          ) : null}
         </div>
       </section>
     </div>
