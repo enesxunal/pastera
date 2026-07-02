@@ -40,6 +40,7 @@ const ID_SUFFIX: Partial<Record<string, string>> = {
   "t-mini-mozzarella": "Mini-Mozzarella",
   "t-pinienkerne": "Pinienkerne",
   "t-extra-parmesan": "Extra Parmesan",
+  "t-kuru-domates": "Getrocknete Tomaten",
   "d-wasser": "Stilles Wasser",
   "sp-haehnchen-mariniert": "Mariniertes Hähnchen",
   "sp-curry-sahne-haehnchen": "Curry-Sahne-Hähnchen",
@@ -52,13 +53,14 @@ const ID_SUFFIX: Partial<Record<string, string>> = {
 
 /** `public/` — hazır makarna fotoğrafları */
 const STD_PASTA_IMAGES: Partial<Record<string, string>> = {
-  "std-pera-e-miel": "Pera e Miele.png",
-  "std-kremali-tavuk": "Pasta Cremosa.png",
-  "std-domates": "Pasta al Pomodoro.png",
-  "std-pesto-mozzarella": "Pasta al Pesto.png",
-  "std-curry-tavuk": "Pasta Curry.png",
-  "std-bolognese": "Pasta Bolognese.png",
-  "std-manti": "Manti.png",
+  "std-bolognese-classico": "bolognese-classicop.png",
+  "std-chicken-cremesosse": "chkicken-creme.png",
+  "std-tartufo-deluxe": "tartufo.png",
+  "std-pesto-verde": "pesto-new.png",
+  "std-manzo-cremoso": "manzo.png",
+  "std-crunchy-chicken": "crunchyckicken.png",
+  "std-funghi-cremoso": "funghi.png",
+  "std-arrabbiata-piccante": "piccante.png",
 };
 
 /** `public/` — topping / malzeme fotoğrafları */
@@ -69,6 +71,7 @@ const PUBLIC_IMAGES: Partial<Record<string, string>> = {
   "t-birne": "armut.png",
   "t-choc-birne": "armut.png",
   "t-ceviz": "ceviz.png",
+  "t-kuru-domates": "web-Pastera-Menü-Getrocknete Tomaten.png",
   "t-gorgonzola": "gorgonzola.png",
   "t-rosmarin": "rozmarin.png",
   "t-passion-fruit": "passion.png",

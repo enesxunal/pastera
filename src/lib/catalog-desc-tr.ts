@@ -1,13 +1,13 @@
 /** Türkçe ürün açıklamaları */
 export const CATALOG_DESC_TR: Record<string, string> = {
-  "noodle-black": "Mürekkep balığı noodle",
-  "std-pera-e-miel": "Klasik · armut, rozmarin, ceviz, krema, gorgonzola",
-  "std-kremali-tavuk": "Krema sosu, tavuk, mantar",
-  "std-domates": "Domates sosu",
-  "std-pesto-mozzarella": "Pesto, mozzarella",
-  "std-curry-tavuk": "Köri, tavuk",
-  "std-bolognese": "Bolognese sosu",
-  "std-manti": "Türk mantısı",
+  "std-bolognese-classico": "Domates sosu, dana kıyma, parmesan, fesleğen",
+  "std-chicken-cremesosse": "Parmesan krema sosu, tavuk göğsü, parmesan, maydanoz",
+  "std-tartufo-deluxe": "Trüf krema sosu, mantar, parmesan, taze trüf",
+  "std-pesto-verde": "Fesleğenli pesto, çam fıstığı, parmesan, baby ıspanak",
+  "std-manzo-cremoso": "Dana dilimleri, trüf krema sosu, mantar, parmesan",
+  "std-crunchy-chicken": "Çıtır tavuk, parmesan krema sosu, parmesan, maydanoz",
+  "std-funghi-cremoso": "Mantar, parmesan krema sosu, parmesan, maydanoz",
+  "std-arrabbiata-piccante": "Acı domates sosu, chili, sarımsak, maydanoz, parmesan",
 };
 
 export function catalogDescTr(id: string): string | undefined {

@@ -16,7 +16,10 @@ export function sauceColor(id: string): string {
     "s-sahnesauce": "#f5f0e4",
     "s-pesto": "#4a7c3f",
     "s-veganes-pesto": "#4a7c3f",
+    "s-vegan-pesto": "#4a7c3f",
     "s-arrabbiata": "#d4382a",
+    "s-trueffel": "#efe6d6",
+    "s-vegan-trueffel": "#efe6d6",
     "s-choc-dark": "#3d2314",
     "s-choc-white": "#f2e8d8",
     "s-pesto-genovese": "#4a7c3f",
@@ -105,19 +108,28 @@ export function toppingPieceType(id: string): ToppingPieceKind {
 
   if (k.includes("cherry") || k.includes("tomaten") || k.includes("domates")) return "tomato";
   if (k.includes("haehnchen") || k.includes("tenders") || k.includes("tavuk")) return "chicken";
-  if (k.includes("rind") || k.includes("dana") || k.includes("filet")) return "beef";
+  if (k.includes("rind") || k.includes("dana") || k.includes("filet") || k.includes("pastrami"))
+    return "beef";
   if (k.includes("garnelen")) return "shrimp";
   if (k.includes("zeytin") || k.includes("oliven")) return "olive";
   if (k.includes("mais")) return "corn";
   if (k.includes("mantar") || k.includes("champignon")) return "mushroom";
   if (k.includes("brokkoli")) return "broccoli";
-  if (k.includes("mozzarella") || k.includes("gorgonzola")) return "cheese";
+  if (k.includes("mozzarella") || k.includes("gorgonzola") || k.includes("parmesan")) return "cheese";
   if (k.includes("falafel")) return "falafel";
   if (k.includes("tofu")) return "tofu";
   if (k.includes("seitan")) return "seitan";
   if (k.includes("zwiebel") || k.includes("sogan") || k.includes("roest")) return "onion";
   if (k.includes("sarimsak") || k.includes("knoblauch")) return "garlic";
-  if (k.includes("ceviz") || k.includes("kaju") || k.includes("walnuss") || k.includes("cashew"))
+  if (
+    k.includes("ceviz") ||
+    k.includes("kaju") ||
+    k.includes("walnuss") ||
+    k.includes("cashew") ||
+    k.includes("pinien") ||
+    k.includes("badem") ||
+    k.includes("mandel")
+  )
     return "nut";
   if (k.includes("choc-muz") || k.includes("banane")) return "banana";
   if (k.includes("choc-cilek") || k.includes("erdbeer")) return "strawberry";

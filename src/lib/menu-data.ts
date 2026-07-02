@@ -12,30 +12,37 @@ export type MenuItem = {
 const img = (id: string): string => menuPhotoForId(id);
 
 export const PASTA_BASE = 6.9;
+export const VEGAN_PASTA_BASE = 7.9;
 
 /** Kendin yap — tuzlu makarna (oluşturucu) */
 export const BUILDER_PASTAS: MenuItem[] = [
   {
     id: "noodle-classic",
-    name: "Classic",
+    name: "Pasta all'Uovo",
     price: PASTA_BASE,
     vegan: false,
     image: img("pasta-klassisch"),
   },
   {
-    id: "noodle-vegan",
-    name: "Vegan",
+    id: "noodle-spinach",
+    name: "Spinat-Pasta",
     price: PASTA_BASE,
+    vegan: false,
+    image: img("pasta-vegan"),
+  },
+  {
+    id: "noodle-vegan",
+    name: "Vegane Klassik Pasta",
+    price: VEGAN_PASTA_BASE,
     vegan: true,
     image: img("pasta-vegan"),
   },
   {
-    id: "noodle-black",
-    name: "Schwarz",
-    price: PASTA_BASE,
-    vegan: false,
-    image: img("pasta-klassisch"),
-    description: "Tintenfisch-Nudeln",
+    id: "noodle-vegan-spinach",
+    name: "Vegane Spinat-Pasta",
+    price: VEGAN_PASTA_BASE,
+    vegan: true,
+    image: img("pasta-vegan"),
   },
 ];
 
@@ -52,10 +59,12 @@ export const PASTAS: MenuItem[] = [...BUILDER_PASTAS, CHOCOLATE_PASTA];
 
 const LEGACY_PASTA_MAP: Record<string, string> = {
   "pasta-klassisch": "noodle-classic",
+  "pasta-spinat": "noodle-spinach",
   "pasta-vegan": "noodle-vegan",
+  "pasta-vegan-spinat": "noodle-vegan-spinach",
   "noodle-fettuccine-classic": "noodle-classic",
   "noodle-fettuccine-pesto": "noodle-classic",
-  "noodle-fettuccine-nero": "noodle-black",
+  "noodle-fettuccine-nero": "noodle-classic",
   "noodle-fettuccine-vegan-classic": "noodle-vegan",
   "noodle-fettuccine-vegan-pesto": "noodle-vegan",
 };
@@ -76,30 +85,36 @@ export function normalizePastaId(raw: string): string {
 }
 
 /** 2 — Soslar */
-export const SAUCES: MenuItem[] = [
-  {
-    id: "s-domates-vegan",
-    name: "Tomatensauce",
-    price: 0,
-    vegan: true,
-    image: img("s-vegane-tomatensauce"),
-  },
+export const SAUCES_CLASSIC: MenuItem[] = [
+  { id: "s-tomatensauce", name: "Tomatensauce", price: 1.5, vegan: false, image: img("s-tomatensauce") },
+  { id: "s-pesto", name: "Pesto", price: 1.5, vegan: false, image: img("s-pesto") },
+  { id: "s-arrabbiata", name: "Arrabbiata", price: 1.5, vegan: true, image: img("s-arrabbiata") },
   { id: "s-bolognese", name: "Bolognese", price: 2.0, vegan: false, image: img("s-bolognese") },
-  { id: "s-curry", name: "Curry", price: 1.0, vegan: false, image: img("s-currysauce") },
-  { id: "s-krema", name: "Sahnesauce", price: 1.0, vegan: false, image: img("s-sahnesauce") },
-  { id: "s-pesto", name: "Pesto (vegan)", price: 1.0, vegan: true, image: img("s-veganes-pesto") },
-  { id: "s-arrabbiata", name: "Arrabbiata (vegan)", price: 1.5, vegan: true, image: img("s-arrabbiata") },
+  { id: "s-trueffel", name: "Trüffelsoße", price: 2.5, vegan: false, image: "" },
+];
+
+export const SAUCES_VEGAN: MenuItem[] = [
+  { id: "s-domates-vegan", name: "Tomatensauce", price: 1.5, vegan: true, image: img("s-vegane-tomatensauce") },
+  { id: "s-arrabbiata", name: "Arrabbiata", price: 1.5, vegan: true, image: img("s-arrabbiata") },
+  { id: "s-vegan-pesto", name: "Veganes Pesto", price: 2.0, vegan: true, image: img("s-veganes-pesto") },
+  { id: "s-vegan-trueffel", name: "Vegane Trüffelsoße", price: 3.0, vegan: true, image: "" },
+];
+
+export const SAUCES: MenuItem[] = [
+  ...SAUCES_CLASSIC,
+  ...SAUCES_VEGAN.filter((x) => !SAUCES_CLASSIC.some((c) => c.id === x.id)),
 ];
 
 /** 3 — Ana toppingler */
 export const TOPPINGS_MAIN: MenuItem[] = [
-  { id: "t-julienne-rind", name: "Julienne Rind", price: 2.0, vegan: false, image: img("sp-rind-mariniert") },
-  { id: "t-julienne-haehnchen", name: "Julienne Hähnchen", price: 1.5, vegan: false, image: img("sp-haehnchen-mariniert") },
-  { id: "t-jumbo-garnelen", name: "Jumbo-Garnelen", price: 2.5, vegan: false, image: img("sp-schwarze-garnelen") },
-  { id: "t-tenders", name: "Chicken Tenders", price: 1.5, vegan: false, image: img("t-tenders") },
-  { id: "t-falafel", name: "Falafel", price: 1.0, vegan: true, image: img("t-falafel") },
-  { id: "t-tofu", name: "Tofu", price: 2.0, vegan: true, image: img("sp-tofu") },
-  { id: "t-seitan", name: "Seitan", price: 2.0, vegan: true, image: img("t-seitan") },
+  { id: "t-julienne-haehnchen", name: "Hähnchen", price: 2.5, vegan: false, image: img("sp-haehnchen-mariniert") },
+  { id: "t-pastrami", name: "Pastrami", price: 2.5, vegan: false, image: "" },
+  { id: "t-julienne-rind", name: "Rindfleisch", price: 3.5, vegan: false, image: img("sp-rind-mariniert") },
+  { id: "t-jumbo-garnelen", name: "Jumbo-Garnelen", price: 3.5, vegan: false, image: img("sp-schwarze-garnelen") },
+  { id: "t-tenders", name: "Chicken Tenders", price: 3.5, vegan: false, image: img("t-tenders") },
+  { id: "t-falafel", name: "Falafel", price: 2.5, vegan: true, image: img("t-falafel") },
+  { id: "t-tofu", name: "Tofu", price: 2.5, vegan: true, image: img("sp-tofu") },
+  { id: "t-seitan", name: "Seitan", price: 3.5, vegan: true, image: img("t-seitan") },
 ];
 
 /** 3 — Ekstra toppingler */
@@ -108,21 +123,21 @@ export const TOPPINGS_EXTRA: MenuItem[] = [
   { id: "t-babyspinat", name: "Babyspinat", price: 1.0, vegan: true, image: img("t-blattspinat") },
   { id: "t-mantar", name: "Champignons", price: 1.0, vegan: true, image: img("t-champignons") },
   { id: "t-rucola", name: "Rucola", price: 1.0, vegan: true, image: img("t-rucola") },
-  { id: "t-birne", name: "Birne", price: 1.0, vegan: true, image: img("t-birne") },
-  { id: "t-brokkoli", name: "Brokkoli", price: 1.0, vegan: true, image: img("t-brokkoli") },
-  { id: "t-ceviz", name: "Walnüsse", price: 1.0, vegan: true, image: img("t-ceviz") },
   { id: "t-mais", name: "Mais", price: 1.0, vegan: true, image: img("t-mais") },
   { id: "t-gorgonzola", name: "Gorgonzola", price: 1.5, vegan: false, image: img("t-gorgonzola") },
-  { id: "t-siyah-zeytin", name: "Schwarze Oliven", price: 1.0, vegan: true, image: img("t-gruene-oliven") },
   { id: "t-rosmarin", name: "Rosmarin", price: 0.5, vegan: true, image: img("t-rosmarin") },
   { id: "t-yesil-zeytin", name: "Grüne Oliven", price: 1.0, vegan: true, image: img("t-gruene-oliven") },
-  { id: "t-passion-fruit", name: "Passionsfrucht", price: 2.0, vegan: true, image: img("t-passion-fruit") },
   { id: "t-kurutulmus-sogan", name: "Röstzwiebeln", price: 0.5, vegan: true, image: img("t-roestzwiebeln") },
   { id: "t-jalapeno", name: "Jalapeño", price: 1.0, vegan: true, image: img("t-jalapenos") },
   { id: "t-sarimsak", name: "Knoblauch", price: 0.5, vegan: true, image: img("t-sarimsak") },
-  { id: "t-mozzarella", name: "Mozzarella in Lake", price: 1.0, vegan: false, image: img("t-mini-mozzarella") },
+  { id: "t-mozzarella", name: "Mozzarella", price: 1.5, vegan: false, image: img("t-mini-mozzarella") },
   { id: "t-taze-sogan", name: "Frühlingszwiebeln", price: 1.0, vegan: true, image: img("t-fruehlingszwiebeln") },
-  { id: "t-kaju", name: "Cashewkerne", price: 1.0, vegan: true, image: img("t-kaju") },
+  { id: "t-kirmizi-sogan", name: "Zwiebeln", price: 1.0, vegan: true, image: img("t-rote-zwiebeln") },
+  { id: "t-ceviz", name: "Walnüsse", price: 1.5, vegan: true, image: img("t-ceviz") },
+  { id: "t-pinienkerne", name: "Pinienkerne", price: 1.5, vegan: true, image: img("t-pinienkerne") },
+  { id: "t-extra-parmesan", name: "Extra Parmesan", price: 1.5, vegan: false, image: img("t-extra-parmesan") },
+  { id: "t-kuru-domates", name: "Getrocknete Tomaten", price: 1.5, vegan: true, image: img("t-getrocknete-tomaten") },
+  { id: "t-badem", name: "Geröstete Mandeln", price: 1.5, vegan: true, image: "" },
 ];
 
 /** Çikolatalı makarna — soslar */
@@ -151,60 +166,68 @@ export function isChocolateBowl(snapshot: { specialIds: string[] }): boolean {
 /** Standart makarna (sabit fiyat) — görseller: public/ */
 export const STANDARD_PASTAS: MenuItem[] = [
   {
-    id: "std-pera-e-miel",
-    name: "Pera e Miele",
-    price: 9.8,
+    id: "std-bolognese-classico",
+    name: "Bolognese Classico",
+    price: 9.9,
     vegan: false,
-    image: img("std-pera-e-miel"),
-    description: "Classic · Birne, Rosmarin, Walnüsse, Sahne, Gorgonzola",
+    image: img("std-bolognese-classico"),
+    description: "Tomatensoße, Rinderhack, Parmesan, Basilikum",
   },
   {
-    id: "std-kremali-tavuk",
-    name: "Pasta Cremosa",
-    price: 8.9,
+    id: "std-chicken-cremesosse",
+    name: "Chicken Cremesoße",
+    price: 11.9,
     vegan: false,
-    image: img("std-kremali-tavuk"),
-    description: "Sahnesauce, Hähnchen, Champignons",
+    image: img("std-chicken-cremesosse"),
+    description: "Parmesan-Cremesoße, Hähnchenbrust, Parmesan, Petersilie",
   },
   {
-    id: "std-domates",
-    name: "Pasta al Pomodoro",
-    price: 6.5,
-    vegan: true,
-    image: img("std-domates"),
-    description: "Tomatensauce",
+    id: "std-tartufo-deluxe",
+    name: "Tartufo Deluxe",
+    price: 14.9,
+    vegan: false,
+    image: img("std-tartufo-deluxe"),
+    description: "Trüffel-Cremesoße, Champignons, Parmesan, frische Trüffel",
   },
   {
-    id: "std-pesto-mozzarella",
-    name: "Pasta al Pesto",
-    price: 7.5,
+    id: "std-pesto-verde",
+    name: "Pesto Verde",
+    price: 10.9,
     vegan: false,
-    image: img("std-pesto-mozzarella"),
-    description: "Pesto, Mozzarella",
+    image: img("std-pesto-verde"),
+    description: "Basilikum-Pesto, Pinienkerne, Parmesan, Babyspinat",
   },
   {
-    id: "std-curry-tavuk",
-    name: "Pasta Curry",
-    price: 8.5,
+    id: "std-manzo-cremoso",
+    name: "Manzo Cremoso",
+    price: 12.4,
     vegan: false,
-    image: img("std-curry-tavuk"),
-    description: "Curry, Hähnchen",
+    image: img("std-manzo-cremoso"),
+    description: "Rinderstreifen, Trüffel-Cremesoße, Champignons, Parmesan",
   },
   {
-    id: "std-bolognese",
-    name: "Pasta Bolognese",
-    price: 8.8,
+    id: "std-crunchy-chicken",
+    name: "Crunchy Chicken",
+    price: 12.9,
     vegan: false,
-    image: img("std-bolognese"),
-    description: "Bolognese",
+    image: img("std-crunchy-chicken"),
+    description: "Knuspriges Hähnchen, Parmesan-Cremesoße, Parmesan, Petersilie",
   },
   {
-    id: "std-manti",
-    name: "Manti",
-    price: 7.9,
+    id: "std-funghi-cremoso",
+    name: "Funghi Cremoso",
+    price: 10.4,
     vegan: false,
-    image: img("std-manti"),
-    description: "Türkische Teigtaschen",
+    image: img("std-funghi-cremoso"),
+    description: "Champignons, Parmesan-Cremesoße, Parmesan, Petersilie",
+  },
+  {
+    id: "std-arrabbiata-piccante",
+    name: "Arrabbiata Piccante",
+    price: 9.4,
+    vegan: false,
+    image: img("std-arrabbiata-piccante"),
+    description: "Scharfe Tomatensoße, Chili, Knoblauch, Petersilie, Parmesan",
   },
 ];
 
@@ -229,36 +252,27 @@ export const SUPPEN: MenuItem[] = [];
 export const VORSPEISEN: MenuItem[] = [];
 /** İçecekler — Almanya'da yaygın seçenekler (fiyatlar sonra güncellenebilir) */
 export const DRINKS: MenuItem[] = [
-  { id: "dr-wasser-still", name: "Mineralwasser still", price: 2.9, vegan: true, image: "" },
-  { id: "dr-wasser-sprudel", name: "Mineralwasser medium", price: 2.9, vegan: true, image: "" },
-  { id: "dr-cola", name: "Cola", price: 3.5, vegan: true, image: "" },
-  { id: "dr-fanta", name: "Fanta", price: 3.5, vegan: true, image: "" },
-  { id: "dr-sprite", name: "Sprite", price: 3.5, vegan: true, image: "" },
-  { id: "dr-spezi", name: "Spezi", price: 3.5, vegan: true, image: "" },
-  { id: "dr-apfelschorle", name: "Apfelschorle", price: 3.9, vegan: true, image: "" },
-  { id: "dr-ice-tea", name: "Eistee Pfirsich", price: 3.5, vegan: true, image: "" },
-  { id: "dr-bier", name: "Pils 0,33 l", price: 3.9, vegan: true, image: "" },
-  { id: "dr-weisswein", name: "Weißwein 0,2 l", price: 4.9, vegan: true, image: "" },
-  { id: "dr-rotwein", name: "Rotwein 0,2 l", price: 4.9, vegan: true, image: "" },
-  { id: "dr-espresso", name: "Espresso", price: 2.5, vegan: true, image: "" },
-  { id: "dr-cappuccino", name: "Cappuccino", price: 3.5, vegan: false, image: "" },
-  { id: "dr-latte", name: "Latte Macchiato", price: 3.9, vegan: false, image: "" },
+  { id: "dr-pastera-zitrone", name: "Pastera Limonade Zitrone", price: 3.5, vegan: true, image: "" },
+  { id: "dr-fritz-kola", name: "fritz-kola Original", price: 3.5, vegan: true, image: "" },
+  { id: "dr-fritz-zero", name: "fritz-kola Super Zero", price: 3.5, vegan: true, image: "" },
+  { id: "dr-fritz-mischmasch", name: "fritz-kola Mischmasch", price: 3.5, vegan: true, image: "" },
+  { id: "dr-fritz-orange", name: "fritz-limo Orange", price: 3.5, vegan: true, image: "" },
 ];
 
 /** Kendin yap — soslar makarna çeşidine göre değişmez */
-export function saucesForBuilder(): MenuItem[] {
-  return SAUCES;
+export function saucesForBuilder(pastaId?: string): MenuItem[] {
+  return saucesForPasta(pastaId ?? BUILDER_PASTAS[0].id);
 }
 
 /** Kendin yap — toppingler makarna çeşidine göre değişmez */
-export function toppingsForBuilder(): MenuItem[] {
-  return [...TOPPINGS_MAIN, ...TOPPINGS_EXTRA];
+export function toppingsForBuilder(pastaId?: string): MenuItem[] {
+  return toppingsForPasta(pastaId ?? BUILDER_PASTAS[0].id);
 }
 
 export function saucesForPasta(pastaId: string): MenuItem[] {
   const id = normalizePastaId(pastaId);
   if (id === "noodle-chocolate") return [];
-  return saucesForBuilder();
+  return id.includes("vegan") ? SAUCES_VEGAN : SAUCES_CLASSIC;
 }
 
 export type ToppingGroups = {
@@ -271,6 +285,13 @@ export function toppingGroupsForPasta(pastaId: string): ToppingGroups {
   const id = normalizePastaId(pastaId);
   if (id === "noodle-chocolate") {
     return { main: [], extra: [], chocolate: TOPPINGS_CHOCOLATE_FRUITS };
+  }
+  if (id.includes("vegan")) {
+    return {
+      main: TOPPINGS_MAIN.filter((x) => x.vegan),
+      extra: TOPPINGS_EXTRA.filter((x) => x.id !== "t-gorgonzola" && x.id !== "t-mozzarella" && x.id !== "t-extra-parmesan"),
+      chocolate: [],
+    };
   }
   return {
     main: TOPPINGS_MAIN,
@@ -327,8 +348,8 @@ export const MENU_HIGHLIGHTS: MenuHighlight[] = [
   },
   {
     id: "standard",
-    priceFrom: 6.5,
-    image: img("std-bolognese"),
+    priceFrom: 9.4,
+    image: img("std-bolognese-classico"),
     href: "/menu#makarnalar",
   },
   {

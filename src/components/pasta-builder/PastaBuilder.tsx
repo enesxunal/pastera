@@ -11,8 +11,7 @@ import {
   isChocolateBowl,
   normalizeBuilderPastaId,
   saucesForBuilder,
-  TOPPINGS_EXTRA,
-  TOPPINGS_MAIN,
+  toppingGroupsForPasta,
   toppingsForBuilder,
   type MenuItem,
 } from "@/lib/menu-data";
@@ -66,9 +65,9 @@ export function PastaBuilder() {
   const [cartErr, setCartErr] = useState("");
 
   const pasta = BUILDER_PASTAS.find((p) => p.id === pastaId) ?? BUILDER_PASTAS[0];
-  const sauces = saucesForBuilder();
-  const allToppings = toppingsForBuilder();
-  const toppingGroups = { main: TOPPINGS_MAIN, extra: TOPPINGS_EXTRA };
+  const sauces = saucesForBuilder(pastaId);
+  const allToppings = toppingsForBuilder(pastaId);
+  const toppingGroups = toppingGroupsForPasta(pastaId);
 
   useEffect(() => {
     const isEdit = searchParams.get("edit") === "1";
