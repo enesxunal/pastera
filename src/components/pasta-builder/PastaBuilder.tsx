@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { useI18n } from "@/components/providers/I18nProvider";
 import { addBowlToCart, getBowlFromCart, updateBowlInCart } from "@/lib/cart";
-import { pageIntro, staggerGrid } from "@/lib/motion-variants";
+import { pageIntro } from "@/lib/motion-variants";
 import {
   BUILDER_PASTAS,
   isChocolateBowl,
@@ -35,13 +35,7 @@ function ToppingGrid({
   setIngredientIds: React.Dispatch<React.SetStateAction<string[]>>;
 }) {
   return (
-    <motion.div
-      className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3"
-      variants={staggerGrid}
-      initial="hidden"
-      whileInView="show"
-      viewport={{ once: true, amount: 0.12 }}
-    >
+    <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
       {items.map((item) => (
         <MenuPickCard
           key={item.id}
@@ -51,7 +45,7 @@ function ToppingGrid({
           onSelect={() => setIngredientIds((ids) => toggleId(ids, item.id))}
         />
       ))}
-    </motion.div>
+    </div>
   );
 }
 
@@ -189,13 +183,7 @@ export function PastaBuilder() {
               {t("builder.step1Title")}
             </h2>
             <p className="mt-1 text-sm text-white/50">{t("builder.step1Hint")}</p>
-            <motion.div
-              className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3"
-              variants={staggerGrid}
-              initial="hidden"
-              whileInView="show"
-              viewport={{ once: true, amount: 0.12 }}
-            >
+            <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
               {BUILDER_PASTAS.map((item) => (
                 <MenuPickCard
                   key={item.id}
@@ -205,7 +193,7 @@ export function PastaBuilder() {
                   onSelect={() => selectPasta(item.id)}
                 />
               ))}
-            </motion.div>
+            </div>
           </section>
 
           {sauces.length > 0 ? (
@@ -214,13 +202,7 @@ export function PastaBuilder() {
                 {t("builder.step2Title")}
               </h2>
               <p className="mt-1 text-sm text-white/50">{t("builder.step2Hint")}</p>
-              <motion.div
-                className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3"
-                variants={staggerGrid}
-                initial="hidden"
-                whileInView="show"
-                viewport={{ once: true, amount: 0.12 }}
-              >
+              <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
                 {sauces.map((item) => (
                   <MenuPickCard
                     key={item.id}
@@ -230,7 +212,7 @@ export function PastaBuilder() {
                     onSelect={() => setSauceIds((ids) => toggleId(ids, item.id))}
                   />
                 ))}
-              </motion.div>
+              </div>
             </section>
           ) : null}
 
@@ -263,13 +245,7 @@ export function PastaBuilder() {
             </div>
           </section>
 
-          <motion.div
-            className="hidden rounded-2xl border-2 border-[#2e402a] bg-brand-forest/35 p-5 shadow-box lg:block"
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ type: "spring", stiffness: 200, damping: 24 }}
-          >
+          <div className="hidden rounded-2xl border-2 border-[#2e402a] bg-brand-forest/35 p-5 shadow-box lg:block">
             <div className="flex flex-wrap items-end justify-between gap-4">
               <div>
                 <p className="text-xs uppercase tracking-widest text-white/50">{t("builder.total")}</p>
@@ -286,7 +262,7 @@ export function PastaBuilder() {
             </div>
             {cartErr ? <p className="mt-3 text-sm text-red-400">{cartErr}</p> : null}
             <p className="mt-3 text-xs text-white/45">{t("builder.previewHint")}</p>
-          </motion.div>
+          </div>
         </div>
 
         <div className="lg:order-2">

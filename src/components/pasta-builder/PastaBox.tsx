@@ -218,27 +218,27 @@ function MobileBoxFloater(props: PastaBoxProps & { pouring: Pouring }) {
           ) : null}
         </AnimatePresence>
 
-        <motion.button
+        <button
           type="button"
           aria-label={t("pastaBox.open")}
           aria-expanded={open}
           onClick={toggle}
-          animate={pulse ? { scale: [1, 1.1, 1] } : { scale: 1 }}
-          transition={{ duration: 0.45 }}
-          className="relative flex h-[4.75rem] w-[4.75rem] items-center justify-center overflow-hidden rounded-2xl border-2 border-[#c49746] bg-[#1a2418] p-1 shadow-[0_6px_24px_rgba(0,0,0,0.5)] ring-2 ring-black/20"
+          className={`relative flex h-[4.75rem] w-[4.75rem] flex-col items-center justify-center overflow-hidden rounded-2xl border-2 border-[#c49746] bg-[#1a2418] p-2 shadow-[0_6px_24px_rgba(0,0,0,0.5)] ring-2 ring-black/20 transition-transform ${
+            pulse ? "scale-110" : "scale-100"
+          }`}
         >
-          <BoxScene
-            {...props}
-            showPastaName={false}
-            showLayerTags={false}
-            boxWidth="w-full"
-          />
+          <span className="text-2xl leading-none" aria-hidden>
+            🍝
+          </span>
+          <span className="mt-1 text-[9px] font-semibold text-[#c49746]">
+            {layerCount > 0 ? `${layerCount}` : "0"}
+          </span>
           {layerCount > 0 ? (
             <span className="absolute -right-1 -top-1 z-30 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#c49746] px-1 text-[10px] font-bold text-[#0a0a0a] shadow-md">
               {layerCount}
             </span>
           ) : null}
-        </motion.button>
+        </button>
         {!open ? (
           <p className="pointer-events-none mt-1.5 max-w-[4.75rem] text-center text-[9px] leading-tight text-white/40">
             {t("pastaBox.tapHint")}

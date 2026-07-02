@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { useI18n } from "@/components/providers/I18nProvider";
 import { addBowlToCart, getBowlFromCart, updateBowlInCart } from "@/lib/cart";
-import { pageIntro, staggerGrid } from "@/lib/motion-variants";
+import { pageIntro } from "@/lib/motion-variants";
 import {
   CHOCOLATE_BOWL_MARKER,
   CHOCOLATE_PASTA,
@@ -34,13 +34,7 @@ function ToppingGrid({
   setIngredientIds: React.Dispatch<React.SetStateAction<string[]>>;
 }) {
   return (
-    <motion.div
-      className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3"
-      variants={staggerGrid}
-      initial="hidden"
-      whileInView="show"
-      viewport={{ once: true, amount: 0.12 }}
-    >
+    <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
       {items.map((item) => (
         <MenuPickCard
           key={item.id}
@@ -50,7 +44,7 @@ function ToppingGrid({
           onSelect={() => setIngredientIds((ids) => toggleId(ids, item.id))}
         />
       ))}
-    </motion.div>
+    </div>
   );
 }
 
@@ -171,20 +165,14 @@ export function ChocolateBuilder() {
               {t("chocolateBuilder.pastaTitle")}
             </h2>
             <p className="mt-1 text-sm text-white/50">{t("chocolateBuilder.pastaHint")}</p>
-            <motion.div
-              className="mt-4 max-w-xs"
-              variants={staggerGrid}
-              initial="hidden"
-              whileInView="show"
-              viewport={{ once: true, amount: 0.12 }}
-            >
+            <div className="mt-4 max-w-xs">
               <MenuPickCard
                 item={pastaItem}
                 mode="single"
                 selected
                 onSelect={() => {}}
               />
-            </motion.div>
+            </div>
           </section>
 
           <section>
@@ -192,13 +180,7 @@ export function ChocolateBuilder() {
               {t("chocolateBuilder.saucesTitle")}
             </h2>
             <p className="mt-1 text-sm text-white/50">{t("chocolateBuilder.saucesHint")}</p>
-            <motion.div
-              className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3"
-              variants={staggerGrid}
-              initial="hidden"
-              whileInView="show"
-              viewport={{ once: true, amount: 0.12 }}
-            >
+            <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
               {sauces.map((item) => (
                 <MenuPickCard
                   key={item.id}
@@ -208,7 +190,7 @@ export function ChocolateBuilder() {
                   onSelect={() => setSauceIds((ids) => toggleId(ids, item.id))}
                 />
               ))}
-            </motion.div>
+            </div>
           </section>
 
           <section>
@@ -223,12 +205,7 @@ export function ChocolateBuilder() {
             />
           </section>
 
-          <motion.div
-            className="hidden rounded-2xl border-2 border-[#2e402a] bg-brand-forest/35 p-5 shadow-box lg:block"
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
+          <div className="hidden rounded-2xl border-2 border-[#2e402a] bg-brand-forest/35 p-5 shadow-box lg:block">
             <div className="flex flex-wrap items-end justify-between gap-4">
               <div>
                 <p className="text-xs uppercase tracking-widest text-white/50">{t("builder.total")}</p>
@@ -244,7 +221,7 @@ export function ChocolateBuilder() {
               </button>
             </div>
             {cartErr ? <p className="mt-3 text-sm text-red-400">{cartErr}</p> : null}
-          </motion.div>
+          </div>
         </div>
 
         <div className="lg:order-2">

@@ -261,7 +261,8 @@ export function saucesForBuilder(pastaId?: string): MenuItem[] {
 
 /** Kendin yap — toppingler makarna çeşidine göre değişmez */
 export function toppingsForBuilder(pastaId?: string): MenuItem[] {
-  return toppingsForPasta(pastaId ?? BUILDER_PASTAS[0].id);
+  const groups = toppingGroupsForPasta(normalizePastaId(pastaId ?? BUILDER_PASTAS[0].id));
+  return [...groups.main, ...groups.extra, ...groups.chocolate];
 }
 
 export function saucesForPasta(pastaId: string): MenuItem[] {
@@ -298,7 +299,8 @@ export function toppingGroupsForPasta(pastaId: string): ToppingGroups {
 export function toppingsForPasta(pastaId: string): MenuItem[] {
   const id = normalizePastaId(pastaId);
   if (id === "noodle-chocolate") return TOPPINGS_CHOCOLATE_FRUITS;
-  return toppingsForBuilder();
+  const groups = toppingGroupsForPasta(id);
+  return [...groups.main, ...groups.extra];
 }
 
 export function filterVegan<T extends MenuItem>(items: T[]): T[] {

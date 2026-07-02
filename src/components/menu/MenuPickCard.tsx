@@ -1,11 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { motion, type Variants } from "framer-motion";
 import type { MenuItem } from "@/lib/menu-data";
 import { formatEur } from "@/lib/format";
 import { menuItemDescription, menuItemLabel } from "@/lib/menu-i18n";
-import { fadeUpCard } from "@/lib/motion-variants";
 import { publicMenuImageSrc } from "@/lib/normalize-menu-image";
 import { VeganBadge } from "@/components/menu/VeganBadge";
 import { useI18n } from "@/components/providers/I18nProvider";
@@ -15,23 +13,18 @@ type Props = {
   selected: boolean;
   onSelect: () => void;
   mode: "single" | "multi";
-  variants?: Variants;
 };
 
-export function MenuPickCard({ item, selected, onSelect, mode, variants = fadeUpCard }: Props) {
+export function MenuPickCard({ item, selected, onSelect, mode }: Props) {
   const { t, locale } = useI18n();
   const imageSrc = publicMenuImageSrc(item.image);
   const label = menuItemLabel(item.id, locale, item.name);
   const desc = menuItemDescription(item.id, locale, item.description);
   return (
-    <motion.button
+    <button
       type="button"
-      variants={variants}
       onClick={onSelect}
-      whileHover={{ scale: 1.02, y: -2 }}
-      whileTap={{ scale: 0.97 }}
-      transition={{ layout: { duration: 0.25 } }}
-      className={`relative aspect-[4/3] w-full overflow-hidden rounded-xl border-2 text-left shadow-md ${
+      className={`relative aspect-[4/3] w-full overflow-hidden rounded-xl border-2 text-left shadow-md transition hover:scale-[1.02] active:scale-[0.97] ${
         selected
           ? "border-[#c49746] shadow-[0_0_28px_-6px_rgba(196,151,70,0.45)]"
           : "border-[#2e402a] hover:border-[#c49746]/40"
@@ -60,17 +53,14 @@ export function MenuPickCard({ item, selected, onSelect, mode, variants = fadeUp
           className="absolute left-2 top-2 shadow-md"
         />
       ) : null}
-      {selected && (
-        <motion.span
+      {selected ? (
+        <span
           className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold text-[#0a0a0a] shadow-lg"
           style={{ backgroundColor: "#c49746" }}
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ type: "spring", stiffness: 500, damping: 22 }}
         >
           {mode === "single" ? "●" : "✓"}
-        </motion.span>
-      )}
+        </span>
+      ) : null}
       <div className="absolute bottom-0 left-0 right-0 p-3">
         <p className="font-display text-sm font-bold leading-tight text-white">{label}</p>
         {desc ? (
@@ -80,6 +70,6 @@ export function MenuPickCard({ item, selected, onSelect, mode, variants = fadeUp
           {mode === "single" ? formatEur(item.price) : `+${formatEur(item.price)}`}
         </p>
       </div>
-    </motion.button>
+    </button>
   );
 }

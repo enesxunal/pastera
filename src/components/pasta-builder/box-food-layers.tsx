@@ -151,7 +151,6 @@ function buildVolumeLayers(centerX: number): string[] {
 /** Makarna — taze fettuccine yığını (geniş şerit, unlu mat yüzey). */
 export function PastaPileSvg({
   pastaId,
-  pouring,
   uid = "pasta",
 }: {
   pastaId?: string;
@@ -188,17 +187,7 @@ export function PastaPileSvg({
       ))}
 
       {ribbons.map((s) => (
-        <motion.g
-          key={s.i}
-          initial={pouring ? { opacity: 0, y: -50 } : false}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{
-            type: "spring",
-            stiffness: 175,
-            damping: 17,
-            delay: pouring ? s.i * 0.018 : 0,
-          }}
-        >
+        <g key={s.i}>
           <path
             d={s.d}
             fill="none"
@@ -233,7 +222,7 @@ export function PastaPileSvg({
             strokeLinecap="round"
             opacity={0.55}
           />
-        </motion.g>
+        </g>
       ))}
 
       {flour.map((f, i) => (
