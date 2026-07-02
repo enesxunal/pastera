@@ -1,6 +1,6 @@
-/** Kapalı değilse coming soon aktif (varsayılan: açık). Canlıya alınca Vercel'de COMING_SOON=false */
+/** Açıkça true verilmedikçe coming soon kapalıdır. */
 export function isComingSoonEnabled(): boolean {
-  return process.env.COMING_SOON !== "false";
+  return process.env.COMING_SOON === "true";
 }
 
 export const COMING_SOON_BYPASS_PREFIXES = [
