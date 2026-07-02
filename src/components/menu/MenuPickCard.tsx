@@ -26,7 +26,6 @@ export function MenuPickCard({ item, selected, onSelect, mode, variants = fadeUp
   return (
     <motion.button
       type="button"
-      layout
       variants={variants}
       onClick={onSelect}
       whileHover={{ scale: 1.02, y: -2 }}
@@ -63,7 +62,6 @@ export function MenuPickCard({ item, selected, onSelect, mode, variants = fadeUp
       ) : null}
       {selected && (
         <motion.span
-          layoutId={`pick-${item.id}`}
           className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold text-[#0a0a0a] shadow-lg"
           style={{ backgroundColor: "#c49746" }}
           initial={{ scale: 0 }}
