@@ -48,8 +48,9 @@ export function getStaticCatalog(): CatalogItem[] {
 
 /** DB kayıtları üzerine kodda tanımlı görsel ve isimleri yazar (eski görsel geri dönmesin). */
 export function applyStaticCatalogOverrides(items: CatalogItem[]): CatalogItem[] {
-  const staticById = new Map(getStaticCatalog().map((x) => [x.id, x]));
-  return items.map((item) => {
+  const staticCatalog = getStaticCatalog();
+  const staticById = new Map(staticCatalog.map((x) => [x.id, x]));
+  const merged = items.map((item) => {
     const stat = staticById.get(item.id);
     if (!stat) return item;
     if (item.id.startsWith("std-")) {
@@ -67,6 +68,10 @@ export function applyStaticCatalogOverrides(items: CatalogItem[]): CatalogItem[]
     }
     return item;
   });
+
+  const seen = new Set(merged.map((x) => x.id));
+  const missingStatics = staticCatalog.filter((x) => !seen.has(x.id));
+  return [...merged, ...missingStatics].sort((a, b) => a.sort_order - b.sort_order);
 }
 
 export function catalogItemById(catalog: CatalogItem[], id: string): CatalogItem | undefined {
