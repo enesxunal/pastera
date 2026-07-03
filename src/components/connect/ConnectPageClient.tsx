@@ -20,7 +20,13 @@ import {
 
 const SOCIAL_STYLES: Record<
   string,
-  { bg: string; ring: string; hoverGlow: string; Icon: typeof InstagramIcon }
+  {
+    bg: string;
+    ring: string;
+    hoverGlow: string;
+    Icon: typeof InstagramIcon;
+    multicolor?: boolean;
+  }
 > = {
   instagram: {
     bg: "bg-gradient-to-br from-[#f9ce34] via-[#ee2a7b] to-[#6228d7]",
@@ -40,6 +46,13 @@ const SOCIAL_STYLES: Record<
     hoverGlow: "hover:shadow-[0_0_28px_rgba(255,0,80,0.35)]",
     Icon: TikTokIcon,
   },
+  google: {
+    bg: "bg-white",
+    ring: "ring-white/30",
+    hoverGlow: "hover:shadow-[0_0_28px_rgba(66,133,244,0.4)]",
+    Icon: GoogleIcon,
+    multicolor: true,
+  },
 };
 
 const ACTION_ICONS: Record<string, string> = {
@@ -48,7 +61,6 @@ const ACTION_ICONS: Record<string, string> = {
   builder: "✨",
   builderVegan: "🌱",
   phone: "📞",
-  google: "google",
 };
 
 function LinkAnchor({
@@ -125,7 +137,7 @@ export function ConnectPageClient() {
           </h2>
           <p className="mt-1 text-center text-xs text-white/45">{t("connect.socialHint")}</p>
 
-          <ul className="mt-5 grid grid-cols-3 gap-3">
+          <ul className="mt-5 grid grid-cols-4 gap-2.5">
             {PASTERA_SOCIAL_ITEMS.map((item) => {
               const style = SOCIAL_STYLES[item.id];
               const Icon = style.Icon;
@@ -134,14 +146,20 @@ export function ConnectPageClient() {
                 <li key={item.id}>
                   <LinkAnchor
                     item={item}
-                    className={`group flex flex-col items-center gap-2.5 rounded-2xl border border-white/10 bg-white/[0.04] p-4 shadow-md transition duration-300 hover:border-white/20 hover:bg-white/[0.07] active:scale-[0.97] ${style.hoverGlow}`}
+                    className={`group flex flex-col items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.04] p-3 shadow-md transition duration-300 hover:border-white/20 hover:bg-white/[0.07] active:scale-[0.97] ${style.hoverGlow}`}
                   >
                     <span
-                      className={`flex h-14 w-14 items-center justify-center rounded-2xl ring-2 ${style.bg} ${style.ring} transition group-hover:scale-105`}
+                      className={`flex h-12 w-12 items-center justify-center rounded-xl ring-2 sm:h-14 sm:w-14 sm:rounded-2xl ${style.bg} ${style.ring} transition group-hover:scale-105`}
                     >
-                      <Icon className="h-7 w-7 text-white drop-shadow-sm" />
+                      <Icon
+                        className={
+                          style.multicolor
+                            ? "h-6 w-6 sm:h-7 sm:w-7"
+                            : "h-6 w-6 text-white drop-shadow-sm sm:h-7 sm:w-7"
+                        }
+                      />
                     </span>
-                    <span className="text-center text-[11px] font-semibold leading-tight text-white/90 group-hover:text-white">
+                    <span className="text-center text-[10px] font-semibold leading-tight text-white/90 group-hover:text-white sm:text-[11px]">
                       {label}
                     </span>
                   </LinkAnchor>
@@ -163,7 +181,6 @@ export function ConnectPageClient() {
           <ul className="mt-4 flex flex-col gap-2.5">
             {PASTERA_ACTION_ITEMS.map((item) => {
               const label = t(`connect.links.${item.id}`);
-              const isGoogle = item.id === "google";
               const isPhone = item.id === "phone";
               const sub = isPhone
                 ? PASTERA_PHONE_DISPLAY
@@ -171,34 +188,25 @@ export function ConnectPageClient() {
                   ? PASTERA_WEBSITE_URL.replace(/^https?:\/\//, "")
                   : undefined;
 
-              const cardClass =
-                isGoogle || isPhone
-                  ? "group flex min-h-[3.5rem] items-center gap-3.5 rounded-2xl border border-[#c49746]/30 bg-gradient-to-r from-[#2e402a]/50 to-[#1a2218]/80 px-4 py-3 shadow-lg transition hover:border-[#c49746]/60 hover:from-[#2e402a]/70 active:scale-[0.99]"
-                  : "group flex min-h-[3.5rem] items-center gap-3.5 rounded-2xl border border-[#2e402a] bg-[#111]/90 px-4 py-3 transition hover:border-[#c49746]/50 hover:bg-[#141414] active:scale-[0.99]";
+              const cardClass = isPhone
+                ? "group flex min-h-[3.5rem] items-center gap-3.5 rounded-2xl border border-[#c49746]/30 bg-gradient-to-r from-[#2e402a]/50 to-[#1a2218]/80 px-4 py-3 shadow-lg transition hover:border-[#c49746]/60 hover:from-[#2e402a]/70 active:scale-[0.99]"
+                : "group flex min-h-[3.5rem] items-center gap-3.5 rounded-2xl border border-[#2e402a] bg-[#111]/90 px-4 py-3 transition hover:border-[#c49746]/50 hover:bg-[#141414] active:scale-[0.99]";
 
               return (
                 <li key={item.id}>
                   <LinkAnchor item={item} className={cardClass}>
                     <span
                       className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${
-                        isGoogle
-                          ? "bg-white"
-                          : isPhone
-                            ? "bg-[#c49746]/20 text-lg"
-                            : "bg-[#2e402a]/80 text-lg"
+                        isPhone ? "bg-[#c49746]/20 text-lg" : "bg-[#2e402a]/80 text-lg"
                       }`}
                       aria-hidden
                     >
-                      {isGoogle ? (
-                        <GoogleIcon className="h-5 w-5" />
-                      ) : (
-                        ACTION_ICONS[item.id]
-                      )}
+                      {ACTION_ICONS[item.id]}
                     </span>
                     <span className="min-w-0 flex-1 text-left">
                       <span
                         className={`block text-sm font-bold ${
-                          isGoogle || isPhone ? "text-[#c49746]" : "text-white group-hover:text-[#c49746]"
+                          isPhone ? "text-[#c49746]" : "text-white group-hover:text-[#c49746]"
                         }`}
                       >
                         {label}
