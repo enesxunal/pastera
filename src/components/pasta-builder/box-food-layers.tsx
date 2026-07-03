@@ -703,7 +703,7 @@ export function BoxFoodSvg({
 }) {
   return (
     <g>
-      <PastaPileSvg pastaId={pastaId} pouring={pouring?.kind === "pasta"} uid={uid} />
+      <PastaPileSvg key={pastaId ?? "default"} pastaId={pastaId} pouring={pouring?.kind === "pasta"} uid={uid} />
       <SauceSpreadSvg layers={layers} pouring={pouring} uid={uid} />
       <ToppingScatterSvg layers={layers} pouring={pouring} />
     </g>

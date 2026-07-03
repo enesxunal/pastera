@@ -44,23 +44,11 @@ export function pastaTint(pastaId?: string): {
   flour: string;
   edge: string;
 } {
-  if (pastaId?.includes("vegan"))
-    return {
-      noodle: "#b8cc78",
-      glow: "#d4e898",
-      shadow: "#7a9458",
-      flour: "#ecf2d8",
-      edge: "#98b868",
-    };
-  if (pastaId?.includes("nero") || pastaId === "noodle-black")
-    return {
-      noodle: "#2a2a2a",
-      glow: "#3d3d3d",
-      shadow: "#111",
-      flour: "#555",
-      edge: "#1a1a1a",
-    };
-  if (pastaId?.includes("chocolate") || pastaId?.includes("choc"))
+  const id = pastaId ?? "";
+  const isSpinach = id.includes("spinach") || id.includes("spinat");
+  const isVegan = id.includes("vegan");
+
+  if (id.includes("chocolate") || id.includes("choc")) {
     return {
       noodle: "#9a6848",
       glow: "#b88058",
@@ -68,7 +56,44 @@ export function pastaTint(pastaId?: string): {
       flour: "#c8a080",
       edge: "#6b4428",
     };
-  /* Taze yumurtalı fettuccine — daha sarı, unlu mat yüzey */
+  }
+  if (id.includes("nero") || id === "noodle-black") {
+    return {
+      noodle: "#2a2a2a",
+      glow: "#3d3d3d",
+      shadow: "#111",
+      flour: "#555",
+      edge: "#1a1a1a",
+    };
+  }
+  if (isSpinach) {
+    if (isVegan) {
+      return {
+        noodle: "#5f9a42",
+        glow: "#7cbc58",
+        shadow: "#3d6e28",
+        flour: "#cce8b8",
+        edge: "#4a8234",
+      };
+    }
+    return {
+      noodle: "#72a850",
+      glow: "#92cc68",
+      shadow: "#4e7838",
+      flour: "#dceec8",
+      edge: "#5e9044",
+    };
+  }
+  if (isVegan) {
+    return {
+      noodle: "#d4c090",
+      glow: "#e8d8a8",
+      shadow: "#a89060",
+      flour: "#f5eed8",
+      edge: "#c0a870",
+    };
+  }
+  /* Taze yumurtalı fettuccine — sarı, unlu mat yüzey */
   return {
     noodle: "#e8d490",
     glow: "#f2e4a8",
