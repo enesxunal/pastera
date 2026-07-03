@@ -6,7 +6,7 @@ import { SiteHeader } from "@/components/layout/SiteHeader";
 import { DeliveryBanner } from "@/components/delivery/DeliveryBanner";
 import { DineInBanner } from "@/components/dine-in/DineInBanner";
 
-const HIDE_PREFIXES = ["/display", "/branch", "/admin", "/lobby"];
+const HIDE_PREFIXES = ["/display", "/branch", "/admin", "/lobby", "/connect"];
 
 export function ConditionalChrome({ hidden = false }: { hidden?: boolean }) {
   const pathname = usePathname();

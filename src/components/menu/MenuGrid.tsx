@@ -12,6 +12,7 @@ import {
   isMenuCartItem,
   menuBuilderHref,
   MENU_KENDIN_YAP_ID,
+  MENU_KENDIN_YAP_VEGAN_ID,
 } from "@/lib/menu-hub-items";
 import { getMenuItem } from "@/lib/menu-data";
 import { menuItemDescription } from "@/lib/menu-i18n";
@@ -156,13 +157,15 @@ export function MenuGrid({
             ? menuItemDescription(item.id, locale, staticItem?.description)
             : item.id === MENU_KENDIN_YAP_ID
               ? t("menu.buildYourOwnHint")
-              : item.id === "noodle-chocolate"
-                ? t("menu.subChocolatePastaHint")
-                : undefined;
+              : item.id === MENU_KENDIN_YAP_VEGAN_ID
+                ? t("menu.buildYourOwnVeganHint")
+                : item.id === "noodle-chocolate"
+                  ? t("menu.subChocolatePastaHint")
+                  : undefined;
         const showAdd = itemCanAddCart(item);
         const showBuilder = itemIsBuilder(item);
         const priceText =
-          item.id === MENU_KENDIN_YAP_ID
+          item.id === MENU_KENDIN_YAP_ID || item.id === MENU_KENDIN_YAP_VEGAN_ID
             ? `${t("home.priceFrom")} ${formatEur(item.price)}`
             : formatEur(item.price);
         const cardShell = "flex h-full flex-col overflow-hidden rounded-xl border-2 border-[#2e402a] bg-[#0f0f0f] shadow-md";

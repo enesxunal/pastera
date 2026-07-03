@@ -110,7 +110,10 @@
     "total": "Summe",
     "toCart": "In den Warenkorb",
     "updateCart": "Im Warenkorb aktualisieren",
-    "previewHint": "Vorschau: gewählte Saucen und Toppings in der Schüssel."
+    "previewHint": "Vorschau: gewählte Saucen und Toppings in der Schüssel.",
+    "titleVegan": "Vegane Pasta kreieren",
+    "introVegan": "Schritt 1: Vegane Nudel. Schritt 2: Sauce(n). Schritt 3: Toppings. Der Preis wird live berechnet.",
+    "step1HintVegan": "Vegane Classic oder Spinat — 7,90 €"
   },
   "chocolateBuilder": {
     "kicker": "Dessert · Selbst zusammenstellen",
@@ -173,7 +176,8 @@
     "sectionPastaChoiceHint": "Selbst zusammenstellen oder fertiges Gericht wählen.",
     "buildYourOwn": "Selbst zusammenstellen",
     "buildYourOwnBadge": "3 Schritte",
-    "buildYourOwnHint": "Classic, Vegan oder Schwarz — Sauce & Topping wählen.",
+    "buildYourOwnHint": "Classic oder Spinat — Sauce & Topping wählen.",
+    "buildYourOwnVeganHint": "Vegane Pasta — Sauce & Topping wählen.",
     "chocolateSectionHint": "Fertige Desserts oder Schoko-Pasta selbst zusammenstellen.",
     "chocolateBuildYourOwnHint": "Schokoladen-Basis + Früchte und Schokolade als Topping.",
     "readyPastas": "Fertige Gerichte",
@@ -517,6 +521,22 @@
     "print": "Bon drucken",
     "autoPrint": "Bei neuer Bestellung automatisch drucken",
     "hint": "Einmal Thermodrucker wählen (80 mm); auch als PDF speicherbar."
+  },
+  "connect": {
+    "kicker": "Pastera",
+    "title": "Alles an einem Ort",
+    "intro": "Menü, Bestellung, Social Media und Kontakt — wähle, wohin du möchtest.",
+    "links": {
+      "website": "Website",
+      "menu": "Speisekarte",
+      "builder": "Pasta zusammenstellen",
+      "builderVegan": "Vegane Pasta zusammenstellen",
+      "phone": "Anrufen",
+      "google": "Google Bewertung",
+      "instagram": "Instagram",
+      "facebook": "Facebook",
+      "tiktok": "TikTok"
+    }
   },
   "footer": {
     "tagline": "Frische Pasta, Suppen und mehr – vor Ort oder zur Lieferung.",

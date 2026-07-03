@@ -13,7 +13,7 @@ const PastaBuilder = dynamic(
   },
 );
 
-export default function BuilderPage() {
+export default function VeganBuilderPage() {
   return (
     <Suspense
       fallback={
@@ -22,7 +22,7 @@ export default function BuilderPage() {
         </div>
       }
     >
-      <PastaBuilder mode="classic" />
+      <PastaBuilder mode="vegan" />
     </Suspense>
   );
 }

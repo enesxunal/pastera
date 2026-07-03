@@ -110,7 +110,10 @@
     "total": "Toplam",
     "toCart": "Sepete ekle",
     "updateCart": "Sepette güncelle",
-    "previewHint": "Önizleme: seçilen sos ve toppingler kasede."
+    "previewHint": "Önizleme: seçilen sos ve toppingler kasede.",
+    "titleVegan": "Vegan pastanı oluştur",
+    "introVegan": "Adım 1: Vegan makarna. Adım 2: Sos(lar). Adım 3: Toppingler. Fiyat anında hesaplanır.",
+    "step1HintVegan": "Vegan klasik veya ıspanak — 7,90 €"
   },
   "chocolateBuilder": {
     "kicker": "Tatlı · Kendin yap",
@@ -173,7 +176,8 @@
     "sectionPastaChoiceHint": "Kendin yap veya hazır tabaklardan birini seç.",
     "buildYourOwn": "Kendin yap",
     "buildYourOwnBadge": "3 adım",
-    "buildYourOwnHint": "Klasik, Vegan veya Siyah — sos ve topping seç.",
+    "buildYourOwnHint": "Klasik veya ıspanak — sos ve topping seç.",
+    "buildYourOwnVeganHint": "Vegan makarna — sos ve topping seç.",
     "chocolateSectionHint": "Hazır tatlılar veya çikolatalı makarnanı kendin oluştur.",
     "chocolateBuildYourOwnHint": "Çikolatalı makarna tabanı + meyve ve çikolata toppingleri.",
     "readyPastas": "Hazır makarnalar",
@@ -517,6 +521,22 @@
     "print": "Fiş yazdır",
     "autoPrint": "Yeni siparişte otomatik fiş",
     "hint": "80 mm termal için yazıcıyı bir kez seçin; PDF olarak da kaydedebilirsiniz."
+  },
+  "connect": {
+    "kicker": "Pastera",
+    "title": "Her şey tek yerde",
+    "intro": "Menü, sipariş, sosyal medya ve iletişim — gitmek istediğin yeri seç.",
+    "links": {
+      "website": "Web sitesi",
+      "menu": "Menü",
+      "builder": "Kendin yap pasta",
+      "builderVegan": "Vegan kendin yap",
+      "phone": "Telefon",
+      "google": "Google yorum",
+      "instagram": "Instagram",
+      "facebook": "Facebook",
+      "tiktok": "TikTok"
+    }
   },
   "footer": {
     "tagline": "Taze makarna, çorbalar ve daha fazlası — restoranda veya eve teslimat.",

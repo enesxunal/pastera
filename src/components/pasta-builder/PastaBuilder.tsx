@@ -7,12 +7,14 @@ import { useI18n } from "@/components/providers/I18nProvider";
 import { addBowlToCart, getBowlFromCart, updateBowlInCart } from "@/lib/cart";
 import { pageIntro } from "@/lib/motion-variants";
 import {
-  BUILDER_PASTAS,
+  builderPastasForMode,
+  defaultPastaIdForMode,
   isChocolateBowl,
   normalizeBuilderPastaId,
   saucesForBuilder,
   toppingGroupsForPasta,
   toppingsForBuilder,
+  type BuilderMode,
   type MenuItem,
 } from "@/lib/menu-data";
 import { formatEur } from "@/lib/format";
@@ -49,16 +51,18 @@ function ToppingGrid({
   );
 }
 
-export function PastaBuilder() {
+export function PastaBuilder({ mode = "classic" }: { mode?: BuilderMode }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { t, locale } = useI18n();
-  const [pastaId, setPastaId] = useState(BUILDER_PASTAS[0].id);
+  const pastaOptions = builderPastasForMode(mode);
+  const defaultPasta = defaultPastaIdForMode(mode);
+  const [pastaId, setPastaId] = useState(defaultPasta);
   const [sauceIds, setSauceIds] = useState<string[]>([]);
   const [ingredientIds, setIngredientIds] = useState<string[]>([]);
   const [cartErr, setCartErr] = useState("");
 
-  const pasta = BUILDER_PASTAS.find((p) => p.id === pastaId) ?? BUILDER_PASTAS[0];
+  const pasta = pastaOptions.find((p) => p.id === pastaId) ?? pastaOptions[0];
   const sauces = saucesForBuilder(pastaId);
   const allToppings = toppingsForBuilder(pastaId);
   const toppingGroups = toppingGroupsForPasta(pastaId);
@@ -68,10 +72,10 @@ export function PastaBuilder() {
     const isNew = searchParams.get("new") === "1";
     const bowlId = searchParams.get("bowl");
     const urlPasta = searchParams.get("pasta");
-    const urlOk = urlPasta ? normalizeBuilderPastaId(urlPasta) : null;
+    const urlOk = urlPasta ? normalizeBuilderPastaId(urlPasta, mode) : null;
 
     if (isNew) {
-      setPastaId(urlOk ?? BUILDER_PASTAS[0].id);
+      setPastaId(urlOk ?? defaultPasta);
       setSauceIds([]);
       setIngredientIds([]);
       setCartErr("");
@@ -81,7 +85,7 @@ export function PastaBuilder() {
     if (isEdit && bowlId) {
       const bowl = getBowlFromCart(bowlId);
       if (bowl && !isChocolateBowl(bowl)) {
-        setPastaId(normalizeBuilderPastaId(bowl.pastaId));
+        setPastaId(normalizeBuilderPastaId(bowl.pastaId, mode));
         setSauceIds(bowl.sauceIds);
         setIngredientIds(bowl.ingredientIds);
         setCartErr("");
@@ -97,11 +101,11 @@ export function PastaBuilder() {
       return;
     }
 
-    setPastaId(BUILDER_PASTAS[0].id);
+    setPastaId(defaultPasta);
     setSauceIds([]);
     setIngredientIds([]);
     setCartErr("");
-  }, [searchParams]);
+  }, [searchParams, mode, defaultPasta]);
 
   const sauceItems = sauces.filter((x) => sauceIds.includes(x.id));
   const ingredientItems = allToppings.filter((x) => ingredientIds.includes(x.id));
@@ -171,9 +175,11 @@ export function PastaBuilder() {
           {t("builder.kicker")}
         </p>
         <h1 className="mt-2 font-display text-3xl font-bold text-white sm:text-4xl">
-          {t("builder.title")}
+          {t(mode === "vegan" ? "builder.titleVegan" : "builder.title")}
         </h1>
-        <p className="mt-3 text-base text-white/60">{t("builder.intro")}</p>
+        <p className="mt-3 text-base text-white/60">
+          {t(mode === "vegan" ? "builder.introVegan" : "builder.intro")}
+        </p>
       </motion.div>
 
       <div className="grid gap-10 lg:grid-cols-[1fr_minmax(0,300px)] lg:items-start">
@@ -182,9 +188,11 @@ export function PastaBuilder() {
             <h2 className="font-display text-lg font-semibold text-white">
               {t("builder.step1Title")}
             </h2>
-            <p className="mt-1 text-sm text-white/50">{t("builder.step1Hint")}</p>
+            <p className="mt-1 text-sm text-white/50">
+              {t(mode === "vegan" ? "builder.step1HintVegan" : "builder.step1Hint")}
+            </p>
             <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
-              {BUILDER_PASTAS.map((item) => (
+              {pastaOptions.map((item) => (
                 <MenuPickCard
                   key={item.id}
                   item={item}

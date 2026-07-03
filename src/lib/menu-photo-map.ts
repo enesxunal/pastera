@@ -6,6 +6,39 @@ function pathFromSuffix(suffix: string): string {
   return `/web-Pastera-Menü-${suffix.normalize("NFC")}.png`;
 }
 
+/** Menü PNG yolları — id takma adları */
+const PHOTO_ID_ALIAS: Record<string, string> = {
+  "s-domates-vegan": "s-vegane-tomatensauce",
+  "s-vegan-pesto": "s-veganes-pesto",
+  "sp-haehnchen-mariniert": "sp-haehnchen-mariniert",
+  "sp-rind-mariniert": "sp-rind-mariniert",
+  "sp-schwarze-garnelen": "sp-schwarze-garnelen",
+  "sp-tofu": "sp-tofu",
+  "sp-seitan": "sp-seitan",
+  "t-cherrytomaten": "t-cherrytomaten",
+  "t-cherry": "t-cherrytomaten",
+  "t-blattspinat": "t-blattspinat",
+  "t-babyspinat": "t-blattspinat",
+  "t-champignons": "t-champignons",
+  "t-mantar": "t-champignons",
+  "t-jalapenos": "t-jalapenos",
+  "t-jalapeno": "t-jalapenos",
+  "t-gruene-oliven": "t-gruene-oliven",
+  "t-yesil-zeytin": "t-gruene-oliven",
+  "t-rote-zwiebeln": "t-rote-zwiebeln",
+  "t-kirmizi-sogan": "t-rote-zwiebeln",
+  "t-roestzwiebeln": "t-roestzwiebeln",
+  "t-kurutulmus-sogan": "t-roestzwiebeln",
+  "t-fruehlingszwiebeln": "t-fruehlingszwiebeln",
+  "t-taze-sogan": "t-fruehlingszwiebeln",
+  "t-getrocknete-tomaten": "t-getrocknete-tomaten",
+  "t-kuru-domates": "t-getrocknete-tomaten",
+  "t-mini-mozzarella": "t-mini-mozzarella",
+  "t-mozzarella": "t-mini-mozzarella",
+  "menu-kendin-yap": "pasta-klassisch",
+  "menu-kendin-yap-vegan": "pasta-vegan",
+};
+
 const ID_SUFFIX: Partial<Record<string, string>> = {
   "pasta-klassisch": "pasta",
   "pasta-vegan": "vegan-pasta",
@@ -41,7 +74,6 @@ const ID_SUFFIX: Partial<Record<string, string>> = {
   "t-pinienkerne": "Pinienkerne",
   "t-extra-parmesan": "Extra Parmesan",
   "t-kuru-domates": "Getrocknete Tomaten",
-  "d-wasser": "Stilles Wasser",
   "sp-haehnchen-mariniert": "Mariniertes Hähnchen",
   "sp-curry-sahne-haehnchen": "Curry-Sahne-Hähnchen",
   "sp-rind-mariniert": "Mariniertes Rindfleisch",
@@ -71,7 +103,6 @@ const PUBLIC_IMAGES: Partial<Record<string, string>> = {
   "t-birne": "armut.png",
   "t-choc-birne": "armut.png",
   "t-ceviz": "ceviz.png",
-  "t-kuru-domates": "web-Pastera-Menü-Getrocknete Tomaten.png",
   "t-gorgonzola": "gorgonzola.png",
   "t-rosmarin": "rozmarin.png",
   "t-passion-fruit": "passion.png",
@@ -89,11 +120,12 @@ const PUBLIC_IMAGES: Partial<Record<string, string>> = {
 };
 
 export function menuPhotoForId(id: string): string {
-  const std = STD_PASTA_IMAGES[id];
+  const resolved = PHOTO_ID_ALIAS[id] ?? id;
+  const std = STD_PASTA_IMAGES[resolved];
   if (std) return `/${std.normalize("NFC")}`;
-  const pub = PUBLIC_IMAGES[id];
+  const pub = PUBLIC_IMAGES[resolved];
   if (pub) return `/${pub.normalize("NFC")}`;
-  const suf = ID_SUFFIX[id];
+  const suf = ID_SUFFIX[resolved];
   if (!suf) return "";
   return pathFromSuffix(suf);
 }

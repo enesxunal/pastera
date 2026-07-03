@@ -7,6 +7,7 @@ export const CATALOG_NAME_TR: Record<string, string> = {
   "noodle-black": "Klasik",
   "noodle-chocolate": "Çikolatalı makarna",
   "menu-kendin-yap": "Kendin yap",
+  "menu-kendin-yap-vegan": "Vegan kendin yap",
   "s-tomatensauce": "Domates sosu",
   "s-domates-vegan": "Domates",
   "s-bolognese": "Bolognese",

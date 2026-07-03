@@ -11,9 +11,7 @@ export const PASTERA_EMAIL_COLORS = {
 
 export const PASTERA_INSTAGRAM_URL = "https://www.instagram.com/pastera.official/";
 
-export const PASTERA_GOOGLE_REVIEW_URL =
-  process.env.PASTERA_GOOGLE_REVIEW_URL?.trim() ||
-  "https://share.google/oM2PvWB3FpOcxjQHt";
+export { PASTERA_GOOGLE_REVIEW_URL } from "@/lib/pastera-links";
 
 export function pasteraLogoUrl(siteUrl: string): string {
   return `${siteUrl.replace(/\/+$/, "")}/pastera-Logo-beyaz.png`;

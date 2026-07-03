@@ -1,4 +1,5 @@
 import { menuPhotoForId } from "@/lib/menu-photo-map";
+import { menuDemoImage } from "@/lib/menu-placeholders";
 
 export type MenuItem = {
   id: string;
@@ -10,12 +11,15 @@ export type MenuItem = {
 };
 
 const img = (id: string): string => menuPhotoForId(id);
+const ph = (name: string): string => menuDemoImage(name);
 
 export const PASTA_BASE = 6.9;
 export const VEGAN_PASTA_BASE = 7.9;
 
-/** Kendin yap — tuzlu makarna (oluşturucu) */
-export const BUILDER_PASTAS: MenuItem[] = [
+export type BuilderMode = "classic" | "vegan";
+
+/** Kendin yap — klasik (yumurtalı) */
+export const BUILDER_PASTAS_CLASSIC: MenuItem[] = [
   {
     id: "noodle-classic",
     name: "Pasta all'Uovo",
@@ -30,6 +34,10 @@ export const BUILDER_PASTAS: MenuItem[] = [
     vegan: false,
     image: img("pasta-vegan"),
   },
+];
+
+/** Kendin yap — vegan */
+export const BUILDER_PASTAS_VEGAN: MenuItem[] = [
   {
     id: "noodle-vegan",
     name: "Vegane Klassik Pasta",
@@ -45,6 +53,21 @@ export const BUILDER_PASTAS: MenuItem[] = [
     image: img("pasta-vegan"),
   },
 ];
+
+/** Tüm builder hamurları (sepet / katalog uyumu) */
+export const BUILDER_PASTAS: MenuItem[] = [...BUILDER_PASTAS_CLASSIC, ...BUILDER_PASTAS_VEGAN];
+
+export function builderPastasForMode(mode: BuilderMode): MenuItem[] {
+  return mode === "vegan" ? BUILDER_PASTAS_VEGAN : BUILDER_PASTAS_CLASSIC;
+}
+
+export function defaultPastaIdForMode(mode: BuilderMode): string {
+  return builderPastasForMode(mode)[0].id;
+}
+
+export function isVeganBuilderPasta(pastaId: string): boolean {
+  return BUILDER_PASTAS_VEGAN.some((p) => p.id === pastaId);
+}
 
 /** Tatlı — çikolatalı makarna (ayrı kendin yap) */
 export const CHOCOLATE_PASTA: MenuItem = {
@@ -74,10 +97,10 @@ export function isChocolatePasta(pastaId: string): boolean {
   return normalizePastaId(pastaId) === "noodle-chocolate";
 }
 
-export function normalizeBuilderPastaId(raw: string): string {
+export function normalizeBuilderPastaId(raw: string, mode: BuilderMode = "classic"): string {
   if (BUILDER_PASTAS.some((p) => p.id === raw)) return raw;
   if (LEGACY_PASTA_MAP[raw]) return LEGACY_PASTA_MAP[raw];
-  return BUILDER_PASTAS[0].id;
+  return defaultPastaIdForMode(mode);
 }
 
 export function normalizePastaId(raw: string): string {
@@ -91,14 +114,14 @@ export const SAUCES_CLASSIC: MenuItem[] = [
   { id: "s-pesto", name: "Pesto", price: 1.5, vegan: false, image: img("s-pesto") },
   { id: "s-arrabbiata", name: "Arrabbiata", price: 1.5, vegan: true, image: img("s-arrabbiata") },
   { id: "s-bolognese", name: "Bolognese", price: 2.0, vegan: false, image: img("s-bolognese") },
-  { id: "s-trueffel", name: "Trüffelsoße", price: 2.5, vegan: false, image: "" },
+  { id: "s-trueffel", name: "Trüffelsoße", price: 2.5, vegan: false, image: img("s-sahnesauce") || ph("Trüffelsoße") },
 ];
 
 export const SAUCES_VEGAN: MenuItem[] = [
   { id: "s-domates-vegan", name: "Tomatensauce", price: 1.5, vegan: true, image: img("s-vegane-tomatensauce") },
   { id: "s-arrabbiata", name: "Arrabbiata", price: 1.5, vegan: true, image: img("s-arrabbiata") },
   { id: "s-vegan-pesto", name: "Veganes Pesto", price: 2.0, vegan: true, image: img("s-veganes-pesto") },
-  { id: "s-vegan-trueffel", name: "Vegane Trüffelsoße", price: 3.0, vegan: true, image: "" },
+  { id: "s-vegan-trueffel", name: "Vegane Trüffelsoße", price: 3.0, vegan: true, image: img("s-vegane-sahnesauce") || ph("Vegane Trüffelsoße") },
 ];
 
 export const SAUCES: MenuItem[] = [
@@ -109,7 +132,7 @@ export const SAUCES: MenuItem[] = [
 /** 3 — Ana toppingler */
 export const TOPPINGS_MAIN: MenuItem[] = [
   { id: "t-julienne-haehnchen", name: "Hähnchen", price: 2.5, vegan: false, image: img("sp-haehnchen-mariniert") },
-  { id: "t-pastrami", name: "Pastrami", price: 2.5, vegan: false, image: "" },
+  { id: "t-pastrami", name: "Pastrami", price: 2.5, vegan: false, image: img("sp-rind-mariniert") || ph("Pastrami") },
   { id: "t-julienne-rind", name: "Rindfleisch", price: 3.5, vegan: false, image: img("sp-rind-mariniert") },
   { id: "t-jumbo-garnelen", name: "Jumbo-Garnelen", price: 3.5, vegan: false, image: img("sp-schwarze-garnelen") },
   { id: "t-tenders", name: "Chicken Tenders", price: 3.5, vegan: false, image: img("t-tenders") },
@@ -138,7 +161,7 @@ export const TOPPINGS_EXTRA: MenuItem[] = [
   { id: "t-pinienkerne", name: "Pinienkerne", price: 1.5, vegan: true, image: img("t-pinienkerne") },
   { id: "t-extra-parmesan", name: "Extra Parmesan", price: 1.5, vegan: false, image: img("t-extra-parmesan") },
   { id: "t-kuru-domates", name: "Getrocknete Tomaten", price: 1.5, vegan: true, image: img("t-getrocknete-tomaten") },
-  { id: "t-badem", name: "Geröstete Mandeln", price: 1.5, vegan: true, image: "" },
+  { id: "t-badem", name: "Geröstete Mandeln", price: 1.5, vegan: true, image: img("t-kaju") || ph("Mandeln") },
 ];
 
 /** Çikolatalı makarna — soslar */
@@ -247,11 +270,11 @@ export const SUPPEN: MenuItem[] = [];
 export const VORSPEISEN: MenuItem[] = [];
 /** İçecekler — Almanya'da yaygın seçenekler (fiyatlar sonra güncellenebilir) */
 export const DRINKS: MenuItem[] = [
-  { id: "dr-pastera-zitrone", name: "Pastera Limonade Zitrone", price: 3.5, vegan: true, image: "" },
-  { id: "dr-fritz-kola", name: "fritz-kola Original", price: 3.5, vegan: true, image: "" },
-  { id: "dr-fritz-zero", name: "fritz-kola Super Zero", price: 3.5, vegan: true, image: "" },
-  { id: "dr-fritz-mischmasch", name: "fritz-kola Mischmasch", price: 3.5, vegan: true, image: "" },
-  { id: "dr-fritz-orange", name: "fritz-limo Orange", price: 3.5, vegan: true, image: "" },
+  { id: "dr-pastera-zitrone", name: "Pastera Limonade Zitrone", price: 3.5, vegan: true, image: ph("Limonade") },
+  { id: "dr-fritz-kola", name: "fritz-kola Original", price: 3.5, vegan: true, image: ph("fritz-kola") },
+  { id: "dr-fritz-zero", name: "fritz-kola Super Zero", price: 3.5, vegan: true, image: ph("fritz-kola Zero") },
+  { id: "dr-fritz-mischmasch", name: "fritz-kola Mischmasch", price: 3.5, vegan: true, image: ph("Mischmasch") },
+  { id: "dr-fritz-orange", name: "fritz-limo Orange", price: 3.5, vegan: true, image: ph("Orange Limo") },
 ];
 
 /** Kendin yap — soslar makarna çeşidine göre değişmez */
