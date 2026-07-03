@@ -20,14 +20,25 @@ export type PasteraLinkItem = {
   tel?: boolean;
 };
 
-export const PASTERA_BIOLINK_ITEMS: PasteraLinkItem[] = [
+/** Sosyal medya — QR sayfasında üstte, belirgin */
+export const PASTERA_SOCIAL_ITEMS: PasteraLinkItem[] = [
+  { id: "instagram", href: PASTERA_INSTAGRAM_URL, external: true },
+  { id: "facebook", href: PASTERA_FACEBOOK_URL, external: true },
+  { id: "tiktok", href: PASTERA_TIKTOK_URL, external: true },
+];
+
+/** Menü, sipariş, iletişim */
+export const PASTERA_ACTION_ITEMS: PasteraLinkItem[] = [
   { id: "website", href: PASTERA_WEBSITE_URL, external: true },
   { id: "menu", href: `${PASTERA_WEBSITE_URL}/menu`, external: true },
   { id: "builder", href: `${PASTERA_WEBSITE_URL}/builder`, external: true },
   { id: "builderVegan", href: `${PASTERA_WEBSITE_URL}/builder/vegan`, external: true },
   { id: "phone", href: `tel:${PASTERA_PHONE_TEL}`, tel: true },
   { id: "google", href: PASTERA_GOOGLE_REVIEW_URL, external: true },
-  { id: "instagram", href: PASTERA_INSTAGRAM_URL, external: true },
-  { id: "facebook", href: PASTERA_FACEBOOK_URL, external: true },
-  { id: "tiktok", href: PASTERA_TIKTOK_URL, external: true },
+];
+
+/** @deprecated PASTERA_ACTION_ITEMS + PASTERA_SOCIAL_ITEMS kullanın */
+export const PASTERA_BIOLINK_ITEMS: PasteraLinkItem[] = [
+  ...PASTERA_SOCIAL_ITEMS,
+  ...PASTERA_ACTION_ITEMS,
 ];

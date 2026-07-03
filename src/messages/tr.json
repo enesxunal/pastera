@@ -526,6 +526,9 @@
     "kicker": "Pastera",
     "title": "Her şey tek yerde",
     "intro": "Menü, sipariş, sosyal medya ve iletişim — gitmek istediğin yeri seç.",
+    "socialTitle": "Bizi takip et",
+    "socialHint": "Yenilikler, videolar ve daha fazlası",
+    "actionsTitle": "Sipariş & iletişim",
     "links": {
       "website": "Web sitesi",
       "menu": "Menü",
