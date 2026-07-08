@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { useI18n } from "@/components/providers/I18nProvider";
+import { isDeliveryEnabled } from "@/lib/delivery-enabled";
 import { savePickupContext } from "@/lib/pickup-context";
 
 type BranchOption = { id: string; slug: string; name: string };
@@ -13,6 +14,7 @@ export function PickupEntryClient() {
   const { t } = useI18n();
   const router = useRouter();
   const { user } = useAuth();
+  const deliveryEnabled = isDeliveryEnabled();
   const [branches, setBranches] = useState<BranchOption[]>([]);
   const [branchId, setBranchId] = useState("");
   const [name, setName] = useState("");
@@ -118,9 +120,11 @@ export function PickupEntryClient() {
           {t("pickup.continue")}
         </button>
       </form>
-      <Link href="/lieferung" className="mt-6 block text-center text-sm text-white/40 hover:text-[#c49746]">
-        {t("pickup.orDelivery")}
-      </Link>
+      {deliveryEnabled ? (
+        <Link href="/lieferung" className="mt-6 block text-center text-sm text-white/40 hover:text-[#c49746]">
+          {t("pickup.orDelivery")}
+        </Link>
+      ) : null}
     </div>
   );
 }

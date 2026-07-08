@@ -43,8 +43,8 @@
     "payCash": "Nakit",
     "payCard": "Kredi kartı",
     "payPayPal": "PayPal",
-    "paymentTestHint": "Bar: ödeme teslimatta veya alırken.",
-    "paymentMixedHint": "Bar teslimatta; PayPal ile şimdi online ödeyebilirsin (kart da PayPal üzerinden).",
+    "paymentTestHint": "Nakit: ödeme restorandan alırken.",
+    "paymentMixedHint": "Nakit alırken; PayPal ile şimdi online ödeyebilirsin (kart da PayPal üzerinden).",
     "paymentPayPalHint": "PayPal ile güvenli online ödeme — onayladıktan sonra sipariş mutfağa gider.",
     "paypalFailed": "PayPal ödemesi tamamlanamadı. Lütfen tekrar dene veya başka ödeme seç.",
     "paypalCancelled": "PayPal ödemesi iptal edildi.",
@@ -60,6 +60,7 @@
     "needOrderContext": "Eve teslimat veya gel-al seçin ve bilgileri tamamlayın.",
     "orderModeTitle": "Nasıl almak istersiniz?",
     "modeDelivery": "Eve teslimat",
+    "deliveryPausedHint": "Eve teslimat geçici olarak kapalı — lütfen gel-al seçin.",
     "modePickup": "Restorandan gel-al",
     "pickupBranchLabel": "Şube",
     "pickupSave": "Gel-al ile devam et",
@@ -201,6 +202,7 @@
     "ctaBuilder": "Makarna oluştur",
     "ctaMenu": "Menü",
     "ctaDelivery": "Eve sipariş",
+    "ctaPickup": "Gel al",
     "productsHeading": "Ürünlerimiz",
     "productsAllLink": "Tümünü gör →",
     "productsSub": "Menünün bir bölümü; tam listesi Menü sayfasında.",
@@ -325,14 +327,19 @@
     "submit": "Adresi kontrol et ve menüye git",
     "banner": "Teslimat",
     "menu": "Menü",
-    "change": "Adresi değiştir"
+    "change": "Adresi değiştir",
+    "pausedKicker": "Geçici",
+    "pausedTitle": "Eve teslimat şu an kapalı",
+    "pausedBody": "Paket servisi geçici olarak durduruldu. Siparişinizi restorandan gel-al ile verebilirsiniz.",
+    "pausedCta": "Gel-al’a git"
   },
   "success": {
     "title": "Sipariş alındı",
     "orderNo": "No",
     "bodyDineIn": "Siparişin mutfağa iletildi. Lütfen masanda bekle.",
     "bodyDelivery": "Teslimat siparişin alındı. Hazırlıyoruz.",
-    "bodyWeb": "Teşekkürler! Bu hâlâ ödeme olmayan bir demo.",
+    "bodyPickup": "Gel-al siparişin alındı. Hazırlıyoruz — yakında restorandan teslim alabilirsin.",
+    "bodyWeb": "Teşekkürler! Siparişin alındı.",
     "demoNote": "Supabase yoksa kayıt tutulmaz.",
     "ctaMenu": "Menüye dön",
     "ctaHome": "Ana sayfa"
@@ -542,9 +549,10 @@
     }
   },
   "footer": {
-    "tagline": "Taze makarna, çorbalar ve daha fazlası — restoranda veya eve teslimat.",
+    "tagline": "Taze makarna, çorbalar ve daha fazlası — restorandan gel-al.",
     "explore": "Keşfet",
     "delivery": "Eve sipariş",
+    "pickup": "Gel al",
     "account": "Hesap",
     "myAccount": "Hesabım",
     "rights": "Tüm hakları saklıdır."

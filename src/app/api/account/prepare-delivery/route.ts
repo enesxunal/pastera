@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getAuthenticatedUserId } from "@/lib/auth-server";
+import { isDeliveryEnabled } from "@/lib/delivery-enabled";
 import { geocodeAddress } from "@/lib/geocode";
 import { checkDeliveryForAddress } from "@/lib/nearest-branch";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
@@ -7,6 +8,10 @@ import { isSupabaseConfigured } from "@/lib/supabase/is-configured";
 
 /** Kayıtlı varsayılan adres + şube ataması (yeniden sipariş / sepet için) */
 export async function POST() {
+  if (!isDeliveryEnabled()) {
+    return NextResponse.json({ ok: false, error: "delivery_disabled" }, { status: 503 });
+  }
+
   if (!isSupabaseConfigured()) {
     return NextResponse.json({ ok: false, error: "not_configured" }, { status: 503 });
   }

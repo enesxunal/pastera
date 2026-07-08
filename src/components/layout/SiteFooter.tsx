@@ -3,10 +3,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useI18n } from "@/components/providers/I18nProvider";
+import { isDeliveryEnabled } from "@/lib/delivery-enabled";
 
 export function SiteFooter() {
   const { t } = useI18n();
   const year = new Date().getFullYear();
+  const deliveryEnabled = isDeliveryEnabled();
 
   return (
     <footer className="relative z-10 mt-auto border-t border-[#2e402a] bg-matte/95">
@@ -43,8 +45,11 @@ export function SiteFooter() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/lieferung" className="flex min-h-11 items-center hover:text-white">
-                    {t("footer.delivery")}
+                  <Link
+                    href={deliveryEnabled ? "/lieferung" : "/abholung"}
+                    className="flex min-h-11 items-center hover:text-white"
+                  >
+                    {deliveryEnabled ? t("footer.delivery") : t("footer.pickup")}
                   </Link>
                 </li>
               </ul>

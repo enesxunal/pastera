@@ -13,6 +13,7 @@ import { applyDeliverySession } from "@/lib/apply-delivery-session";
 import { OrderDetailPanel } from "@/components/orders/OrderDetailPanel";
 import { formatOrderNumber } from "@/lib/order-display";
 import { formatPcoin } from "@/lib/format-pcoin";
+import { isDeliveryEnabled } from "@/lib/delivery-enabled";
 import type { OrderRow } from "@/lib/order-types";
 
 type Profile = {
@@ -36,6 +37,7 @@ export function AccountClient() {
   const router = useRouter();
   const { user, loading, configured, signOut } = useAuth();
   const supabasePublic = useSupabasePublicConfig();
+  const deliveryEnabled = isDeliveryEnabled();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [orders, setOrders] = useState<OrderSummary[]>([]);
   const [activeOrder, setActiveOrder] = useState<OrderSummary | null>(null);
@@ -83,6 +85,10 @@ export function AccountClient() {
   }, [loadData]);
 
   async function orderAgain() {
+    if (!deliveryEnabled) {
+      router.push("/abholung");
+      return;
+    }
     const res = await fetch("/api/account/prepare-delivery", {
       method: "POST",
       credentials: "include",
@@ -190,10 +196,15 @@ export function AccountClient() {
         <h2 className="font-display text-lg font-bold text-[#c49746]">{t("account.addressesTitle")}</h2>
         {addresses.length === 0 ? (
           <p className="mt-3 text-sm text-white/45">
-            {t("account.noAddresses")}{" "}
-            <Link href="/lieferung" className="text-[#c49746] underline">
-              {t("account.addAddressLink")}
-            </Link>
+            {t("account.noAddresses")}
+            {deliveryEnabled ? (
+              <>
+                {" "}
+                <Link href="/lieferung" className="text-[#c49746] underline">
+                  {t("account.addAddressLink")}
+                </Link>
+              </>
+            ) : null}
           </p>
         ) : (
           <ul className="mt-4 space-y-3">

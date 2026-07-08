@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { geocodeAddress } from "@/lib/geocode";
+import { isDeliveryEnabled } from "@/lib/delivery-enabled";
 import { checkDeliveryForAddress } from "@/lib/nearest-branch";
 import { getBranchBySlug } from "@/lib/branches-server";
 import { haversineKm, roundKm } from "@/lib/geo";
@@ -14,6 +15,10 @@ type Body = {
 };
 
 export async function POST(request: Request) {
+  if (!isDeliveryEnabled()) {
+    return NextResponse.json({ ok: false, error: "delivery_disabled" }, { status: 503 });
+  }
+
   let body: Body;
   try {
     body = (await request.json()) as Body;

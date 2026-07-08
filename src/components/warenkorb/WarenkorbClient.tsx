@@ -24,6 +24,7 @@ import {
 } from "@/lib/activate-saved-address";
 import { loadDeliveryContact, saveDeliveryContact } from "@/lib/delivery-contact";
 import { loadDeliveryContext, clearDeliveryContext } from "@/lib/delivery-context";
+import { isDeliveryEnabled } from "@/lib/delivery-enabled";
 import { loadDineInContext } from "@/lib/dine-in-context";
 import { loadPickupContext, savePickupContext, clearPickupContext } from "@/lib/pickup-context";
 import type { PaymentType } from "@/lib/order-types";
@@ -35,9 +36,11 @@ import {
   PayPalCheckoutButtons,
 } from "@/components/warenkorb/PayPalCheckoutButtons";
 import type { SubmitOrderPayload } from "@/lib/submit-order";
+import { isVeganBuilderPasta } from "@/lib/menu-data";
 
 type BranchOption = { id: string; slug: string; name: string };
 const paypalEnabled = isPayPalEnabled();
+const deliveryEnabled = isDeliveryEnabled();
 
 export function WarenkorbClient() {
   const router = useRouter();
@@ -52,7 +55,9 @@ export function WarenkorbClient() {
   const [phoneInput, setPhoneInput] = useState("");
   const [checkoutErr, setCheckoutErr] = useState("");
   const [paymentType, setPaymentType] = useState<PaymentType>("cash");
-  const [modeTab, setModeTab] = useState<"delivery" | "pickup">("delivery");
+  const [modeTab, setModeTab] = useState<"delivery" | "pickup">(
+    deliveryEnabled ? "delivery" : "pickup",
+  );
   const [branches, setBranches] = useState<BranchOption[]>([]);
   const [pickupBranchId, setPickupBranchId] = useState("");
   const [pickupName, setPickupName] = useState("");
@@ -123,6 +128,11 @@ export function WarenkorbClient() {
   useEffect(() => {
     if (!mounted) return;
     if (loadDineInContext()) return;
+    if (!deliveryEnabled) {
+      if (loadDeliveryContext()) clearDeliveryContext();
+      setModeTab("pickup");
+      return;
+    }
     if (loadDeliveryContext()) setModeTab("delivery");
     else if (loadPickupContext()) setModeTab("pickup");
   }, [mounted, deliveryReady]);
@@ -404,9 +414,12 @@ export function WarenkorbClient() {
             <div className="divide-y divide-[#2e402a]/60">
               {bowls.map((bowl, bowlIndex) => {
                 const detailLines = bowl.bowlLines.slice(1);
+                const rawBowl = cart?.bowls.find((b) => b.id === bowl.id);
                 const editHref = bowl.isChocolate
                   ? `/builder/chocolate?edit=1&bowl=${encodeURIComponent(bowl.id)}`
-                  : `/builder?edit=1&bowl=${encodeURIComponent(bowl.id)}`;
+                  : rawBowl && isVeganBuilderPasta(rawBowl.pastaId)
+                    ? `/builder/vegan?edit=1&bowl=${encodeURIComponent(bowl.id)}`
+                    : `/builder?edit=1&bowl=${encodeURIComponent(bowl.id)}`;
                 return (
                   <div key={bowl.id} className="p-5 sm:p-6">
                     <div className="flex items-start justify-between gap-3">
@@ -548,32 +561,38 @@ export function WarenkorbClient() {
                 <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-white/45">
                   {t("cart.orderModeTitle")}
                 </p>
-                <div className="mb-5 grid grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => switchToDeliveryTab()}
-                    className={`min-h-11 rounded-xl px-3 py-2.5 text-sm font-bold ${
-                      modeTab === "delivery"
-                        ? "bg-[#c49746] text-[#0a0a0a]"
-                        : "border border-[#2e402a] text-white/60 hover:border-[#c49746]/40"
-                    }`}
-                  >
-                    {t("cart.modeDelivery")}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => switchToPickupTab()}
-                    className={`min-h-11 rounded-xl px-3 py-2.5 text-sm font-bold ${
-                      modeTab === "pickup"
-                        ? "bg-[#c49746] text-[#0a0a0a]"
-                        : "border border-[#2e402a] text-white/60 hover:border-[#c49746]/40"
-                    }`}
-                  >
-                    {t("cart.modePickup")}
-                  </button>
-                </div>
+                {deliveryEnabled ? (
+                  <div className="mb-5 grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => switchToDeliveryTab()}
+                      className={`min-h-11 rounded-xl px-3 py-2.5 text-sm font-bold ${
+                        modeTab === "delivery"
+                          ? "bg-[#c49746] text-[#0a0a0a]"
+                          : "border border-[#2e402a] text-white/60 hover:border-[#c49746]/40"
+                      }`}
+                    >
+                      {t("cart.modeDelivery")}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => switchToPickupTab()}
+                      className={`min-h-11 rounded-xl px-3 py-2.5 text-sm font-bold ${
+                        modeTab === "pickup"
+                          ? "bg-[#c49746] text-[#0a0a0a]"
+                          : "border border-[#2e402a] text-white/60 hover:border-[#c49746]/40"
+                      }`}
+                    >
+                      {t("cart.modePickup")}
+                    </button>
+                  </div>
+                ) : (
+                  <p className="mb-5 rounded-xl border border-[#c49746]/25 bg-[#c49746]/10 px-4 py-3 text-sm text-[#c49746]">
+                    {t("cart.deliveryPausedHint")}
+                  </p>
+                )}
 
-                {modeTab === "delivery" ? (
+                {deliveryEnabled && modeTab === "delivery" ? (
                   <div className="mb-5">
                     {delivery ? (
                       <div className="rounded-xl border-2 border-[#c49746]/50 bg-[#c49746]/10 p-4">

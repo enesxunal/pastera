@@ -2,6 +2,7 @@ import { getAuthenticatedUserId } from "@/lib/auth-server";
 import { upsertCustomerAddress } from "@/lib/customer-addresses";
 import { allocateBranchDisplayNumber } from "@/lib/allocate-branch-display-number";
 import { getBranchById } from "@/lib/branches-server";
+import { isDeliveryEnabled } from "@/lib/delivery-enabled";
 import { findNearestDeliveringBranch } from "@/lib/nearest-branch";
 import { haversineKm, roundKm } from "@/lib/geo";
 import type { OrderType } from "@/lib/order-types";
@@ -78,6 +79,10 @@ export async function submitOrder(body: SubmitOrderPayload): Promise<SubmitOrder
 
   if (orderType === "web") {
     return { ok: false, error: "delivery_required" };
+  }
+
+  if (orderType === "delivery" && !isDeliveryEnabled()) {
+    return { ok: false, error: "delivery_disabled" };
   }
 
   let branchId = await resolveBranchId(body.branchId, body.branchSlug);

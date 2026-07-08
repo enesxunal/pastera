@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getAuthenticatedUserId } from "@/lib/auth-server";
+import { isDeliveryEnabled } from "@/lib/delivery-enabled";
 import { geocodeAddress } from "@/lib/geocode";
 import { checkDeliveryForAddress } from "@/lib/nearest-branch";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
@@ -15,6 +16,10 @@ type Body = {
 };
 
 export async function POST(request: Request) {
+  if (!isDeliveryEnabled()) {
+    return NextResponse.json({ ok: false, error: "delivery_disabled" }, { status: 503 });
+  }
+
   if (!isSupabaseConfigured()) {
     return NextResponse.json({ ok: false, error: "not_configured" }, { status: 503 });
   }

@@ -43,8 +43,8 @@
     "payCash": "Bar",
     "payCard": "Kreditkarte",
     "payPayPal": "PayPal",
-    "paymentTestHint": "Bar: Zahlung bei Lieferung oder Abholung.",
-    "paymentMixedHint": "Bar bei Lieferung; mit PayPal sofort online bezahlen (Karte auch über PayPal).",
+    "paymentTestHint": "Bar: Zahlung bei Abholung im Restaurant.",
+    "paymentMixedHint": "Bar bei Abholung; mit PayPal sofort online bezahlen (Karte auch über PayPal).",
     "paymentPayPalHint": "Sichere Online-Zahlung mit PayPal — danach geht die Bestellung in die Küche.",
     "paypalFailed": "PayPal-Zahlung fehlgeschlagen. Bitte erneut versuchen oder andere Zahlungsart wählen.",
     "paypalCancelled": "PayPal-Zahlung abgebrochen.",
@@ -60,6 +60,7 @@
     "needOrderContext": "Bitte Lieferung oder Abholung wählen und ausfüllen.",
     "orderModeTitle": "Wie möchtest du bestellen?",
     "modeDelivery": "Nach Hause liefern",
+    "deliveryPausedHint": "Lieferung ist vorübergehend pausiert — bitte Abholung wählen.",
     "modePickup": "Im Restaurant abholen",
     "pickupBranchLabel": "Filiale",
     "pickupSave": "Mit Abholung fortfahren",
@@ -201,6 +202,7 @@
     "ctaBuilder": "Pasta zusammenstellen",
     "ctaMenu": "Speisekarte",
     "ctaDelivery": "Lieferung",
+    "ctaPickup": "Abholung",
     "productsHeading": "Unsere Gerichte",
     "productsAllLink": "Alles anzeigen →",
     "productsSub": "Auszug aus der Karte – vollständige Liste unter Speisekarte.",
@@ -325,14 +327,19 @@
     "submit": "Adresse prüfen & Menü öffnen",
     "banner": "Lieferung an",
     "menu": "Menü",
-    "change": "Adresse ändern"
+    "change": "Adresse ändern",
+    "pausedKicker": "Vorübergehend",
+    "pausedTitle": "Lieferung gerade nicht möglich",
+    "pausedBody": "Die Lieferung ist vorübergehend pausiert. Du kannst deine Bestellung zur Abholung im Restaurant aufgeben.",
+    "pausedCta": "Zur Abholung"
   },
   "success": {
     "title": "Bestellung eingegangen",
     "orderNo": "Nr.",
     "bodyDineIn": "Deine Bestellung wurde an die Küche gesendet. Bitte warte am Tisch.",
     "bodyDelivery": "Deine Lieferbestellung ist eingegangen. Wir bereiten sie vor.",
-    "bodyWeb": "Vielen Dank! Dies ist noch eine Demo ohne echte Zahlung.",
+    "bodyPickup": "Deine Abholbestellung ist eingegangen. Wir bereiten sie vor — du kannst sie bald in der Filiale abholen.",
+    "bodyWeb": "Vielen Dank! Deine Bestellung ist eingegangen.",
     "demoNote": "Ohne Supabase wird nichts gespeichert.",
     "ctaMenu": "Zur Speisekarte",
     "ctaHome": "Zur Startseite"
@@ -542,9 +549,10 @@
     }
   },
   "footer": {
-    "tagline": "Frische Pasta, Suppen und mehr – vor Ort oder zur Lieferung.",
+    "tagline": "Frische Pasta, Suppen und mehr – Abholung im Restaurant.",
     "explore": "Entdecken",
     "delivery": "Lieferung",
+    "pickup": "Abholung",
     "account": "Konto",
     "myAccount": "Mein Konto",
     "rights": "Alle Rechte vorbehalten."

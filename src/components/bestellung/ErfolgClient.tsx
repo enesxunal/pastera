@@ -6,12 +6,13 @@ import { useEffect, useState } from "react";
 import { useI18n } from "@/components/providers/I18nProvider";
 import { clearDeliveryContext, loadDeliveryContext } from "@/lib/delivery-context";
 import { loadDineInContext } from "@/lib/dine-in-context";
+import { clearPickupContext, loadPickupContext } from "@/lib/pickup-context";
 
 export function ErfolgClient() {
   const { t } = useI18n();
   const searchParams = useSearchParams();
   const [orderId, setOrderId] = useState<string | null>(null);
-  const [mode, setMode] = useState<"dine_in" | "delivery" | "web">("web");
+  const [mode, setMode] = useState<"dine_in" | "delivery" | "pickup" | "web">("pickup");
 
   useEffect(() => {
     const fromUrl = searchParams.get("id");
@@ -22,9 +23,21 @@ export function ErfolgClient() {
     else if (loadDeliveryContext()) {
       setMode("delivery");
       clearDeliveryContext();
-    } else setMode("web");
+    } else if (loadPickupContext()) {
+      setMode("pickup");
+      clearPickupContext();
+    } else {
+      setMode("pickup");
+    }
     if (fromStorage) sessionStorage.removeItem("pastera-order-short-id");
   }, [searchParams]);
+
+  const body =
+    mode === "dine_in"
+      ? t("success.bodyDineIn")
+      : mode === "delivery"
+        ? t("success.bodyDelivery")
+        : t("success.bodyPickup");
 
   return (
     <div className="mx-auto max-w-xl px-4 py-20 text-center sm:px-6">
@@ -40,16 +53,7 @@ export function ErfolgClient() {
           {t("success.orderNo")} {orderId}
         </p>
       ) : null}
-      <p className="mt-4 text-white/60">
-        {mode === "dine_in"
-          ? t("success.bodyDineIn")
-          : mode === "delivery"
-            ? t("success.bodyDelivery")
-            : t("success.bodyWeb")}
-      </p>
-      {mode === "web" ? (
-        <p className="mt-2 text-xs text-white/40">{t("success.demoNote")}</p>
-      ) : null}
+      <p className="mt-4 text-white/60">{body}</p>
       <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:justify-center">
         <Link
           href="/menu"
