@@ -91,7 +91,7 @@
   "menuHub": {
     "title": "Menü",
     "badge": "Menü",
-    "intro": "Kendin yap veya hazır makarna seç. Tatlılar ve çikolatalı makarna ayrı bölümde.",
+    "intro": "Kendin yap veya hazır makarna seç. Sos ve toppinglerle pastanı oluştur.",
     "open": "Listeyi aç →"
   },
   "builder": {
@@ -198,7 +198,7 @@
     "kicker": "Pastera",
     "title1": "El emeği.",
     "titleAccent": "Sıcak servis.",
-    "leadShort": "Makarna çeşidini seç, sos ve topping ekle — veya standart tabak ve tatlı sipariş et.",
+    "leadShort": "Makarna çeşidini seç, sos ve topping ekle — veya hazır tabak sipariş et.",
     "ctaBuilder": "Makarna oluştur",
     "ctaMenu": "Menü",
     "ctaDelivery": "Eve sipariş",

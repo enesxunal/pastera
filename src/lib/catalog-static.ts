@@ -4,7 +4,6 @@ import {
   DRINKS,
   PASTAS,
   SAUCES,
-  SAUCES_CHOCOLATE,
   STANDARD_PASTAS,
   TOPPINGS,
 } from "@/lib/menu-data";
@@ -25,13 +24,14 @@ function mapItems(items: MenuItem[], category: CatalogCategory, start: number): 
   }));
 }
 
-/** Fallback-Katalog aus dem Code (wenn DB leer oder nicht konfiguriert). */
+/** Fallback-Katalog aus dem Code (wenn DB leer oder nicht konfiguriert).
+ *  Tatlı / çikolatalı makarna şimdilik menü dışı. */
 export function getStaticCatalog(): CatalogItem[] {
   const out: CatalogItem[] = [];
   let o = 0;
   const blocks: { items: MenuItem[]; cat: CatalogCategory }[] = [
     { items: PASTAS, cat: "pasta_base" },
-    { items: [...SAUCES, ...SAUCES_CHOCOLATE], cat: "sauce" },
+    { items: SAUCES, cat: "sauce" },
     { items: TOPPINGS, cat: "topping" },
     { items: STANDARD_PASTAS, cat: "chef_special" },
     { items: DRINKS, cat: "drink" },

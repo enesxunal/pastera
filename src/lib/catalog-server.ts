@@ -44,6 +44,8 @@ export async function getCatalogFromDb(branchId?: string | null): Promise<Catalo
     let items = filterToCurrentMenu(
       data.map((r) => mapRow(r as Parameters<typeof mapRow>[0])),
     );
+    // Tatlı / çikolata şimdilik müşteri menüsünde yok
+    items = items.filter((i) => i.category !== "dessert" && !i.id.startsWith("d-") && i.id !== "noodle-chocolate");
     if (!items.length) return getStaticCatalog();
     if (branchId) {
       const overrides = await getBranchPriceOverrides(branchId);

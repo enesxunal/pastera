@@ -1,20 +1,6 @@
-import dynamic from "next/dynamic";
+import { redirect } from "next/navigation";
 
-const ChocolateBuilder = dynamic(
-  () =>
-    import("@/components/pasta-builder/ChocolateBuilder").then((m) => ({
-      default: m.ChocolateBuilder,
-    })),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="mx-auto max-w-6xl px-4 py-20 text-center text-white/50">
-        Yükleniyor …
-      </div>
-    ),
-  },
-);
-
+/** Çikolatalı makarna şimdilik menü dışı — ileride tekrar açılabilir */
 export default function ChocolateBuilderPage() {
-  return <ChocolateBuilder />;
+  redirect("/menu");
 }

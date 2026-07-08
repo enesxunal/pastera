@@ -260,10 +260,10 @@ export const CHEF_SPECIALS_VEGAN: MenuItem[] = [];
 export const SPECIALS: MenuItem[] = [];
 export const SAUCEN_KLASSISCH = SAUCES.filter((s) => !s.vegan);
 export const SAUCEN_VEGAN = SAUCES.filter((s) => s.vegan);
+/** Tuzlu menü toppingleri — çikolata meyveleri şimdilik menü dışı */
 export const TOPPINGS: MenuItem[] = [
   ...TOPPINGS_MAIN,
   ...TOPPINGS_EXTRA,
-  ...TOPPINGS_CHOCOLATE_FRUITS,
 ];
 export const INGREDIENTS = TOPPINGS;
 export const SUPPEN: MenuItem[] = [];

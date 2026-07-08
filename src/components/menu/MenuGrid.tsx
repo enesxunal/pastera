@@ -159,9 +159,7 @@ export function MenuGrid({
               ? t("menu.buildYourOwnHint")
               : item.id === MENU_KENDIN_YAP_VEGAN_ID
                 ? t("menu.buildYourOwnVeganHint")
-                : item.id === "noodle-chocolate"
-                  ? t("menu.subChocolatePastaHint")
-                  : undefined;
+                : undefined;
         const showAdd = itemCanAddCart(item);
         const showBuilder = itemIsBuilder(item);
         const priceText =

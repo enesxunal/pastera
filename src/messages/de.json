@@ -91,7 +91,7 @@
   "menuHub": {
     "title": "Speisekarte",
     "badge": "Speisekarte",
-    "intro": "Pastasorte 6,90 € — Sauce & Topping dazu. Standard-Gerichte und Desserts mit Festpreis.",
+    "intro": "Pastasorte wählen — Sauce & Topping dazu. Oder fertige Gerichte mit Festpreis.",
     "open": "Liste öffnen →"
   },
   "builder": {
@@ -198,7 +198,7 @@
     "kicker": "Pastera",
     "title1": "Handgemacht.",
     "titleAccent": "Heiß serviert.",
-    "leadShort": "Pastasorte wählen, Sauce & Topping — oder Standard-Gerichte und Desserts bestellen.",
+    "leadShort": "Pastasorte wählen, Sauce & Topping hinzufügen — oder fertige Gerichte bestellen.",
     "ctaBuilder": "Pasta zusammenstellen",
     "ctaMenu": "Speisekarte",
     "ctaDelivery": "Lieferung",
