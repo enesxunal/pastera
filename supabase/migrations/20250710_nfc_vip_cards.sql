@@ -20,7 +20,11 @@ create index if not exists nfc_cards_card_code_idx on public.nfc_cards (card_cod
 
 alter table public.nfc_cards enable row level security;
 
--- Örnek test kartı (NFC link: /c/kart-001)
+-- Örnek test kartları (NFC: /c/kart-001 …)
 insert into public.nfc_cards (card_code, tier, status)
-values ('kart-001', 'black', 'unassigned')
+values
+  ('kart-001', 'black', 'unassigned'),
+  ('kart-002', 'gold', 'unassigned'),
+  ('kart-003', 'gold', 'unassigned'),
+  ('kart-004', 'black', 'unassigned')
 on conflict (card_code) do nothing;

@@ -3,45 +3,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { useI18n } from "@/components/providers/I18nProvider";
 import { formatPcoin } from "@/lib/format-pcoin";
-import type { MembershipTier } from "@/lib/membership";
-
-type CardPayload =
-  | { ok: false; error: string }
-  | { ok: true; view: "revoked"; cardCode: string }
-  | { ok: true; view: "unassigned" | "admin_unassigned"; cardCode: string; cardTier: "gold" | "black" }
-  | {
-      ok: true;
-      view: "public";
-      cardCode: string;
-      cardTier: "gold" | "black";
-      displayName: string;
-    }
-  | {
-      ok: true;
-      view: "owner";
-      cardCode: string;
-      cardTier: "gold" | "black";
-      fullName: string | null;
-      membershipTier: MembershipTier;
-      discountPercent: number;
-      loyaltyPoints: number;
-    }
-  | {
-      ok: true;
-      view: "admin";
-      cardCode: string;
-      cardTier: "gold" | "black";
-      cardStatus: string;
-      member: {
-        id: string;
-        fullName: string | null;
-        email: string | null;
-        phone: string | null;
-        loyaltyPoints: number;
-        membershipTier: MembershipTier;
-        discountPercent: number;
-      };
-    };
+import type { CardScanPayload } from "@/lib/card-scan-server";
 
 function tierStyles(tier: "gold" | "black") {
   if (tier === "black") {
@@ -91,33 +53,18 @@ function VipCardShell({
   );
 }
 
-export function CardScanClient({ code }: { code: string }) {
+function CardView({ data }: { data: CardScanPayload }) {
   const { t } = useI18n();
-  const [data, setData] = useState<CardPayload | null>(null);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    void fetch(`/api/cards/${encodeURIComponent(code)}`, { credentials: "include" })
-      .then(async (r) => {
-        const j = (await r.json()) as CardPayload;
-        setData(j);
-      })
-      .catch(() => setData({ ok: false, error: "network" }))
-      .finally(() => setLoading(false));
-  }, [code]);
-
-  if (loading) {
-    return (
-      <div className="flex min-h-[70vh] items-center justify-center text-white/50">
-        {t("membership.loading")}
-      </div>
-    );
-  }
-
-  if (!data || !data.ok) {
+  if (!data.ok) {
     return (
       <div className="mx-auto max-w-md px-4 py-20 text-center">
-        <p className="text-white/60">{t("membership.notFound")}</p>
+        <p className="font-display text-xl font-bold text-white">
+          {data.error === "db_setup" ? t("membership.dbSetupTitle") : t("membership.notFound")}
+        </p>
+        {data.error === "db_setup" ? (
+          <p className="mt-3 text-sm text-white/50">{t("membership.dbSetupHint")}</p>
+        ) : null}
       </div>
     );
   }
@@ -198,7 +145,9 @@ export function CardScanClient({ code }: { code: string }) {
       <div className="mx-auto max-w-md px-4 py-16">
         <VipCardShell tier={data.cardTier}>
           <p className="text-xs font-bold uppercase tracking-[0.28em] text-white/40">PASTERA</p>
-          <span className={`mt-4 inline-block rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider ${s.badge}`}>
+          <span
+            className={`mt-4 inline-block rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider ${s.badge}`}
+          >
             {s.label}
           </span>
           <p className="mt-8 font-display text-3xl font-bold text-white">
@@ -208,9 +157,7 @@ export function CardScanClient({ code }: { code: string }) {
             {t("membership.yourDiscount")}:{" "}
             <span className="font-bold text-[#c49746]">{data.discountPercent}%</span>
           </p>
-          <p className="mt-2 text-sm text-white/45">
-            {formatPcoin(data.loyaltyPoints)} P Coin
-          </p>
+          <p className="mt-2 text-sm text-white/45">{formatPcoin(data.loyaltyPoints)} P Coin</p>
         </VipCardShell>
         <p className="mt-8 text-center text-xs text-white/35">{t("membership.ownerHint")}</p>
       </div>
@@ -236,4 +183,42 @@ export function CardScanClient({ code }: { code: string }) {
   }
 
   return null;
+}
+
+export function CardScanClient({
+  code,
+  initial,
+}: {
+  code: string;
+  initial?: CardScanPayload;
+}) {
+  const { t } = useI18n();
+  const [data, setData] = useState<CardScanPayload | null>(initial ?? null);
+  const [loading, setLoading] = useState(!initial);
+
+  useEffect(() => {
+    if (initial) return;
+    void fetch(`/api/cards/${encodeURIComponent(code)}`, { credentials: "include" })
+      .then(async (r) => setData((await r.json()) as CardScanPayload))
+      .catch(() => setData({ ok: false, error: "network" }))
+      .finally(() => setLoading(false));
+  }, [code, initial]);
+
+  if (loading) {
+    return (
+      <div className="flex min-h-[70vh] items-center justify-center text-white/50">
+        {t("membership.loading")}
+      </div>
+    );
+  }
+
+  if (!data) {
+    return (
+      <div className="mx-auto max-w-md px-4 py-20 text-center">
+        <p className="text-white/60">{t("membership.notFound")}</p>
+      </div>
+    );
+  }
+
+  return <CardView data={data} />;
 }

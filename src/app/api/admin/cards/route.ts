@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { isAdminRequest } from "@/lib/admin-auth";
-import { normalizeCardCode, type NfcCardTier } from "@/lib/membership";
+import { ensureDefaultNfcCards } from "@/lib/card-scan-server";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 
 function isAdmin(req: NextRequest) {
@@ -13,12 +13,16 @@ export async function GET(req: NextRequest) {
   const svc = createSupabaseServiceClient();
   if (!svc) return NextResponse.json({ ok: false, error: "no_service" }, { status: 503 });
 
+  await ensureDefaultNfcCards();
+
   const { data: cards, error } = await svc
     .from("nfc_cards")
     .select("id, card_code, tier, status, user_id, assigned_at, created_at")
-    .order("created_at", { ascending: true });
+    .order("card_code", { ascending: true });
 
-  if (error) return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
+  if (error) {
+    return NextResponse.json({ ok: false, error: error.message, needsMigration: true }, { status: 500 });
+  }
 
   const userIds = Array.from(
     new Set((cards ?? []).map((c) => c.user_id).filter(Boolean)),
@@ -40,42 +44,4 @@ export async function GET(req: NextRequest) {
       scanUrl: `${siteUrl}/c/${c.card_code}`,
     })),
   });
-}
-
-export async function POST(req: NextRequest) {
-  if (!isAdmin(req)) return NextResponse.json({ ok: false }, { status: 401 });
-
-  let body: { cardCode?: string; tier?: NfcCardTier };
-  try {
-    body = (await req.json()) as typeof body;
-  } catch {
-    return NextResponse.json({ ok: false, error: "invalid_json" }, { status: 400 });
-  }
-
-  const cardCode = normalizeCardCode(body.cardCode ?? "");
-  const tier = body.tier;
-  if (!cardCode) {
-    return NextResponse.json({ ok: false, error: "card_code_required" }, { status: 400 });
-  }
-  if (tier !== "gold" && tier !== "black") {
-    return NextResponse.json({ ok: false, error: "invalid_tier" }, { status: 400 });
-  }
-
-  const svc = createSupabaseServiceClient();
-  if (!svc) return NextResponse.json({ ok: false, error: "no_service" }, { status: 503 });
-
-  const { data, error } = await svc
-    .from("nfc_cards")
-    .insert({ card_code: cardCode, tier, status: "unassigned" })
-    .select("id, card_code, tier, status")
-    .single();
-
-  if (error) {
-    if (error.code === "23505") {
-      return NextResponse.json({ ok: false, error: "duplicate_code" }, { status: 409 });
-    }
-    return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
-  }
-
-  return NextResponse.json({ ok: true, card: data });
 }
