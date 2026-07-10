@@ -15,7 +15,7 @@ export async function GET() {
 
   const { data: profile } = await svc
     .from("profiles")
-    .select("full_name, phone, email, loyalty_points")
+    .select("full_name, phone, email, loyalty_points, membership_tier")
     .eq("id", userId)
     .maybeSingle();
 
@@ -26,6 +26,7 @@ export async function GET() {
       phone: profile?.phone ?? null,
       email: profile?.email ?? authData.user?.email ?? null,
       loyalty_points: Number(profile?.loyalty_points ?? 0),
+      membership_tier: profile?.membership_tier ?? "standard",
     },
   });
 }

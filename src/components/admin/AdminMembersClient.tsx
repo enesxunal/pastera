@@ -7,6 +7,7 @@ import { AdminNav } from "@/components/admin/AdminNav";
 import { useI18n } from "@/components/providers/I18nProvider";
 import { formatEur } from "@/lib/format";
 import { formatPcoin } from "@/lib/format-pcoin";
+import { discountForTier, type MembershipTier } from "@/lib/membership";
 
 type MemberRow = {
   id: string;
@@ -14,12 +15,14 @@ type MemberRow = {
   full_name: string | null;
   phone: string | null;
   loyalty_points: number;
+  membership_tier: MembershipTier;
   created_at: string;
   orderCount: number;
   deliveredCount: number;
   totalSpent: number;
   branches: { id: string; name: string }[];
   lastOrder: string | null;
+  nfc_card: { card_code: string; tier: string } | null;
 };
 
 type Summary = {
@@ -35,6 +38,7 @@ export function AdminMembersClient() {
   const [summary, setSummary] = useState<Summary | null>(null);
   const [search, setSearch] = useState("");
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [tierBusy, setTierBusy] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     const res = await fetch("/api/admin/members");
@@ -50,6 +54,17 @@ export function AdminMembersClient() {
   useEffect(() => {
     void load();
   }, [load]);
+
+  async function changeTier(memberId: string, tier: MembershipTier) {
+    setTierBusy(memberId);
+    await fetch(`/api/admin/members/${memberId}/membership`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ tier }),
+    });
+    setTierBusy(null);
+    void load();
+  }
 
   const q = search.trim().toLowerCase();
   const filtered = q
@@ -97,6 +112,9 @@ export function AdminMembersClient() {
                 <div className="flex flex-wrap justify-between gap-2">
                   <p className="font-semibold text-white">{m.full_name?.trim() || m.email || "—"}</p>
                   <p className="text-sm text-[#c49746]">
+                    {m.membership_tier !== "standard" ? (
+                      <span className="mr-2 uppercase">{m.membership_tier} VIP</span>
+                    ) : null}
                     {m.orderCount} {t("branchDetail.ordersCount")} · {formatEur(m.totalSpent)}
                   </p>
                 </div>
@@ -108,7 +126,35 @@ export function AdminMembersClient() {
                   <p>
                     {t("auth.pointsLabel")}: {formatPcoin(m.loyalty_points)} P Coin
                   </p>
-                  <p className="mt-1">
+                  <div className="mt-3">
+                    <label className="block text-xs uppercase tracking-widest text-white/45">
+                      {t("admin.membershipTier")}
+                      <select
+                        value={m.membership_tier}
+                        disabled={tierBusy === m.id}
+                        onChange={(e) => void changeTier(m.id, e.target.value as MembershipTier)}
+                        className="mt-1 block w-full max-w-xs rounded-lg border border-[#2e402a] bg-[#0a0a0a] px-3 py-2 text-sm text-white"
+                      >
+                        <option value="standard">{t("membership.standardTitle")}</option>
+                        <option value="gold">{t("membership.goldTitle")}</option>
+                        <option value="black">{t("membership.blackTitle")}</option>
+                      </select>
+                    </label>
+                    {m.membership_tier !== "standard" ? (
+                      <p className="mt-2 text-xs text-[#c49746]">
+                        {t("membership.discount")}: {discountForTier(m.membership_tier)}%
+                      </p>
+                    ) : null}
+                    {m.nfc_card ? (
+                      <p className="mt-2 text-xs text-white/45">
+                        NFC:{" "}
+                        <a href={`/c/${m.nfc_card.card_code}`} className="text-[#c49746] underline">
+                          {m.nfc_card.card_code}
+                        </a>
+                      </p>
+                    ) : null}
+                  </div>
+                  <p className="mt-3">
                     {t("admin.membersDelivered")}: {m.deliveredCount}
                   </p>
                   <p className="mt-1">

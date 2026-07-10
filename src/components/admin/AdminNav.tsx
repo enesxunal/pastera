@@ -10,6 +10,7 @@ const links = [
   { href: "/admin/catalog", key: "admin.navCatalog" },
   { href: "/admin/orders", key: "admin.navOrders" },
   { href: "/admin/members", key: "admin.navMembers" },
+  { href: "/admin/cards", key: "admin.navCards" },
 ] as const;
 
 export function AdminNav() {

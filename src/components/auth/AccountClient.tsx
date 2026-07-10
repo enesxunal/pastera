@@ -16,9 +16,12 @@ import { formatPcoin } from "@/lib/format-pcoin";
 import { isDeliveryEnabled } from "@/lib/delivery-enabled";
 import type { OrderRow } from "@/lib/order-types";
 
+import { discountForTier, isVipTier, membershipLabelKey, type MembershipTier } from "@/lib/membership";
+
 type Profile = {
   full_name: string | null;
   loyalty_points: number;
+  membership_tier: MembershipTier;
 };
 
 type OrderSummary = OrderRow;
@@ -51,12 +54,18 @@ export function AccountClient() {
     try {
       const supabase = createSupabaseBrowserClient(supabasePublic);
       const [profileRes, ordersRes, addrRes] = await Promise.all([
-        supabase.from("profiles").select("full_name, loyalty_points").eq("id", user.id).maybeSingle(),
+        supabase.from("profiles").select("full_name, loyalty_points, membership_tier").eq("id", user.id).maybeSingle(),
         fetch("/api/orders/me", { credentials: "include" }),
         fetch("/api/account/addresses", { credentials: "include" }),
       ]);
 
-      if (profileRes.data) setProfile(profileRes.data as Profile);
+      if (profileRes.data) {
+        const row = profileRes.data as Profile;
+        setProfile({
+          ...row,
+          membership_tier: (row.membership_tier ?? "standard") as MembershipTier,
+        });
+      }
 
       const ordersJson = (await ordersRes.json()) as {
         orders?: OrderSummary[];
@@ -163,6 +172,31 @@ export function AccountClient() {
       <h1 className="font-display text-3xl font-bold text-white">{t("auth.accountTitle")}</h1>
       <p className="mt-2 text-white/60">{name}</p>
       <p className="text-sm text-white/40">{user.email}</p>
+
+      {profile && isVipTier(profile.membership_tier) ? (
+        <div
+          className={`mt-6 overflow-hidden rounded-2xl border-2 p-6 ${
+            profile.membership_tier === "black"
+              ? "border-white/15 bg-gradient-to-br from-[#0a0a0a] to-[#141414]"
+              : "border-[#c49746]/40 bg-gradient-to-br from-[#1a1408] to-[#0f0c06]"
+          }`}
+        >
+          <p className="text-xs font-bold uppercase tracking-[0.25em] text-white/40">PASTERA</p>
+          <p
+            className={`mt-2 font-display text-lg font-bold ${
+              profile.membership_tier === "black" ? "text-white" : "text-[#e8c872]"
+            }`}
+          >
+            {t(membershipLabelKey(profile.membership_tier))}
+          </p>
+          <p className="mt-3 text-sm text-white/60">
+            {t("membership.yourDiscount")}:{" "}
+            <span className="font-bold text-[#c49746]">
+              {discountForTier(profile.membership_tier)}%
+            </span>
+          </p>
+        </div>
+      ) : null}
 
       <div className="mt-8 grid gap-4 sm:grid-cols-2">
         <div className="rounded-2xl border border-[#2e402a] bg-[#111] p-6">

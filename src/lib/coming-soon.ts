@@ -9,6 +9,7 @@ export const COMING_SOON_BYPASS_PREFIXES = [
   "/display",
   "/lobby",
   "/connect",
+  "/c",
   "/api",
 ] as const;
 

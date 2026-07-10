@@ -11,10 +11,15 @@ export async function GET(req: NextRequest) {
   const svc = createSupabaseServiceClient();
   if (!svc) return NextResponse.json({ ok: false, error: "no_service" }, { status: 503 });
 
-  const [{ data: profiles }, { data: orders }, { data: branches }] = await Promise.all([
+  const [
+    profilesResult,
+    { data: orders },
+    { data: branches },
+    cardsResult,
+  ] = await Promise.all([
     svc
       .from("profiles")
-      .select("id, email, full_name, phone, loyalty_points, role, created_at")
+      .select("id, email, full_name, phone, loyalty_points, role, membership_tier, created_at")
       .order("created_at", { ascending: false })
       .limit(5000),
     svc
@@ -23,9 +28,28 @@ export async function GET(req: NextRequest) {
       .order("created_at", { ascending: false })
       .limit(5000),
     svc.from("branches").select("id, name"),
+    svc.from("nfc_cards").select("card_code, tier, user_id, status").eq("status", "active"),
   ]);
 
+  let profiles = profilesResult.data;
+  if (profilesResult.error) {
+    const fallback = await svc
+      .from("profiles")
+      .select("id, email, full_name, phone, loyalty_points, role, created_at")
+      .order("created_at", { ascending: false })
+      .limit(5000);
+    if (fallback.error) {
+      return NextResponse.json({ ok: false, error: fallback.error.message }, { status: 500 });
+    }
+    profiles = fallback.data?.map((p) => ({ ...p, membership_tier: "standard" })) ?? null;
+  }
+
+  const nfcCards = cardsResult.error ? [] : (cardsResult.data ?? []);
+
   const branchNames = new Map((branches ?? []).map((b) => [b.id, b.name]));
+  const cardByUser = new Map(
+    (nfcCards ?? []).filter((c) => c.user_id).map((c) => [c.user_id as string, c]),
+  );
 
   const members = (profiles ?? []).map((p) => {
     const phone = p.phone?.trim() ?? "";
@@ -44,8 +68,10 @@ export async function GET(req: NextRequest) {
       full_name: p.full_name,
       phone: p.phone,
       loyalty_points: Number(p.loyalty_points ?? 0),
+      membership_tier: p.membership_tier ?? "standard",
       role: p.role,
       created_at: p.created_at,
+      nfc_card: cardByUser.get(p.id) ?? null,
       orderCount: related.length,
       deliveredCount: delivered.length,
       totalSpent: delivered.reduce((s, o) => s + Number(o.total_amount ?? 0), 0),
