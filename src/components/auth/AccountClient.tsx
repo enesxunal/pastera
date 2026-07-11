@@ -14,6 +14,7 @@ import { OrderDetailPanel } from "@/components/orders/OrderDetailPanel";
 import { formatOrderNumber } from "@/lib/order-display";
 import { formatPcoin } from "@/lib/format-pcoin";
 import { isDeliveryEnabled } from "@/lib/delivery-enabled";
+import { isOnlineOrderingEnabled } from "@/lib/online-ordering-enabled";
 import type { OrderRow } from "@/lib/order-types";
 
 import { discountForTier, isVipTier, membershipLabelKey, type MembershipTier } from "@/lib/membership";
@@ -41,6 +42,7 @@ export function AccountClient() {
   const { user, loading, configured, signOut } = useAuth();
   const supabasePublic = useSupabasePublicConfig();
   const deliveryEnabled = isDeliveryEnabled();
+  const orderingEnabled = isOnlineOrderingEnabled();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [orders, setOrders] = useState<OrderSummary[]>([]);
   const [activeOrder, setActiveOrder] = useState<OrderSummary | null>(null);
@@ -94,6 +96,10 @@ export function AccountClient() {
   }, [loadData]);
 
   async function orderAgain() {
+    if (!orderingEnabled) {
+      router.push("/menu");
+      return;
+    }
     if (!deliveryEnabled) {
       router.push("/abholung");
       return;
@@ -318,14 +324,16 @@ export function AccountClient() {
       </section>
 
       <div className="mt-10 flex flex-wrap gap-3">
-        <button
-          type="button"
-          onClick={() => void orderAgain()}
-          className="rounded-full px-6 py-2.5 font-display text-sm font-bold text-[#0a0a0a]"
-          style={{ backgroundColor: "#c49746" }}
-        >
-          {t("account.orderAgain")}
-        </button>
+        {orderingEnabled ? (
+          <button
+            type="button"
+            onClick={() => void orderAgain()}
+            className="rounded-full px-6 py-2.5 font-display text-sm font-bold text-[#0a0a0a]"
+            style={{ backgroundColor: "#c49746" }}
+          >
+            {t("account.orderAgain")}
+          </button>
+        ) : null}
         <Link
           href="/menu"
           className="rounded-full border border-[#2e402a] px-6 py-2.5 text-sm text-white/70"

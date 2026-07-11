@@ -1,9 +1,11 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { MasaEntryClient } from "@/components/dine-in/MasaEntryClient";
+import { OnlineOrderingPausedClient } from "@/components/ordering/OnlineOrderingPausedClient";
 import type { SupportedLocale } from "@/lib/cart";
 import { getBranchBySlug } from "@/lib/branches-server";
 import { message } from "@/lib/i18n";
+import { isOnlineOrderingEnabled } from "@/lib/online-ordering-enabled";
 
 type Props = {
   params: { branchSlug: string; table: string };
@@ -21,6 +23,10 @@ export default async function MasaEntryPage({ params }: Props) {
         <p className="text-white/60">{message(locale, "common.branchNotFound")}</p>
       </div>
     );
+  }
+
+  if (!isOnlineOrderingEnabled()) {
+    return <OnlineOrderingPausedClient />;
   }
 
   return (

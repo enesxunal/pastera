@@ -11,10 +11,12 @@ import { useI18n } from "@/components/providers/I18nProvider";
 import { catalogByCategory } from "@/lib/catalog-static";
 import { pageIntro } from "@/lib/motion-variants";
 import { isDeliveryEnabled } from "@/lib/delivery-enabled";
+import { isOnlineOrderingEnabled } from "@/lib/online-ordering-enabled";
 
 const BANNER_IMAGES = ["/pastera.jpg", "/pastera-vegan.jpg"] as const;
 const BANNER_ROTATE_MS = 10_000;
 const deliveryEnabled = isDeliveryEnabled();
+const orderingEnabled = isOnlineOrderingEnabled();
 
 export function HomePageClient() {
   const { t, locale } = useI18n();
@@ -85,12 +87,14 @@ export function HomePageClient() {
               >
                 {t("home.ctaMenu")}
               </Link>
-              <Link
-                href={deliveryEnabled ? "/lieferung" : "/abholung"}
-                className="inline-flex min-h-[2.75rem] items-center justify-center rounded-full border border-[#c49746]/50 bg-black/30 px-6 text-sm font-semibold text-[#c49746] backdrop-blur-sm transition hover:bg-black/45"
-              >
-                {deliveryEnabled ? t("home.ctaDelivery") : t("home.ctaPickup")}
-              </Link>
+              {orderingEnabled ? (
+                <Link
+                  href={deliveryEnabled ? "/lieferung" : "/abholung"}
+                  className="inline-flex min-h-[2.75rem] items-center justify-center rounded-full border border-[#c49746]/50 bg-black/30 px-6 text-sm font-semibold text-[#c49746] backdrop-blur-sm transition hover:bg-black/45"
+                >
+                  {deliveryEnabled ? t("home.ctaDelivery") : t("home.ctaPickup")}
+                </Link>
+              ) : null}
               <Link
                 href="/builder"
                 className="inline-flex min-h-[2.75rem] items-center justify-center rounded-full border border-white/25 bg-black/30 px-6 text-sm font-semibold text-white backdrop-blur-sm transition hover:border-[#c49746]/50 hover:bg-black/45"

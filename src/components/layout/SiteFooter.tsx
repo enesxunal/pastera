@@ -4,11 +4,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { useI18n } from "@/components/providers/I18nProvider";
 import { isDeliveryEnabled } from "@/lib/delivery-enabled";
+import { isOnlineOrderingEnabled } from "@/lib/online-ordering-enabled";
 
 export function SiteFooter() {
   const { t } = useI18n();
   const year = new Date().getFullYear();
   const deliveryEnabled = isDeliveryEnabled();
+  const orderingEnabled = isOnlineOrderingEnabled();
 
   return (
     <footer className="relative z-10 mt-auto border-t border-[#2e402a] bg-matte/95">
@@ -45,12 +47,16 @@ export function SiteFooter() {
                   </Link>
                 </li>
                 <li>
-                  <Link
-                    href={deliveryEnabled ? "/lieferung" : "/abholung"}
-                    className="flex min-h-11 items-center hover:text-white"
-                  >
-                    {deliveryEnabled ? t("footer.delivery") : t("footer.pickup")}
-                  </Link>
+                  {orderingEnabled ? (
+                    <Link
+                      href={deliveryEnabled ? "/lieferung" : "/abholung"}
+                      className="flex min-h-11 items-center hover:text-white"
+                    >
+                      {deliveryEnabled ? t("footer.delivery") : t("footer.pickup")}
+                    </Link>
+                  ) : (
+                    <span className="flex min-h-11 items-center text-white/35">{t("ordering.pausedTitle")}</span>
+                  )}
                 </li>
               </ul>
             </div>

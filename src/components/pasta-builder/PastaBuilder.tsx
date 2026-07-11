@@ -21,7 +21,10 @@ import { formatEur } from "@/lib/format";
 import { menuItemLabel } from "@/lib/menu-i18n";
 import { MobileActionBar } from "@/components/layout/MobileActionBar";
 import { MenuPickCard } from "@/components/menu/MenuPickCard";
+import { isOnlineOrderingEnabled } from "@/lib/online-ordering-enabled";
 import { PastaBox } from "./PastaBox";
+
+const orderingEnabled = isOnlineOrderingEnabled();
 
 function toggleId(ids: string[], id: string): string[] {
   return ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id];
@@ -138,6 +141,10 @@ export function PastaBuilder({ mode = "classic" }: { mode?: BuilderMode }) {
 
   function goToWarenkorb() {
     setCartErr("");
+    if (!orderingEnabled) {
+      setCartErr(t("ordering.pausedBody"));
+      return;
+    }
     const bowlPayload = {
       pastaId,
       sauceIds,

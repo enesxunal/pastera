@@ -1,9 +1,13 @@
 import { NextResponse } from "next/server";
 import { submitOrder, type SubmitOrderPayload } from "@/lib/submit-order";
+import { isOnlineOrderingEnabled } from "@/lib/online-ordering-enabled";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(request: Request) {
+  if (!isOnlineOrderingEnabled()) {
+    return NextResponse.json({ ok: false, error: "ordering_disabled" }, { status: 503 });
+  }
   let body: SubmitOrderPayload;
   try {
     body = (await request.json()) as SubmitOrderPayload;

@@ -333,6 +333,12 @@
     "pausedBody": "Die Lieferung ist vorübergehend pausiert. Du kannst deine Bestellung zur Abholung im Restaurant aufgeben.",
     "pausedCta": "Zur Abholung"
   },
+  "ordering": {
+    "pausedKicker": "Vorübergehend",
+    "pausedTitle": "Online-Bestellung pausiert",
+    "pausedBody": "Bestellungen über die Website sind vorübergehend nicht möglich. Bitte bestelle vor Ort im Restaurant — wir melden uns, sobald der Online-Service wieder startet.",
+    "pausedCta": "Speisekarte ansehen"
+  },
   "success": {
     "title": "Bestellung eingegangen",
     "orderNo": "Nr.",

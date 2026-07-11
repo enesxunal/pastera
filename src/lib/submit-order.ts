@@ -3,6 +3,7 @@ import { upsertCustomerAddress } from "@/lib/customer-addresses";
 import { allocateBranchDisplayNumber } from "@/lib/allocate-branch-display-number";
 import { getBranchById } from "@/lib/branches-server";
 import { isDeliveryEnabled } from "@/lib/delivery-enabled";
+import { isOnlineOrderingEnabled } from "@/lib/online-ordering-enabled";
 import { findNearestDeliveringBranch } from "@/lib/nearest-branch";
 import { haversineKm, roundKm } from "@/lib/geo";
 import type { OrderType } from "@/lib/order-types";
@@ -64,6 +65,10 @@ async function resolveBranchId(
 }
 
 export async function submitOrder(body: SubmitOrderPayload): Promise<SubmitOrderResult> {
+  if (!isOnlineOrderingEnabled()) {
+    return { ok: false, error: "ordering_disabled" };
+  }
+
   if (!isSupabaseConfigured()) {
     return { ok: false, error: "database_unavailable" };
   }

@@ -333,6 +333,12 @@
     "pausedBody": "Paket servisi geçici olarak durduruldu. Siparişinizi restorandan gel-al ile verebilirsiniz.",
     "pausedCta": "Gel-al’a git"
   },
+  "ordering": {
+    "pausedKicker": "Geçici olarak",
+    "pausedTitle": "Online sipariş kapalı",
+    "pausedBody": "Web sitesinden şu an sipariş verilemiyor. Lütfen restoranda sipariş ver — online servis tekrar açılınca haber vereceğiz.",
+    "pausedCta": "Menüyü gör"
+  },
   "success": {
     "title": "Sipariş alındı",
     "orderNo": "No",
