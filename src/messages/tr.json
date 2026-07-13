@@ -585,10 +585,7 @@
     }
   },
   "qrMenu": {
-    "title": "Menü",
-    "hint": "Kaydırarak sayfalar arasında gez — veya PDF aç / indir.",
-    "openPdf": "PDF aç",
-    "download": "İndir"
+    "title": "Menü"
   },
   "footer": {
     "tagline": "Taze makarna, çorbalar ve daha fazlası — restorandan gel-al.",

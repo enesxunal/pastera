@@ -585,10 +585,7 @@
     }
   },
   "qrMenu": {
-    "title": "Speisekarte",
-    "hint": "Wische zum Blättern — oder PDF öffnen / herunterladen.",
-    "openPdf": "PDF öffnen",
-    "download": "Download"
+    "title": "Speisekarte"
   },
   "footer": {
     "tagline": "Frische Pasta, Suppen und mehr – Abholung im Restaurant.",
