@@ -7,7 +7,7 @@ import { DeliveryBanner } from "@/components/delivery/DeliveryBanner";
 import { DineInBanner } from "@/components/dine-in/DineInBanner";
 import { isDeliveryEnabled } from "@/lib/delivery-enabled";
 
-const HIDE_PREFIXES = ["/display", "/branch", "/admin", "/lobby", "/connect", "/c"];
+const HIDE_PREFIXES = ["/display", "/branch", "/admin", "/lobby", "/connect", "/qr-menu", "/c"];
 
 export function ConditionalChrome({ hidden = false }: { hidden?: boolean }) {
   const pathname = usePathname();

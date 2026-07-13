@@ -58,6 +58,7 @@ const SOCIAL_STYLES: Record<
 const ACTION_ICONS: Record<string, string> = {
   website: "🌐",
   menu: "🍝",
+  qrMenu: "📋",
   builder: "✨",
   builderVegan: "🌱",
   phone: "📞",

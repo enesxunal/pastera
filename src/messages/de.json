@@ -574,6 +574,7 @@
     "links": {
       "website": "Website",
       "menu": "Speisekarte",
+      "qrMenu": "QR-Speisekarte (PDF)",
       "builder": "Pasta zusammenstellen",
       "builderVegan": "Vegane Pasta zusammenstellen",
       "phone": "Anrufen",
@@ -582,6 +583,12 @@
       "facebook": "Facebook",
       "tiktok": "TikTok"
     }
+  },
+  "qrMenu": {
+    "title": "Speisekarte",
+    "hint": "Wische zum Blättern — oder PDF öffnen / herunterladen.",
+    "openPdf": "PDF öffnen",
+    "download": "Download"
   },
   "footer": {
     "tagline": "Frische Pasta, Suppen und mehr – Abholung im Restaurant.",

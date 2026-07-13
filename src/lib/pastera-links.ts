@@ -32,6 +32,7 @@ export const PASTERA_SOCIAL_ITEMS: PasteraLinkItem[] = [
 export const PASTERA_ACTION_ITEMS: PasteraLinkItem[] = [
   { id: "website", href: PASTERA_WEBSITE_URL, external: true },
   { id: "menu", href: `${PASTERA_WEBSITE_URL}/menu`, external: true },
+  { id: "qrMenu", href: `${PASTERA_WEBSITE_URL}/qr-menu`, external: true },
   { id: "builder", href: `${PASTERA_WEBSITE_URL}/builder`, external: true },
   { id: "builderVegan", href: `${PASTERA_WEBSITE_URL}/builder/vegan`, external: true },
   { id: "phone", href: `tel:${PASTERA_PHONE_TEL}`, tel: true },

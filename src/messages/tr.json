@@ -574,6 +574,7 @@
     "links": {
       "website": "Web sitesi",
       "menu": "Menü",
+      "qrMenu": "QR menü (PDF)",
       "builder": "Kendin yap pasta",
       "builderVegan": "Vegan kendin yap",
       "phone": "Telefon",
@@ -582,6 +583,12 @@
       "facebook": "Facebook",
       "tiktok": "TikTok"
     }
+  },
+  "qrMenu": {
+    "title": "Menü",
+    "hint": "Kaydırarak sayfalar arasında gez — veya PDF aç / indir.",
+    "openPdf": "PDF aç",
+    "download": "İndir"
   },
   "footer": {
     "tagline": "Taze makarna, çorbalar ve daha fazlası — restorandan gel-al.",
