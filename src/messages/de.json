@@ -585,7 +585,9 @@
     }
   },
   "qrMenu": {
-    "title": "Speisekarte"
+    "title": "Speisekarte",
+    "loading": "Speisekarte wird geladen …",
+    "error": "Speisekarte konnte nicht geladen werden."
   },
   "footer": {
     "tagline": "Frische Pasta, Suppen und mehr – Abholung im Restaurant.",

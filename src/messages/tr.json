@@ -585,7 +585,9 @@
     }
   },
   "qrMenu": {
-    "title": "Menü"
+    "title": "Menü",
+    "loading": "Menü yükleniyor …",
+    "error": "Menü yüklenemedi."
   },
   "footer": {
     "tagline": "Taze makarna, çorbalar ve daha fazlası — restorandan gel-al.",
