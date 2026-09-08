@@ -1,4 +1,4 @@
-export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.pastera.de").replace(/\/+$/, "");
+export const SITE_URL = "https://www.pastera.de";
 
 export const PASTERA_BUSINESS = {
   name: "Pastera",
@@ -14,7 +14,11 @@ export const PASTERA_BUSINESS = {
   facebook: "https://www.facebook.com/pastera.official",
   tiktok: "https://www.tiktok.com/@pastera.official",
   openingHours: [
-    { days: ["Monday", "Tuesday", "Wednesday", "Thursday"], opens: "11:00", closes: "01:00" },
+    {
+      days: ["Monday", "Tuesday", "Wednesday", "Thursday"],
+      opens: "11:00",
+      closes: "01:00",
+    },
     { days: ["Friday", "Saturday"], opens: "11:00", closes: "04:00" },
     { days: ["Sunday"], opens: "12:00", closes: "01:00" },
   ],

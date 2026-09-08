@@ -5,6 +5,6 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false, nocache: true },
 };
 
-export default function PrivateLayout({ children }: { children: ReactNode }) {
+export default function NoIndexLayout({ children }: { children: ReactNode }) {
   return <>{children}</>;
 }

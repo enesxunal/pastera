@@ -4,7 +4,10 @@ import { DM_Sans, Syne } from "next/font/google";
 import { cookies } from "next/headers";
 import "./globals.css";
 import { AppProviders } from "@/components/providers/AppProviders";
-import { ConditionalChrome, ConditionalFooter } from "@/components/layout/ConditionalChrome";
+import {
+  ConditionalChrome,
+  ConditionalFooter,
+} from "@/components/layout/ConditionalChrome";
 import { isComingSoonEnabled } from "@/lib/coming-soon";
 import type { SupportedLocale } from "@/lib/cart";
 import { PASTERA_BUSINESS, SITE_URL } from "@/lib/site-info";
@@ -28,7 +31,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
     default: "Pastera – Frische Pasta in Köln-Ehrenfeld",
-    template: "%s | Pastera Köln",
+    template: "%s | Pastera",
   },
   description:
     "Pastera in Köln-Ehrenfeld: frisch zubereitete Pasta-Gerichte, Saucen, Toppings und vegane Optionen. Speisekarte online entdecken.",
@@ -62,7 +65,8 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Pastera – Frische Pasta in Köln-Ehrenfeld",
-    description: "Pasta-Restaurant in Köln-Ehrenfeld – Speisekarte und vegane Optionen entdecken.",
+    description:
+      "Pasta-Restaurant in Köln-Ehrenfeld – Speisekarte und vegane Optionen entdecken.",
     images: ["/opengraph-image.png"],
   },
   icons: {
@@ -133,7 +137,10 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(restaurantJsonLd) }}
         />
-        <AppProviders initialLocale={initialLocale} supabasePublic={supabasePublic}>
+        <AppProviders
+          initialLocale={initialLocale}
+          supabasePublic={supabasePublic}
+        >
           <div className="pastera-brand-bar" aria-hidden />
           <div className="relative flex min-h-dvh flex-col overflow-x-hidden">
             <div

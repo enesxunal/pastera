@@ -2,6 +2,7 @@
   "nav": {
     "start": "Ana sayfa",
     "menu": "Menü",
+    "blog": "Blog",
     "pasta": "Makarna",
     "cart": "Sepet",
     "menuOpen": "Menüyü aç",
@@ -240,6 +241,7 @@
     "banner": "Masadan sipariş",
     "table": "Masa",
     "menu": "Menü",
+    "blog": "Blog",
     "loading": "Masa yükleniyor…"
   },
   "display": {
@@ -327,6 +329,7 @@
     "submit": "Adresi kontrol et ve menüye git",
     "banner": "Teslimat",
     "menu": "Menü",
+    "blog": "Blog",
     "change": "Adresi değiştir",
     "pausedKicker": "Geçici",
     "pausedTitle": "Eve teslimat şu an kapalı",
@@ -574,6 +577,7 @@
     "links": {
       "website": "Web sitesi",
       "menu": "Menü",
+      "blog": "Blog",
       "qrMenu": "QR menü (PDF)",
       "builder": "Kendin yap pasta",
       "builderVegan": "Vegan kendin yap",

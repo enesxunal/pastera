@@ -13,12 +13,20 @@ const orderingEnabled = isOnlineOrderingEnabled();
 const paths = [
   { href: "/", key: "start" as const },
   { href: "/menu", key: "menu" as const },
+  { href: "/blog", key: "blog" as const },
   ...(orderingEnabled ? [{ href: "/warenkorb", key: "cart" as const }] : []),
 ];
 
 function CartIcon() {
   return (
-    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+    <svg
+      viewBox="0 0 24 24"
+      className="h-5 w-5"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      aria-hidden
+    >
       <path d="M6 6h15l-1.5 9H7.5L6 6Z" strokeLinejoin="round" />
       <path d="M6 6 5 3H2" strokeLinecap="round" />
       <circle cx="9" cy="20" r="1.5" fill="currentColor" stroke="none" />
@@ -73,33 +81,34 @@ export function SiteHeader() {
     </div>
   );
 
-  const authLinks = !loading && user ? (
-    <Link
-      href="/auth/account"
-      onClick={closeMenu}
-      className="flex min-h-11 items-center rounded-full px-4 text-sm text-[#c49746] transition hover:bg-forest/40"
-    >
-      {t("auth.myAccount")}
-    </Link>
-  ) : !loading ? (
-    <>
+  const authLinks =
+    !loading && user ? (
       <Link
-        href="/auth/login"
+        href="/auth/account"
         onClick={closeMenu}
-        className="flex min-h-11 items-center rounded-full px-4 text-sm text-white/75 transition hover:bg-forest/40 hover:text-white"
+        className="flex min-h-11 items-center rounded-full px-4 text-sm text-[#c49746] transition hover:bg-forest/40"
       >
-        {t("auth.loginLink")}
+        {t("auth.myAccount")}
       </Link>
-      <Link
-        href="/auth/register"
-        onClick={closeMenu}
-        className="flex min-h-11 items-center rounded-full px-4 text-sm font-semibold text-[#0a0a0a] transition hover:opacity-90"
-        style={{ backgroundColor: "#c49746" }}
-      >
-        {t("auth.registerLink")}
-      </Link>
-    </>
-  ) : null;
+    ) : !loading ? (
+      <>
+        <Link
+          href="/auth/login"
+          onClick={closeMenu}
+          className="flex min-h-11 items-center rounded-full px-4 text-sm text-white/75 transition hover:bg-forest/40 hover:text-white"
+        >
+          {t("auth.loginLink")}
+        </Link>
+        <Link
+          href="/auth/register"
+          onClick={closeMenu}
+          className="flex min-h-11 items-center rounded-full px-4 text-sm font-semibold text-[#0a0a0a] transition hover:opacity-90"
+          style={{ backgroundColor: "#c49746" }}
+        >
+          {t("auth.registerLink")}
+        </Link>
+      </>
+    ) : null;
 
   const mobileMenu =
     menuOpen && portalReady
@@ -148,82 +157,85 @@ export function SiteHeader() {
 
   return (
     <>
-    <header className="relative z-20 border-b border-[#2e402a] bg-matte/90 backdrop-blur-md">
-      <div
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-[#c49746]/40 to-transparent"
-        aria-hidden
-      />
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-2 px-4 sm:gap-3 sm:px-6">
-        <Link href="/" className="flex shrink-0 items-center gap-3 transition-opacity hover:opacity-90">
-          <Image
-            src="/pastera-Logo-beyaz.png"
-            alt="Pastera"
-            width={120}
-            height={36}
-            className="h-8 w-auto"
-            priority
-          />
-        </Link>
-
-        <div className="flex items-center gap-1 sm:gap-2">
-          {/* Masaüstü navigasyon */}
-          <nav className="hidden items-center gap-0.5 md:flex md:gap-1">
-            {paths.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="flex min-h-11 items-center rounded-full px-3 py-2 text-sm text-white/85 transition-colors hover:bg-forest/40 hover:text-white lg:px-4"
-              >
-                {t(`nav.${item.key}`)}
-              </Link>
-            ))}
-          </nav>
-
-          <div className="hidden items-center gap-2 border-l border-[#2e402a]/60 pl-2 md:flex">
-            {authLinks}
-          </div>
-
-          {langButtons}
-
-          {/* Mobil: sepet yalnız online sipariş açıkken görünür. */}
-          {orderingEnabled ? (
-            <Link
-              href="/warenkorb"
-              className="flex min-h-11 min-w-11 items-center justify-center rounded-full text-white/85 transition hover:bg-forest/40 md:hidden"
-              aria-label={t("nav.cartAria")}
-            >
-              <CartIcon />
-            </Link>
-          ) : null}
-
-          {/* Mobil: menü düğmesi */}
-          <button
-            type="button"
-            onClick={() => setMenuOpen((o) => !o)}
-            className="flex min-h-11 min-w-11 flex-col items-center justify-center gap-1.5 rounded-full text-white/85 transition hover:bg-forest/40 md:hidden"
-            aria-expanded={menuOpen}
-            aria-label={menuOpen ? t("nav.menuClose") : t("nav.menuOpen")}
+      <header className="relative z-20 border-b border-[#2e402a] bg-matte/90 backdrop-blur-md">
+        <div
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-[#c49746]/40 to-transparent"
+          aria-hidden
+        />
+        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-2 px-4 sm:gap-3 sm:px-6">
+          <Link
+            href="/"
+            className="flex shrink-0 items-center gap-3 transition-opacity hover:opacity-90"
           >
-            <span
-              className={`block h-0.5 w-5 rounded-full bg-current transition-transform ${
-                menuOpen ? "translate-y-2 rotate-45" : ""
-              }`}
+            <Image
+              src="/pastera-Logo-beyaz.png"
+              alt="Pastera"
+              width={120}
+              height={36}
+              className="h-8 w-auto"
+              priority
             />
-            <span
-              className={`block h-0.5 w-5 rounded-full bg-current transition-opacity ${
-                menuOpen ? "opacity-0" : ""
-              }`}
-            />
-            <span
-              className={`block h-0.5 w-5 rounded-full bg-current transition-transform ${
-                menuOpen ? "-translate-y-2 -rotate-45" : ""
-              }`}
-            />
-          </button>
+          </Link>
+
+          <div className="flex items-center gap-1 sm:gap-2">
+            {/* Masaüstü navigasyon */}
+            <nav className="hidden items-center gap-0.5 md:flex md:gap-1">
+              {paths.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="flex min-h-11 items-center rounded-full px-3 py-2 text-sm text-white/85 transition-colors hover:bg-forest/40 hover:text-white lg:px-4"
+                >
+                  {t(`nav.${item.key}`)}
+                </Link>
+              ))}
+            </nav>
+
+            <div className="hidden items-center gap-2 border-l border-[#2e402a]/60 pl-2 md:flex">
+              {authLinks}
+            </div>
+
+            {langButtons}
+
+            {/* Mobil: sepet yalnız online sipariş açıkken görünür. */}
+            {orderingEnabled ? (
+              <Link
+                href="/warenkorb"
+                className="flex min-h-11 min-w-11 items-center justify-center rounded-full text-white/85 transition hover:bg-forest/40 md:hidden"
+                aria-label={t("nav.cartAria")}
+              >
+                <CartIcon />
+              </Link>
+            ) : null}
+
+            {/* Mobil: menü düğmesi */}
+            <button
+              type="button"
+              onClick={() => setMenuOpen((o) => !o)}
+              className="flex min-h-11 min-w-11 flex-col items-center justify-center gap-1.5 rounded-full text-white/85 transition hover:bg-forest/40 md:hidden"
+              aria-expanded={menuOpen}
+              aria-label={menuOpen ? t("nav.menuClose") : t("nav.menuOpen")}
+            >
+              <span
+                className={`block h-0.5 w-5 rounded-full bg-current transition-transform ${
+                  menuOpen ? "translate-y-2 rotate-45" : ""
+                }`}
+              />
+              <span
+                className={`block h-0.5 w-5 rounded-full bg-current transition-opacity ${
+                  menuOpen ? "opacity-0" : ""
+                }`}
+              />
+              <span
+                className={`block h-0.5 w-5 rounded-full bg-current transition-transform ${
+                  menuOpen ? "-translate-y-2 -rotate-45" : ""
+                }`}
+              />
+            </button>
+          </div>
         </div>
-      </div>
-    </header>
-    {mobileMenu}
+      </header>
+      {mobileMenu}
     </>
   );
 }
