@@ -6,11 +6,14 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { useI18n } from "@/components/providers/I18nProvider";
+import { isOnlineOrderingEnabled } from "@/lib/online-ordering-enabled";
+
+const orderingEnabled = isOnlineOrderingEnabled();
 
 const paths = [
   { href: "/", key: "start" as const },
   { href: "/menu", key: "menu" as const },
-  { href: "/warenkorb", key: "cart" as const },
+  ...(orderingEnabled ? [{ href: "/warenkorb", key: "cart" as const }] : []),
 ];
 
 function CartIcon() {
@@ -182,14 +185,16 @@ export function SiteHeader() {
 
           {langButtons}
 
-          {/* Mobil: sepet ikonu */}
-          <Link
-            href="/warenkorb"
-            className="flex min-h-11 min-w-11 items-center justify-center rounded-full text-white/85 transition hover:bg-forest/40 md:hidden"
-            aria-label={t("nav.cartAria")}
-          >
-            <CartIcon />
-          </Link>
+          {/* Mobil: sepet yalnız online sipariş açıkken görünür. */}
+          {orderingEnabled ? (
+            <Link
+              href="/warenkorb"
+              className="flex min-h-11 min-w-11 items-center justify-center rounded-full text-white/85 transition hover:bg-forest/40 md:hidden"
+              aria-label={t("nav.cartAria")}
+            >
+              <CartIcon />
+            </Link>
+          ) : null}
 
           {/* Mobil: menü düğmesi */}
           <button

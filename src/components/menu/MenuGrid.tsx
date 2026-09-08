@@ -19,6 +19,7 @@ import { menuItemDescription } from "@/lib/menu-i18n";
 import { publicMenuImageSrc } from "@/lib/normalize-menu-image";
 import { useI18n } from "@/components/providers/I18nProvider";
 import { VeganBadge } from "@/components/menu/VeganBadge";
+import { isOnlineOrderingEnabled } from "@/lib/online-ordering-enabled";
 
 export type MenuGridCategory =
   | "pasta"
@@ -46,6 +47,8 @@ type MenuGridProps = {
 function nameOf(item: CatalogItem, locale: SupportedLocale) {
   return locale === "tr" ? item.name_tr : item.name_de;
 }
+
+const orderingEnabled = isOnlineOrderingEnabled();
 
 export function MenuGrid({
   title,
@@ -130,7 +133,7 @@ export function MenuGrid({
     label: string;
     vegan: boolean;
     desc?: string;
-    priceText: string;
+    priceText?: string;
   }) {
     return (
       <>
@@ -141,7 +144,7 @@ export function MenuGrid({
         <p className="mt-1 min-h-[2.5rem] line-clamp-2 text-sm leading-snug text-white/45">
           {desc || "\u00A0"}
         </p>
-        <p className="mt-1 text-sm font-semibold text-[#c49746]">{priceText}</p>
+        {priceText ? <p className="mt-1 text-sm font-semibold text-[#c49746]">{priceText}</p> : null}
       </>
     );
   }
@@ -160,12 +163,13 @@ export function MenuGrid({
               : item.id === MENU_KENDIN_YAP_VEGAN_ID
                 ? t("menu.buildYourOwnVeganHint")
                 : undefined;
-        const showAdd = itemCanAddCart(item);
+        const showAdd = orderingEnabled && itemCanAddCart(item);
         const showBuilder = itemIsBuilder(item);
-        const priceText =
-          item.id === MENU_KENDIN_YAP_ID || item.id === MENU_KENDIN_YAP_VEGAN_ID
+        const priceText = orderingEnabled
+          ? item.id === MENU_KENDIN_YAP_ID || item.id === MENU_KENDIN_YAP_VEGAN_ID
             ? `${t("home.priceFrom")} ${formatEur(item.price)}`
-            : formatEur(item.price);
+            : formatEur(item.price)
+          : undefined;
         const cardShell = "flex h-full flex-col overflow-hidden rounded-xl border-2 border-[#2e402a] bg-[#0f0f0f] shadow-md";
 
         if (showAdd) {
@@ -273,7 +277,9 @@ export function MenuGrid({
               <h3 id="menu-add-qty-title" className="font-display text-xl font-bold text-white">
                 {pickerLabel}
               </h3>
-              <p className="mt-1 text-sm text-[#c49746]">{formatEur(picker.price)}</p>
+              {orderingEnabled ? (
+                <p className="mt-1 text-sm text-[#c49746]">{formatEur(picker.price)}</p>
+              ) : null}
               <p className="mt-4 text-xs font-semibold uppercase tracking-widest text-white/45">
                 {t("cart.quantity")}
               </p>

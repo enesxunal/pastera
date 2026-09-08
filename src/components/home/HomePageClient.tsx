@@ -34,6 +34,12 @@ export function HomePageClient() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 pb-16 pt-6 sm:px-6 sm:pb-20 sm:pt-8">
+      {!orderingEnabled ? (
+        <aside className="mb-6 rounded-2xl border border-[#c49746]/35 bg-[#15130d] px-5 py-4 text-sm text-white/75" role="status">
+          <strong className="font-display text-[#c49746]">{t("ordering.pausedTitle")}</strong>
+          <span className="ml-2">{t("ordering.pausedBody")}</span>
+        </aside>
+      ) : null}
       <section className="relative overflow-hidden rounded-2xl border border-[#2e402a]/80 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.75)]">
         <div className="absolute inset-0">
           {BANNER_IMAGES.map((src, i) => (
@@ -46,7 +52,7 @@ export function HomePageClient() {
             >
               <Image
                 src={src}
-                alt=""
+                alt={i === 0 ? "Pastera Pasta-Gericht" : "Vegane Pasta bei Pastera"}
                 fill
                 className="object-cover object-center"
                 sizes="(max-width: 1152px) 100vw, 1152px"

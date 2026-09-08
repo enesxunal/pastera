@@ -6,11 +6,19 @@ import { updateSupabaseSession } from "@/lib/supabase/middleware";
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  if (pathname === "/google8892a9fc6bec8836.html") {
+    return NextResponse.next();
+  }
+
   if (isComingSoonEnabled() && !isComingSoonBypassPath(pathname) && pathname !== "/") {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
   const response = NextResponse.next({ request });
+  const noIndexPrefixes = ["/admin", "/branch", "/display", "/lobby", "/auth", "/warenkorb", "/lieferung", "/abholung", "/bestellung"];
+  if (noIndexPrefixes.some((prefix) => pathname.startsWith(prefix))) {
+    response.headers.set("X-Robots-Tag", "noindex, nofollow");
+  }
 
   if (pathname.startsWith("/admin")) {
     if (!pathname.startsWith("/admin/login")) {

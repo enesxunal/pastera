@@ -7,6 +7,7 @@ import { menuItemDescription, menuItemLabel } from "@/lib/menu-i18n";
 import { publicMenuImageSrc } from "@/lib/normalize-menu-image";
 import { VeganBadge } from "@/components/menu/VeganBadge";
 import { useI18n } from "@/components/providers/I18nProvider";
+import { isOnlineOrderingEnabled } from "@/lib/online-ordering-enabled";
 
 type Props = {
   item: MenuItem;
@@ -14,6 +15,8 @@ type Props = {
   onSelect: () => void;
   mode: "single" | "multi";
 };
+
+const orderingEnabled = isOnlineOrderingEnabled();
 
 export function MenuPickCard({ item, selected, onSelect, mode }: Props) {
   const { t, locale } = useI18n();
@@ -66,9 +69,11 @@ export function MenuPickCard({ item, selected, onSelect, mode }: Props) {
         {desc ? (
           <p className="mt-0.5 line-clamp-2 text-xs leading-snug text-white/55 sm:text-sm">{desc}</p>
         ) : null}
-        <p className="mt-0.5 text-xs font-semibold text-[#c49746]">
-          {mode === "single" ? formatEur(item.price) : `+${formatEur(item.price)}`}
-        </p>
+        {orderingEnabled ? (
+          <p className="mt-0.5 text-xs font-semibold text-[#c49746]">
+            {mode === "single" ? formatEur(item.price) : `+${formatEur(item.price)}`}
+          </p>
+        ) : null}
       </div>
     </button>
   );

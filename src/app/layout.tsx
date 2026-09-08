@@ -7,6 +7,7 @@ import { AppProviders } from "@/components/providers/AppProviders";
 import { ConditionalChrome, ConditionalFooter } from "@/components/layout/ConditionalChrome";
 import { isComingSoonEnabled } from "@/lib/coming-soon";
 import type { SupportedLocale } from "@/lib/cart";
+import { PASTERA_BUSINESS, SITE_URL } from "@/lib/site-info";
 
 const syne = Syne({
   subsets: ["latin", "latin-ext"],
@@ -23,41 +24,52 @@ const dmSans = DM_Sans({
 /** Vercel ortam değişkenleri her istekte okunabilsin (yalnızca build anına bağlı kalmasın). */
 export const dynamic = "force-dynamic";
 
-const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.pastera.de").replace(/\/+$/, "");
-
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
-  title: isComingSoonEnabled() ? "Pastera — Coming Soon" : "Pastera · Pasta, Suppen & mehr",
-  description: isComingSoonEnabled()
-    ? "Pastera öffnet bald — frische Pasta und mehr."
-    : "Pasta-Basis mit Saucen, Specials und Toppings konfigurieren. Speisekarte mit Suppen, Vorspeisen und Getränken – Warenkorb inklusive.",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "Pastera – Frische Pasta in Köln-Ehrenfeld",
+    template: "%s | Pastera Köln",
+  },
+  description:
+    "Pastera in Köln-Ehrenfeld: frisch zubereitete Pasta-Gerichte, Saucen, Toppings und vegane Optionen. Speisekarte online entdecken.",
+  applicationName: "Pastera",
+  alternates: {
+    canonical: "/",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, "max-image-preview": "large" },
+  },
   openGraph: {
     type: "website",
     locale: "de_DE",
     alternateLocale: ["tr_TR"],
-    url: siteUrl,
+    url: SITE_URL,
     siteName: "Pastera",
-    title: "Pastera · Modern Pasta Kitchen",
+    title: "Pastera – Frische Pasta in Köln-Ehrenfeld",
     description:
-      "Frische Pasta selbst zusammenstellen oder fertige Gerichte bestellen — vor Ort oder zur Lieferung.",
+      "Frisch zubereitete Pasta, Saucen, Toppings und vegane Optionen in Köln-Ehrenfeld. Menü online entdecken.",
     images: [
       {
         url: "/opengraph-image.png",
         width: 1200,
         height: 630,
-        alt: "Pastera — Modern Pasta Kitchen",
+        alt: "Pastera – Modern Pasta Kitchen in Köln-Ehrenfeld",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Pastera · Modern Pasta Kitchen",
-    description:
-      "Frische Pasta selbst zusammenstellen oder fertige Gerichte bestellen — vor Ort oder zur Lieferung.",
+    title: "Pastera – Frische Pasta in Köln-Ehrenfeld",
+    description: "Pasta-Restaurant in Köln-Ehrenfeld – Speisekarte und vegane Optionen entdecken.",
     images: ["/opengraph-image.png"],
   },
+  icons: {
+    icon: ["/favicon.ico", "/icon.png"],
+    apple: "/apple-touch-icon.png",
+  },
 };
-
 export const viewport = {
   width: "device-width",
   initialScale: 1,
@@ -80,12 +92,47 @@ export default function RootLayout({
   };
 
   const comingSoon = isComingSoonEnabled();
+  const restaurantJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Restaurant",
+    "@id": `${SITE_URL}/#restaurant`,
+    name: PASTERA_BUSINESS.name,
+    url: SITE_URL,
+    logo: `${SITE_URL}/pastera-Logo.png`,
+    image: `${SITE_URL}/opengraph-image.png`,
+    telephone: PASTERA_BUSINESS.telephone,
+    description: PASTERA_BUSINESS.description,
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: PASTERA_BUSINESS.streetAddress,
+      postalCode: PASTERA_BUSINESS.postalCode,
+      addressLocality: PASTERA_BUSINESS.addressLocality,
+      addressCountry: PASTERA_BUSINESS.addressCountry,
+    },
+    servesCuisine: ["Pasta", "Italian-inspired", "Vegan options"],
+    menu: `${SITE_URL}/menu`,
+    sameAs: [
+      PASTERA_BUSINESS.instagram,
+      PASTERA_BUSINESS.facebook,
+      PASTERA_BUSINESS.tiktok,
+    ],
+    openingHoursSpecification: PASTERA_BUSINESS.openingHours.map((hours) => ({
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: hours.days.map((day) => `https://schema.org/${day}`),
+      opens: hours.opens,
+      closes: hours.closes,
+    })),
+  };
 
   return (
     <html lang={initialLocale === "tr" ? "tr" : "de"}>
       <body
         className={`${syne.variable} ${dmSans.variable} font-sans antialiased bg-matte text-white`}
       >
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(restaurantJsonLd) }}
+        />
         <AppProviders initialLocale={initialLocale} supabasePublic={supabasePublic}>
           <div className="pastera-brand-bar" aria-hidden />
           <div className="relative flex min-h-dvh flex-col overflow-x-hidden">

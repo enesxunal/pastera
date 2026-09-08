@@ -97,9 +97,9 @@
   "builder": {
     "kicker": "Menü",
     "title": "Kendi makarnanı oluştur",
-    "intro": "1. adım: noodle. 2. adım: sos(lar). 3. adım: toppingler. Fiyat anında güncellenir.",
+    "intro": "1. adım: makarnayı seç. 2. adım: sos(lar). 3. adım: topping seçeneklerini keşfet.",
     "step1Title": "Adım 1 — Makarna çeşidi",
-    "step1Hint": "Klasik, Vegan veya Siyah — 6,90 €",
+    "step1Hint": "Klasik, Vegan veya Siyah makarna seç.",
     "step2Title": "Adım 2 — Soslar",
     "step2Hint": "Birden fazla sos seçilebilir.",
     "step3Title": "Adım 3 — Toppingler",
@@ -113,8 +113,8 @@
     "updateCart": "Sepette güncelle",
     "previewHint": "Önizleme: seçilen sos ve toppingler kasede.",
     "titleVegan": "Vegan pastanı oluştur",
-    "introVegan": "Adım 1: Vegan makarna. Adım 2: Sos(lar). Adım 3: Toppingler. Fiyat anında hesaplanır.",
-    "step1HintVegan": "Vegan klasik veya ıspanak — 7,90 €"
+    "introVegan": "Adım 1: Vegan makarna. Adım 2: Sos(lar). Adım 3: Topping seçeneklerini keşfet.",
+    "step1HintVegan": "Vegan klasik veya ıspanak makarna seç."
   },
   "chocolateBuilder": {
     "kicker": "Tatlı · Kendin yap",
@@ -160,15 +160,15 @@
   },
   "menu": {
     "sectionNoodles": "Makarna çeşidi",
-    "sectionNoodlesHint": "Klasik, Vegan, Siyah — 6,90 €. Sos ve topping oluşturucuda.",
+    "sectionNoodlesHint": "Klasik, Vegan veya Siyah — sos ve toppingleri oluşturucuda keşfet.",
     "sectionStandard": "Standart makarna",
-    "sectionStandardHint": "Hazır isimli tabaklar — sabit fiyat, sepete ekle.",
+    "sectionStandardHint": "Farklı sos ve toppinglerle hazırlanan hazır makarna tabakları.",
     "sectionDessert": "Tatlı",
-    "sectionDessertHint": "3 ürün — hazır tatlılar sepete eklenir, çikolatalı makarnayı kendin oluşturursun.",
+    "sectionDessertHint": "Tatlıları ve çikolatalı makarnayı keşfet.",
     "configure": "Oluştur",
     "veganBadge": "Vegan ürün",
     "subChocolatePasta": "Çikolatalı makarna",
-    "subChocolatePastaHint": "6,90 € + meyve/çikolata topping — oluşturucuda.",
+    "subChocolatePastaHint": "Çikolatalı makarnayı meyve ve çikolata toppingleriyle keşfet.",
     "sectionChefSpecials": "Standart makarna",
     "sectionChefSpecialsHint": "Hazır tabaklar — sabit fiyat.",
     "subChefClassic": "Chef Specials (klasik)",
@@ -182,23 +182,23 @@
     "chocolateSectionHint": "Hazır tatlılar veya çikolatalı makarnanı kendin oluştur.",
     "chocolateBuildYourOwnHint": "Çikolatalı makarna tabanı + meyve ve çikolata toppingleri.",
     "readyPastas": "Hazır makarnalar",
-    "readyPastasBadge": "Sabit fiyat",
-    "readyPastasHint": "İsimli tabaklar — doğrudan sepete ekle.",
+    "readyPastasBadge": "Favoriler",
+    "readyPastasHint": "Menümüzdeki isimli ve sevilen makarna tabakları.",
     "chocolateBadge": "Tatlı",
     "sectionPastaHint": "Klasik veya vegan taban — ardından sos ve toppingleri oluşturucuda seçersin.",
     "sectionWarm": "Ara sıcaklar",
-    "sectionWarmHint": "Çorbalar ve mezeler; adet seçerek sepete eklenir.",
+    "sectionWarmHint": "Menümüzdeki çorbalar ve ara sıcaklar.",
     "subSoups": "Çorbalar",
     "subStarters": "Mezeler",
     "sectionDrinks": "İçecekler",
-    "sectionDrinksHint": "Su, gazlı, bira, şarap ve kahve — sepete ekle ile sipariş.",
+    "sectionDrinksHint": "Su, gazlı içecekler ve menümüzdeki diğer içecekler.",
     "emptySection": "Bu bölümde henüz aktif ürün yok."
   },
   "home": {
     "kicker": "Pastera",
     "title1": "El emeği.",
     "titleAccent": "Sıcak servis.",
-    "leadShort": "Makarna çeşidini seç, sos ve topping ekle — veya hazır tabak sipariş et.",
+    "leadShort": "Taze makarna, sos ve topping seçeneklerini keşfet — veya hazır tabaklarımızı incele.",
     "ctaBuilder": "Makarna oluştur",
     "ctaMenu": "Menü",
     "ctaDelivery": "Eve sipariş",
@@ -218,7 +218,7 @@
       },
       "standard": {
         "name": "Hazır makarnalar",
-        "description": "Hazır tabaklar — sabit fiyat.",
+        "description": "Menümüzdeki sevilen hazır makarna tabakları.",
         "badge": "Favori"
       },
       "dessert": {
@@ -336,7 +336,7 @@
   "ordering": {
     "pausedKicker": "Geçici olarak",
     "pausedTitle": "Online sipariş kapalı",
-    "pausedBody": "Web sitesinden şu an sipariş verilemiyor. Lütfen restoranda sipariş ver — online servis tekrar açılınca haber vereceğiz.",
+    "pausedBody": "Online siparişler şu anda duraklatıldı. Bu sırada menümüzü keşfedebilir ve Köln-Ehrenfeld’de bizi ziyaret edebilirsin.",
     "pausedCta": "Menüyü gör"
   },
   "success": {
@@ -590,7 +590,7 @@
     "error": "Menü yüklenemedi."
   },
   "footer": {
-    "tagline": "Taze makarna, çorbalar ve daha fazlası — restorandan gel-al.",
+    "tagline": "Köln-Ehrenfeld’de taze makarna — menüyü online keşfet, restoranda tadını çıkar.",
     "explore": "Keşfet",
     "delivery": "Eve sipariş",
     "pickup": "Gel al",

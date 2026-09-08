@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useI18n } from "@/components/providers/I18nProvider";
 import { isDeliveryEnabled } from "@/lib/delivery-enabled";
 import { isOnlineOrderingEnabled } from "@/lib/online-ordering-enabled";
+import { PASTERA_INSTAGRAM_URL } from "@/lib/pastera-links";
 
 export function SiteFooter() {
   const { t } = useI18n();
@@ -29,6 +30,14 @@ export function SiteFooter() {
               className="h-7 w-auto opacity-90"
             />
             <p className="mt-3 max-w-xs text-sm text-white/45">{t("footer.tagline")}</p>
+            <a
+              href={PASTERA_INSTAGRAM_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-4 inline-flex text-sm font-semibold text-[#c49746] underline-offset-4 hover:underline"
+            >
+              @pastera.official · Instagram
+            </a>
           </div>
           <nav className="flex flex-wrap gap-x-8 gap-y-4 text-sm">
             <div>

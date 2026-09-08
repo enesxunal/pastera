@@ -260,24 +260,30 @@ export function PastaBuilder({ mode = "classic" }: { mode?: BuilderMode }) {
             </div>
           </section>
 
-          <div className="hidden rounded-2xl border-2 border-[#2e402a] bg-brand-forest/35 p-5 shadow-box lg:block">
-            <div className="flex flex-wrap items-end justify-between gap-4">
-              <div>
-                <p className="text-xs uppercase tracking-widest text-white/50">{t("builder.total")}</p>
-                <p className="font-display text-3xl font-bold text-white">{formatEur(total)}</p>
+          {orderingEnabled ? (
+            <div className="hidden rounded-2xl border-2 border-[#2e402a] bg-brand-forest/35 p-5 shadow-box lg:block">
+              <div className="flex flex-wrap items-end justify-between gap-4">
+                <div>
+                  <p className="text-xs uppercase tracking-widest text-white/50">{t("builder.total")}</p>
+                  <p className="font-display text-3xl font-bold text-white">{formatEur(total)}</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={goToWarenkorb}
+                  className="rounded-full px-6 py-3 font-display text-sm font-bold text-matte transition hover:brightness-110"
+                  style={{ backgroundColor: "#c49746" }}
+                >
+                  {cartButtonLabel}
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={goToWarenkorb}
-                className="rounded-full px-6 py-3 font-display text-sm font-bold text-matte transition hover:brightness-110"
-                style={{ backgroundColor: "#c49746" }}
-              >
-                {cartButtonLabel}
-              </button>
+              {cartErr ? <p className="mt-3 text-sm text-red-400">{cartErr}</p> : null}
+              <p className="mt-3 text-xs text-white/45">{t("builder.previewHint")}</p>
             </div>
-            {cartErr ? <p className="mt-3 text-sm text-red-400">{cartErr}</p> : null}
-            <p className="mt-3 text-xs text-white/45">{t("builder.previewHint")}</p>
-          </div>
+          ) : (
+            <div className="hidden rounded-2xl border border-[#c49746]/30 bg-[#15130d] p-5 text-sm text-white/65 lg:block">
+              {t("ordering.pausedBody")}
+            </div>
+          )}
         </div>
 
         <div className="lg:order-2">
@@ -289,12 +295,14 @@ export function PastaBuilder({ mode = "classic" }: { mode?: BuilderMode }) {
         </div>
       </div>
 
-      <MobileActionBar
-        totalLabel={t("builder.total")}
-        total={formatEur(total)}
-        buttonLabel={cartButtonLabel}
-        onAction={goToWarenkorb}
-      />
+      {orderingEnabled ? (
+        <MobileActionBar
+          totalLabel={t("builder.total")}
+          total={formatEur(total)}
+          buttonLabel={cartButtonLabel}
+          onAction={goToWarenkorb}
+        />
+      ) : null}
     </div>
   );
 }

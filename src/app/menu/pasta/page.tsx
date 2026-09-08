@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { MenuGrid } from "@/components/menu/MenuGrid";
@@ -6,6 +7,12 @@ import { catalogByCategory } from "@/lib/catalog-static";
 import { getCatalogFromDb } from "@/lib/catalog-server";
 import { message } from "@/lib/i18n";
 import { SAUCEN_KLASSISCH } from "@/lib/menu-data";
+
+export const metadata: Metadata = {
+  title: "Pasta Menü – Pastera Köln-Ehrenfeld",
+  description: "Pasta, Saucen und Toppings bei Pastera in Köln-Ehrenfeld entdecken – inklusive veganer Optionen und Pasta-Konfigurator.",
+  alternates: { canonical: "/menu/pasta" },
+};
 
 export default async function MenuPastaPage() {
   const catalog = await getCatalogFromDb();

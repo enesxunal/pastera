@@ -5,7 +5,10 @@ import Link from "next/link";
 import { MENU_HIGHLIGHTS } from "@/lib/menu-data";
 import { publicMenuImageSrc } from "@/lib/normalize-menu-image";
 import { formatEur } from "@/lib/format";
+import { isOnlineOrderingEnabled } from "@/lib/online-ordering-enabled";
 import { useI18n } from "@/components/providers/I18nProvider";
+
+const orderingEnabled = isOnlineOrderingEnabled();
 
 export function MenuHighlights() {
   const { t } = useI18n();
@@ -67,9 +70,11 @@ export function MenuHighlights() {
               <p className="mt-2 flex-1 text-sm leading-relaxed text-white/55">
                 {t(`home.highlights.${item.id}.description`)}
               </p>
-              <p className="mt-4 font-display text-lg font-bold" style={{ color: "#c49746" }}>
-                {t("home.priceFrom")} {formatEur(item.priceFrom)}
-              </p>
+              {orderingEnabled ? (
+                <p className="mt-4 font-display text-lg font-bold" style={{ color: "#c49746" }}>
+                  {t("home.priceFrom")} {formatEur(item.priceFrom)}
+                </p>
+              ) : null}
             </div>
           </Link>
           );

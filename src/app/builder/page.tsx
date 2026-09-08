@@ -1,5 +1,12 @@
+import type { Metadata } from "next";
 import dynamic from "next/dynamic";
 import { Suspense } from "react";
+
+export const metadata: Metadata = {
+  title: "Pasta zusammenstellen – Pastera Köln",
+  description: "Entdecke Pastasorten, Saucen und Toppings im Pastera Pasta-Konfigurator. Online-Bestellungen sind derzeit pausiert.",
+  alternates: { canonical: "/builder" },
+};
 
 const PastaBuilder = dynamic(
   () => import("@/components/pasta-builder/PastaBuilder").then((m) => ({ default: m.PastaBuilder })),

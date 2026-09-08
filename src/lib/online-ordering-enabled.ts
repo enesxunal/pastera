@@ -1,8 +1,12 @@
 /**
- * Online sipariş (gel-al, masada, paket) — varsayılan kapalı.
- * Tekrar açmak için Vercel / .env.local:
- *   NEXT_PUBLIC_ONLINE_ORDERING_ENABLED=true
+ * Merkezi online sipariş feature flag'i.
+ *
+ * Geçici browse-only döneminde bilinçli olarak kapalı tutulur. Satışı tekrar
+ * açarken bu sabiti true yapıp lint/build ve checkout smoke-testlerini çalıştırın.
+ * Admin / branch / display operasyonel altyapısı bu flag'den etkilenmez.
  */
+export const ORDERING_ENABLED = false;
+
 export function isOnlineOrderingEnabled(): boolean {
-  return process.env.NEXT_PUBLIC_ONLINE_ORDERING_ENABLED === "true";
+  return ORDERING_ENABLED;
 }
