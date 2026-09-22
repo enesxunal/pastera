@@ -199,7 +199,7 @@ export const STANDARD_PASTAS: MenuItem[] = [
   },
   {
     id: "std-chicken-cremesosse",
-    name: "Chicken Cremesoße",
+    name: "Chicken Alfredo",
     price: 11.9,
     vegan: false,
     image: img("std-chicken-cremesosse"),

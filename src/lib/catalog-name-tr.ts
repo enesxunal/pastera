@@ -54,7 +54,7 @@ export const CATALOG_NAME_TR: Record<string, string> = {
   "t-choc-birne": "Armut",
   "t-choc-passion": "Passion fruit",
   "std-bolognese-classico": "Bolognese Classico",
-  "std-chicken-cremesosse": "Chicken Cremesoße",
+  "std-chicken-cremesosse": "Chicken Alfredo",
   "std-tartufo-deluxe": "Tartufo Deluxe",
   "std-pesto-verde": "Pesto Verde",
   "std-manzo-cremoso": "Manzo Cremoso",
