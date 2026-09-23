@@ -93,9 +93,13 @@ export function SiteFooter() {
             </div>
           </nav>
         </div>
-        <p className="mt-8 border-t border-[#2e402a]/60 pt-6 text-center text-xs text-white/35">
-          © {year} Pastera · {t("footer.rights")}
-        </p>
+        <div className="mt-8 flex flex-col items-center justify-between gap-3 border-t border-[#2e402a]/60 pt-6 text-xs text-white/35 sm:flex-row">
+          <p>© {year} Pastera · {t("footer.rights")}</p>
+          <div className="flex items-center gap-4">
+            <Link href="/impressum" className="hover:text-white">Impressum</Link>
+            <Link href="/datenschutz" className="hover:text-white">Datenschutz</Link>
+          </div>
+        </div>
       </div>
     </footer>
   );
