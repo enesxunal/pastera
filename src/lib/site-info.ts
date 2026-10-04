@@ -2,14 +2,16 @@ export const SITE_URL = "https://www.pastera.de";
 
 export const PASTERA_BUSINESS = {
   name: "Pastera",
-  legalName: "Pastera",
+  legalName: "Pastera – Frische Pasta",
   description:
     "Pastera ist ein Pasta-Restaurant in Köln-Ehrenfeld mit frisch zubereiteten Pasta-Gerichten, verschiedenen Saucen, Toppings und veganen Optionen.",
   streetAddress: "Venloer Straße 342",
   postalCode: "50823",
   addressLocality: "Köln",
+  addressRegion: "Nordrhein-Westfalen",
   addressCountry: "DE",
-  telephone: "+49 15566 487369",
+  telephone: "+49 163 4566354",
+  priceRange: "€€",
   instagram: "https://www.instagram.com/pastera.official/",
   facebook: "https://www.facebook.com/pastera.official",
   tiktok: "https://www.tiktok.com/@pastera.official",

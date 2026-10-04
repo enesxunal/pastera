@@ -3,9 +3,17 @@ import { MenuHub } from "@/components/menu/MenuHub";
 import { MenuPageFrame } from "@/components/menu/MenuPageFrame";
 
 export const metadata: Metadata = {
-  title: "Speisekarte – Frische Pasta in Köln-Ehrenfeld",
-  description: "Entdecke die Pastera Speisekarte mit Pasta-Gerichten, Saucen, Toppings, veganen Optionen und weiteren Gerichten in Köln-Ehrenfeld.",
+  title: "Pastera Speisekarte Köln-Ehrenfeld – Pasta, Preise & Vegan",
+  description:
+    "Entdecke die aktuelle Pastera Speisekarte in Köln-Ehrenfeld: Pasta, Saucen, Toppings, vegane Optionen und aktuelle Preise.",
   alternates: { canonical: "/menu" },
+  openGraph: {
+    title: "Pastera Speisekarte Köln-Ehrenfeld",
+    description:
+      "Pasta, Saucen, Toppings, vegane Optionen und aktuelle Preise bei Pastera in Köln-Ehrenfeld.",
+    url: "/menu",
+    type: "website",
+  },
 };
 
 export default function MenuPage() {

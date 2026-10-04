@@ -111,10 +111,14 @@ export default function RootLayout({
       streetAddress: PASTERA_BUSINESS.streetAddress,
       postalCode: PASTERA_BUSINESS.postalCode,
       addressLocality: PASTERA_BUSINESS.addressLocality,
+      addressRegion: PASTERA_BUSINESS.addressRegion,
       addressCountry: PASTERA_BUSINESS.addressCountry,
     },
+    priceRange: PASTERA_BUSINESS.priceRange,
     servesCuisine: ["Pasta", "Italian-inspired", "Vegan options"],
     menu: `${SITE_URL}/menu`,
+    hasMap:
+      "https://www.google.com/maps/search/?api=1&query=Venloer+Stra%C3%9Fe+342+50823+K%C3%B6ln",
     sameAs: [
       PASTERA_BUSINESS.instagram,
       PASTERA_BUSINESS.facebook,

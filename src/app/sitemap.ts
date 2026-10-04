@@ -2,68 +2,83 @@ import type { MetadataRoute } from "next";
 import { SITE_URL } from "@/lib/site-info";
 import { BLOG_POSTS } from "@/lib/blog-posts";
 
+const CORE_UPDATED_AT = new Date("2026-10-04");
+
 export default function sitemap(): MetadataRoute.Sitemap {
-  const now = new Date();
   return [
     {
       url: `${SITE_URL}/`,
-      lastModified: now,
+      lastModified: CORE_UPDATED_AT,
       changeFrequency: "weekly",
       priority: 1,
     },
     {
       url: `${SITE_URL}/menu`,
-      lastModified: now,
+      lastModified: CORE_UPDATED_AT,
       changeFrequency: "weekly",
       priority: 0.9,
     },
     {
       url: `${SITE_URL}/menu/pasta`,
-      lastModified: now,
+      lastModified: CORE_UPDATED_AT,
       changeFrequency: "weekly",
       priority: 0.8,
     },
     {
       url: `${SITE_URL}/menu/vorspeisen`,
-      lastModified: now,
+      lastModified: CORE_UPDATED_AT,
       changeFrequency: "weekly",
       priority: 0.7,
     },
     {
       url: `${SITE_URL}/menu/getraenke`,
-      lastModified: now,
+      lastModified: CORE_UPDATED_AT,
       changeFrequency: "weekly",
       priority: 0.7,
     },
     {
       url: `${SITE_URL}/builder`,
-      lastModified: now,
-      changeFrequency: "weekly",
+      lastModified: CORE_UPDATED_AT,
+      changeFrequency: "monthly",
       priority: 0.7,
     },
     {
       url: `${SITE_URL}/builder/vegan`,
-      lastModified: now,
-      changeFrequency: "weekly",
-      priority: 0.7,
+      lastModified: CORE_UPDATED_AT,
+      changeFrequency: "monthly",
+      priority: 0.65,
     },
     {
-      url: `${SITE_URL}/qr-menu`,
-      lastModified: now,
+      url: `${SITE_URL}/restaurant-ehrenfeld`,
+      lastModified: CORE_UPDATED_AT,
       changeFrequency: "monthly",
-      priority: 0.5,
+      priority: 0.9,
     },
     {
-      url: `${SITE_URL}/connect`,
-      lastModified: now,
+      url: `${SITE_URL}/pasta-koeln`,
+      lastModified: CORE_UPDATED_AT,
       changeFrequency: "monthly",
-      priority: 0.4,
+      priority: 0.9,
+    },
+    {
+      url: `${SITE_URL}/pasta-ehrenfeld`,
+      lastModified: CORE_UPDATED_AT,
+      changeFrequency: "monthly",
+      priority: 0.85,
+    },
+    {
+      url: `${SITE_URL}/pasta-venloer-strasse`,
+      lastModified: CORE_UPDATED_AT,
+      changeFrequency: "monthly",
+      priority: 0.85,
     },
     {
       url: `${SITE_URL}/blog`,
-      lastModified: now,
+      lastModified: new Date(
+        Math.max(...BLOG_POSTS.map((post) => new Date(post.updatedAt).getTime())),
+      ),
       changeFrequency: "weekly",
-      priority: 0.8,
+      priority: 0.75,
     },
     {
       url: `${SITE_URL}/impressum`,
@@ -81,7 +96,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${SITE_URL}/blog/${post.slug}`,
       lastModified: new Date(post.updatedAt),
       changeFrequency: "monthly" as const,
-      priority: 0.65,
+      priority: 0.6,
     })),
   ];
 }

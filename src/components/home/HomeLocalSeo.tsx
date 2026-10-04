@@ -40,6 +40,20 @@ export function HomeLocalSeo() {
             Pasta zusammenstellen
           </Link>
         </div>
+        <nav className="mt-6 flex flex-wrap gap-x-5 gap-y-2 border-t border-white/10 pt-5 text-sm font-semibold text-white/65">
+          <Link href="/restaurant-ehrenfeld" className="hover:text-[#c49746]">
+            Restaurant Ehrenfeld
+          </Link>
+          <Link href="/pasta-koeln" className="hover:text-[#c49746]">
+            Pasta Köln
+          </Link>
+          <Link href="/pasta-ehrenfeld" className="hover:text-[#c49746]">
+            Pasta Ehrenfeld
+          </Link>
+          <Link href="/pasta-venloer-strasse" className="hover:text-[#c49746]">
+            Pasta Venloer Straße
+          </Link>
+        </nav>
       </div>
     </section>
   );
