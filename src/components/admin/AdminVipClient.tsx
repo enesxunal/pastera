@@ -36,6 +36,7 @@ export function AdminVipClient(){
  return <main className="mx-auto max-w-6xl px-4 py-10 text-white sm:px-6">
   <AdminNav/><h1 className="font-display text-3xl font-bold">Pastera VIP Club</h1>
   <p className="mt-2 text-sm text-white/50">NFC Kundenkarten · Pro separatem Auflegen +1 Bestellung · 10 Bestellungen = 1 Gratis-Pasta</p>
+  <a href="/admin/vip/pos" className="mt-4 inline-flex rounded-full border border-[#c49746] px-5 py-3 font-semibold text-[#c49746] hover:bg-[#c49746]/10">NFC-Kassenbildschirm öffnen</a>
   <div className="mt-6 grid gap-3 sm:grid-cols-3">{[["Karten insgesamt",data.cards.length],["Aktiv",active.length],["Noch frei",unassigned.length]].map(([label,value])=><div key={String(label)} className="rounded-xl border border-[#2e402a] bg-[#111] p-5"><p className="text-xs text-white/50">{label}</p><p className="mt-2 text-3xl font-bold text-[#c49746]">{value}</p></div>)}</div>
   {message&&<p role="status" className="mt-5 rounded-lg border border-[#c49746]/30 p-3 text-sm text-[#c49746]">{message}</p>}
   <section className="mt-9 grid gap-8 lg:grid-cols-2">
