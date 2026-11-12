@@ -5,7 +5,7 @@ import { useState, type FormEvent } from "react";
 import { useI18n } from "@/components/providers/I18nProvider";
 
 export default function AdminLoginPage() {
-  const { t, locale } = useI18n();
+  const { t } = useI18n();
   const router = useRouter();
   const [password, setPassword] = useState("");
   const [err, setErr] = useState("");
@@ -53,11 +53,6 @@ export default function AdminLoginPage() {
           {t("admin.submit")}
         </button>
       </form>
-      <p className="mt-6 text-xs text-white/40">
-        {locale === "de"
-          ? "Lokal: .env.local · Live: Vercel → ADMIN_PASSWORD"
-          : "Bilgisayar: .env.local · Canlı: Vercel → ADMIN_PASSWORD"}
-      </p>
     </div>
   );
 }
