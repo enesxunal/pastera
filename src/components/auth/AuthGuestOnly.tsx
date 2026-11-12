@@ -11,7 +11,9 @@ export function AuthGuestOnly({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!loading && user) {
-      router.replace("/auth/account");
+      const next = new URLSearchParams(window.location.search).get("next");
+      const safeNext = next && next.startsWith("/") && !next.startsWith("//") && !next.includes("\\");
+      router.replace(safeNext ? next : "/auth/account");
     }
   }, [loading, user, router]);
 
