@@ -1,8 +1,9 @@
+import { isAdminRequest } from "@/lib/admin-auth";
 import { NextResponse, type NextRequest } from "next/server";
 import { buildBackupPayload } from "@/lib/backup-export";
 
 function isAdmin(req: NextRequest): boolean {
-  return req.cookies.get("pastera_admin")?.value === "1";
+  return isAdminRequest(req);
 }
 
 /** JSON yedek — tek tıkla indir */

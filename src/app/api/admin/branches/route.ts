@@ -1,10 +1,11 @@
+import { isAdminRequest } from "@/lib/admin-auth";
 import { NextResponse, type NextRequest } from "next/server";
 import { parseOptionalNumber, resolveBranchCoordinates } from "@/lib/branch-admin";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import type { BranchRow } from "@/lib/order-types";
 
 function isAdmin(req: NextRequest): boolean {
-  return req.cookies.get("pastera_admin")?.value === "1";
+  return isAdminRequest(req);
 }
 
 type BranchBody = {

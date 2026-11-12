@@ -34,7 +34,8 @@ function LoginForm() {
         setErr(t("common.wrongEmailPassword"));
         return;
       }
-      router.push("/auth/account");
+      const next=searchParams.get("next");
+      router.push(next && next.startsWith("/") && !next.startsWith("//") && !next.includes("\\") ? next : "/auth/account");
       router.refresh();
     } catch {
       setErr(t("auth.configError"));

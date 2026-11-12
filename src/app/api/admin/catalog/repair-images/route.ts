@@ -1,9 +1,10 @@
+import { isAdminRequest } from "@/lib/admin-auth";
 import { NextResponse, type NextRequest } from "next/server";
 import { normalizeMenuImagePath } from "@/lib/normalize-menu-image";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 
 function isAdmin(req: NextRequest): boolean {
-  return req.cookies.get("pastera_admin")?.value === "1";
+  return isAdminRequest(req);
 }
 
 /** Supabase catalog_items.image alanlarını NFC yola çevirir (tek seferlik düzeltme). */

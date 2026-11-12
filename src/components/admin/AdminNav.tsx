@@ -11,6 +11,7 @@ const links = [
   { href: "/admin/orders", key: "admin.navOrders" },
   { href: "/admin/members", key: "admin.navMembers" },
   { href: "/admin/cards", key: "admin.navCards" },
+  { href: "/admin/vip", key: "vip.adminNav" },
 ] as const;
 
 export function AdminNav() {
@@ -31,7 +32,7 @@ export function AdminNav() {
                 : "border border-[#2e402a] text-white/70 hover:border-[#c49746]/40 hover:text-white"
             }`}
           >
-            {t(key)}
+            {key === "vip.adminNav" ? "VIP Club" : t(key)}
           </Link>
         );
       })}

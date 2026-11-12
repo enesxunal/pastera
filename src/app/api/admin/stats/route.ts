@@ -1,10 +1,11 @@
+import { isAdminRequest } from "@/lib/admin-auth";
 import { NextResponse, type NextRequest } from "next/server";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { computeGlobalStats, last7DaysRevenue, type OrderForStats } from "@/lib/order-stats";
 import { listActiveBranches } from "@/lib/branches-server";
 
 function isAdmin(req: NextRequest): boolean {
-  return req.cookies.get("pastera_admin")?.value === "1";
+  return isAdminRequest(req);
 }
 
 export async function GET(req: NextRequest) {

@@ -1,0 +1,10 @@
+import assert from "node:assert/strict";
+import { createAdminSession, verifyAdminSession } from "../../src/lib/admin-auth";
+process.env.ADMIN_SESSION_SECRET="unit_test_random_secret_very_long_12345678";
+assert.equal(verifyAdminSession("1"),false,"legacy cookie must not be trusted");
+assert.equal(verifyAdminSession(undefined),false);
+const token=createAdminSession();
+assert.equal(verifyAdminSession(token),true,"valid cookie");
+assert.equal(verifyAdminSession(token.slice(0,-1)+(token.endsWith('0')?'1':'0')),false,"tampering");
+assert.equal(verifyAdminSession("0000000000."+token.split('.')[1]+"."+token.split('.')[2]),false,"expired token");
+console.log("VIP admin session security: 5 assertions PASS");

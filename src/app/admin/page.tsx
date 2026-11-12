@@ -1,8 +1,8 @@
-import { cookies } from "next/headers";
+import { isAdminCookie } from "@/lib/admin-auth";
 import { redirect } from "next/navigation";
 
 export default function AdminEntryPage() {
-  if (cookies().get("pastera_admin")?.value === "1") {
+  if (isAdminCookie()) {
     redirect("/admin/dashboard");
   }
   redirect("/admin/login");

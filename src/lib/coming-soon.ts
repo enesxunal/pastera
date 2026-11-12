@@ -11,6 +11,7 @@ export const COMING_SOON_BYPASS_PREFIXES = [
   "/connect",
   "/qr-menu",
   "/c",
+  "/vip",
   "/api",
 ] as const;
 

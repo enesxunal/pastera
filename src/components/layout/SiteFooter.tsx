@@ -74,6 +74,7 @@ export function SiteFooter() {
                 {t("footer.account")}
               </p>
               <ul className="space-y-0.5 text-white/60">
+                <li><Link href="/vip" className="flex min-h-11 items-center text-[#c49746] hover:text-white">Pastera VIP Club</Link></li>
                 <li>
                   <Link href="/auth/login" className="flex min-h-11 items-center hover:text-white">
                     {t("auth.loginLink")}

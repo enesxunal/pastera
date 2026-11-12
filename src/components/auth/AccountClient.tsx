@@ -204,6 +204,8 @@ export function AccountClient() {
         </div>
       ) : null}
 
+      <Link href="/vip" className="mt-6 flex items-center justify-between rounded-2xl border border-[#c49746]/40 bg-[#1c2118] px-5 py-4 text-sm font-bold text-[#c49746]">PASTERA VIP Club · 10 Bestellungen = 1 Gratis-Pasta <span aria-hidden>→</span></Link>
+
       <div className="mt-8 grid gap-4 sm:grid-cols-2">
         <div className="rounded-2xl border border-[#2e402a] bg-[#111] p-6">
           <p className="text-xs uppercase tracking-widest text-[#c49746]">{t("auth.pointsLabel")}</p>

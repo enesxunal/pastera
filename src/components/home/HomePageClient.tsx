@@ -112,6 +112,17 @@ export function HomePageClient() {
         </div>
       </section>
 
+      <section className="mt-8 overflow-hidden rounded-2xl border border-[#c49746]/35 bg-gradient-to-r from-[#13271e] via-[#1d291d] to-[#171309] p-6 sm:p-8" aria-labelledby="vip-club-home-title">
+        <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#c49746]">PASTERA VIP MEMBER · 2026</p>
+        <div className="mt-2 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 id="vip-club-home-title" className="font-display text-2xl font-bold text-white sm:text-3xl">10 Bestellungen. 1 Pasta gratis.</h2>
+            <p className="mt-2 max-w-xl text-sm text-white/65">Bis 31.12.2026 kostenlos VIP Member werden und deine NFC-Karte sichern – zur kostenlosen Abholung oder auf Anfrage mit kostenloser Lieferung.</p>
+          </div>
+          <Link href="/vip" className="inline-flex shrink-0 items-center justify-center rounded-full bg-[#c49746] px-6 py-3 text-sm font-bold text-black transition hover:brightness-110">VIP-Karte sichern</Link>
+        </div>
+      </section>
+
       <MenuHighlights />
 
       <section className="mt-16 border-t border-[#2e402a]/70 pt-14" aria-labelledby="home-speisekarte">

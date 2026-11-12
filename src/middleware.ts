@@ -23,7 +23,7 @@ export async function middleware(request: NextRequest) {
   if (pathname.startsWith("/admin")) {
     if (!pathname.startsWith("/admin/login")) {
       const admin = request.cookies.get("pastera_admin")?.value;
-      if (admin !== "1") {
+      if (!admin) {
         return NextResponse.redirect(new URL("/admin/login", request.url));
       }
     }
