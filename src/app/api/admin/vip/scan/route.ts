@@ -12,13 +12,14 @@ function terminalAuthorized(req:NextRequest){
 }
 export async function POST(req:NextRequest){
  if(!isAdminRequest(req)&&!terminalAuthorized(req))return NextResponse.json({ok:false,error:"unauthorized"},{status:401});
- const body=await req.json().catch(()=>null) as {uid?:string;eventId?:string}|null;
+ const body=await req.json().catch(()=>null) as {uid?:string;eventId?:string;simulation?:boolean}|null;
+ if(body?.simulation && (process.env.NODE_ENV === "production" || !isAdminRequest(req))) return NextResponse.json({ok:false,error:"simulation_not_allowed"},{status:403});
  const uid=(body?.uid||"").replace(/[^0-9a-f]/gi,"").toUpperCase();
  if(!/^[0-9A-F]{8,20}$/.test(uid)||!body?.eventId||!/^[0-9a-f-]{36}$/i.test(body.eventId))return NextResponse.json({ok:false,error:"uid_and_event_id_required"},{status:400});
  const svc=createSupabaseServiceClient();if(!svc)return NextResponse.json({ok:false,error:"not_configured"},{status:503});
  const {data:card}=await svc.from("vip_club_cards").select("user_id,card_number").eq("uid_hex",uid).eq("status","active").maybeSingle();
  if(!card?.user_id)return NextResponse.json({ok:false,error:"unassigned_card"},{status:404});
- const {data,error}=await svc.rpc("vip_club_stamp",{p_uid:uid,p_request_id:body.eventId,p_operator:"NFC-POS"});
+ const {data,error}=await svc.rpc("vip_club_stamp",{p_uid:uid,p_request_id:body.eventId,p_operator:body.simulation?"QA-SIMULATION":"NFC-POS"});
  if(error)return NextResponse.json({ok:false,error:"stamp_failed"},{status:409});
  try{
   const state=await getVipState(card.user_id);
