@@ -8,6 +8,7 @@ import argparse
 import ctypes
 import importlib.util
 import json
+import os
 import pathlib
 import threading
 import time
@@ -28,17 +29,50 @@ events = deque(maxlen=80)
 sequence = 0
 reader_names = []
 reader_error = ''
+boot_id = str(uuid.uuid4())
+reader_states = {}
+last_poll_at = 0.0
+last_card_at = 0.0
+
+
+def diagnostic_read(ctx, device):
+    """Read UID while returning PC/SC details rather than silently hiding errors."""
+    card = ctypes.c_void_p()
+    protocol = reader.DWORD()
+    rc = reader.PCSC.SCardConnect(ctx, device, 2, 3, ctypes.byref(card), ctypes.byref(protocol))
+    if rc:
+        code = rc & 0xffffffff
+        return None, ('no_card' if code == 0x8010000C else 'pcsc_%08X' % code)
+    try:
+        request_data = bytes.fromhex('FFCA000000')
+        request = ctypes.create_string_buffer(request_data)
+        response = ctypes.create_string_buffer(260)
+        length = reader.DWORD(260)
+        pci = reader.PCI(protocol.value, ctypes.sizeof(reader.PCI))
+        rc = reader.PCSC.SCardTransmit(card, ctypes.byref(pci), request,
+                                       len(request_data), None, response, ctypes.byref(length))
+        if rc:
+            return ('unsupported', None), 'transmit_%08X' % (rc & 0xffffffff)
+        raw = response.raw[:length.value]
+        if len(raw) < 4 or raw[-2:] != b'\x90\x00':
+            return ('unsupported', None), 'invalid_apdu_%s' % raw[-2:].hex().upper()
+        uid = raw[:-2].hex().upper()
+        if not 8 <= len(uid) <= 20:
+            return ('unsupported', None), 'uid_length_invalid'
+        return ('ok', uid), 'uid_ok'
+    finally:
+        reader.PCSC.SCardDisconnect(card, 0)
 
 
 def listen_for_cards():
-    global sequence, reader_error, reader_names
+    global sequence, reader_error, reader_names, last_poll_at, last_card_at
     ctx = ctypes.c_void_p()
     rc = reader.PCSC.SCardEstablishContext(0, None, None, ctypes.byref(ctx))
     if rc:
         reader_error = 'PCSC initialization failed: %08X' % (rc & 0xffffffff)
         print(reader_error, flush=True)
         return
-    names = reader.readers(ctx)
+    names = sorted(reader.readers(ctx), key=lambda name: (not name.endswith(b' 01'), name))
     reader_names = [name.decode(errors='replace') for name in names]
     if not names:
         reader_error = 'No PC/SC NFC reader found.'
@@ -47,29 +81,44 @@ def listen_for_cards():
     print('NFC reader ready:', ', '.join(reader_names), flush=True)
     active_card = False
     absent_polls = 0
+    reader_armed = False  # A card already present at service startup must not get another stamp.
     try:
         while True:
             outcome = None
             selected = None
             for name in names:
-                found = reader.read_card(ctx, name)
-                if found is not None:
+                found, state = diagnostic_read(ctx, name)
+                decoded = name.decode(errors='replace')
+                with lock:
+                    previous = reader_states.get(decoded)
+                    reader_states[decoded] = state
+                    last_poll_at = time.time()
+                if previous != state:
+                    print('Reader state: %s -> %s' % (decoded, state), flush=True)
+                if found is not None and found[0] == 'ok':
                     outcome, selected = found, name
                     break
+                if found is not None and outcome is None:
+                    outcome, selected = found, name
             if outcome is None:
                 absent_polls += 1
                 if absent_polls >= 3:
                     active_card = False
+                    reader_armed = True
             else:
                 absent_polls = 0
                 if not active_card:
                     active_card = True
+                    if not reader_armed:
+                        print('Card present at startup; lift and replace to stamp.', flush=True)
+                        continue
                     status, uid = outcome
                     if status != 'ok' or not uid:
                         print('Card present but UID unsupported.', flush=True)
                     else:
                         with lock:
                             sequence += 1
+                            last_card_at = time.time()
                             event = {'seq': sequence, 'eventId': str(uuid.uuid4()), 'uid': uid}
                             events.append(event)
                         print('Card scanned on %s; event #%d' % (selected.decode(errors='replace'), sequence), flush=True)
@@ -79,6 +128,17 @@ def listen_for_cards():
         print('Reader error:', reader_error, flush=True)
     finally:
         reader.PCSC.SCardReleaseContext(ctx)
+
+
+def watchdog():
+    """Restart a wedged PC/SC daemon via launchd instead of reporting ready forever."""
+    while True:
+        time.sleep(3)
+        with lock:
+            last = last_poll_at
+        if last and time.time() - last > 14:
+            print('PCSC watchdog: reader poll stalled; restarting local service.', flush=True)
+            os._exit(74)
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -130,15 +190,20 @@ class Handler(BaseHTTPRequestHandler):
             seq = sequence
             copied_events = list(events)
         if parts.path == '/status':
-            self.send_json(200, {'ok': not bool(reader_error), 'readers': reader_names,
-                                 'sequence': seq, 'error': reader_error})
+            alive = bool(last_poll_at) and time.time() - last_poll_at < 7
+            self.send_json(200, {'ok': not bool(reader_error) and alive, 'readers': reader_names,
+                                 'sequence': seq, 'instanceId': boot_id, 'error': reader_error,
+                                 'readerStates': dict(reader_states),
+                                 'lastPollAt': last_poll_at,
+                                 'lastCardAt': last_card_at})
         elif parts.path == '/events':
             try:
                 since = max(0, int(parse_qs(parts.query).get('after', ['0'])[0]))
             except ValueError:
                 self.send_json(400, {'ok': False, 'error': 'invalid_sequence'})
                 return
-            self.send_json(200, {'ok': True, 'sequence': seq,
+            self.send_json(200, {'ok': True, 'sequence': seq, 'instanceId': boot_id,
+                                 'readerAlive': bool(last_poll_at) and time.time() - last_poll_at < 7,
                                  'events': [e for e in copied_events if e['seq'] > since]})
         else:
             self.send_json(404, {'ok': False, 'error': 'not_found'})
@@ -151,6 +216,7 @@ def main():
     global PORT
     PORT = args.port
     threading.Thread(target=listen_for_cards, name='nfc-pcsc', daemon=True).start()
+    threading.Thread(target=watchdog, name='nfc-watchdog', daemon=True).start()
     server = ThreadingHTTPServer(('127.0.0.1', PORT), Handler)
     print('Pastera Mac NFC bridge listening at http://127.0.0.1:%d' % PORT, flush=True)
     print('Use https://www.pastera.de/admin/vip/pos with a signed-in admin session.', flush=True)

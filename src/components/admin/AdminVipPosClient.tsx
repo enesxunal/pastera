@@ -34,6 +34,7 @@ export function AdminVipPosClient() {
   const [macReaderState, setMacReaderState] = useState<"offline" | "connecting" | "ready">("offline");
   const [macReaderMessage, setMacReaderMessage] = useState("");
   const macLastSeqRef = useRef<number | null>(null);
+  const macInstanceRef = useRef<string | null>(null);
   const macPollingRef = useRef(false);
   const readerInputRef = useRef<HTMLInputElement>(null);
   const previousScanRef = useRef<{ uid: string; at: number } | null>(null);
@@ -139,11 +140,13 @@ export function AdminVipPosClient() {
     if (!macReaderEnabled) {
       setMacReaderState("offline");
       macLastSeqRef.current = null;
+      macInstanceRef.current = null;
       return;
     }
     const base = "http://127.0.0.1:8767";
     let stopped = false;
     let timer: ReturnType<typeof setInterval> | undefined;
+    let retryTimer: ReturnType<typeof setTimeout> | undefined;
     setMacReaderState("connecting");
     setMacReaderMessage("Mac-NFC-Lesegerät wird verbunden …");
 
@@ -154,8 +157,15 @@ export function AdminVipPosClient() {
       try {
         const response = await fetch(`${base}/events?after=${macLastSeqRef.current}`, { cache: "no-store", credentials: "omit" });
         if (!response.ok) throw new Error("local_reader_disconnected");
-        const data = await response.json() as { ok?: boolean; events?: LocalReaderEvent[] };
-        if (!data.ok || !Array.isArray(data.events)) throw new Error("local_reader_unavailable");
+        const data = await response.json() as { ok?: boolean; events?: LocalReaderEvent[]; instanceId?: string; readerAlive?: boolean };
+        if (!data.ok || !Array.isArray(data.events) || !data.readerAlive) throw new Error("local_reader_unavailable");
+        if (data.instanceId && macInstanceRef.current !== data.instanceId) {
+          // Local service restarted and its event counter reset. Do not skip
+          // the first real presentation after a launchd watchdog restart.
+          macInstanceRef.current = data.instanceId;
+          macLastSeqRef.current = 0;
+        }
+        if (!stopped) setMacReaderState("ready");
         for (const event of data.events) {
           if (stopped) break;
           if (!/^[0-9A-F]{8,20}$/i.test(event.uid) || !/^[0-9a-f-]{36}$/i.test(event.eventId)) {
@@ -192,8 +202,9 @@ export function AdminVipPosClient() {
       } catch {
         if (!stopped) {
           setMacReaderState("offline");
-          setMacReaderMessage("Mac-Verbindung unterbrochen. Lokalen NFC-Dienst prüfen und erneut verbinden.");
-          if (timer) clearInterval(timer);
+          setMacReaderMessage("Mac-NFC-Dienst vorübergehend nicht erreichbar; Verbindung wird automatisch erneut geprüft.");
+          // Keep polling: the local launchd watchdog will restart a stalled
+          // PC/SC process, and the next response will contain a new instanceId.
         }
       } finally {
         macPollingRef.current = false;
@@ -204,19 +215,21 @@ export function AdminVipPosClient() {
       try {
         const res = await fetch(`${base}/status`, { cache: "no-store", credentials: "omit" });
         if (!res.ok) throw new Error("local_reader_unavailable");
-        const status = await res.json() as { ok?: boolean; sequence?: number; readers?: string[]; error?: string };
-        if (!status.ok || typeof status.sequence !== "number" || !status.readers?.length) {
+        const status = await res.json() as { ok?: boolean; sequence?: number; instanceId?: string; readers?: string[]; error?: string };
+        if (!status.ok || typeof status.sequence !== "number" || !status.instanceId || !status.readers?.length) {
           throw new Error(status.error || "reader_not_found");
         }
         if (stopped) return;
         macLastSeqRef.current = status.sequence;
+        macInstanceRef.current = status.instanceId;
         setMacReaderState("ready");
         setMacReaderMessage("Mac-NFC-Lesegerät verbunden. Karte auflegen und für eine neue Buchung wieder abheben.");
         timer = setInterval(() => void poll(), 650);
       } catch {
         if (!stopped) {
           setMacReaderState("offline");
-          setMacReaderMessage("Mac-Leser nicht erreichbar. NFC-Bridge starten und dem Browser den lokalen Netzwerkzugriff erlauben.");
+          setMacReaderMessage("Mac-Leser nicht erreichbar. Verbindung wird erneut versucht; gegebenenfalls lokalen Netzwerkzugriff in Chrome erlauben.");
+          retryTimer = setTimeout(() => void initialize(), 2500);
         }
       }
     }
@@ -224,6 +237,7 @@ export function AdminVipPosClient() {
     return () => {
       stopped = true;
       if (timer) clearInterval(timer);
+      if (retryTimer) clearTimeout(retryTimer);
     };
   }, [macReaderEnabled, refresh, router]);
 
