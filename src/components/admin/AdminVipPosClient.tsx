@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 
 type PosEvent = {
@@ -24,6 +24,14 @@ export function AdminVipPosClient() {
   const [connected, setConnected] = useState(false);
   const [error, setError] = useState("");
   const [newScan, setNewScan] = useState(false);
+  // Browser-only NFC is possible when the reader behaves like a USB keyboard.
+  // Standard Windows PC/SC/CCID readers cannot be opened by a normal web page.
+  const [keyboardMode, setKeyboardMode] = useState(false);
+  const [keyboardUid, setKeyboardUid] = useState("");
+  const [readerMessage, setReaderMessage] = useState("");
+  const [readerBusy, setReaderBusy] = useState(false);
+  const readerInputRef = useRef<HTMLInputElement>(null);
+  const previousScanRef = useRef<{ uid: string; at: number } | null>(null);
   const lastEventRef = useRef<string | null>(null);
   const initializedRef = useRef(false);
   const flashRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -63,6 +71,62 @@ export function AdminVipPosClient() {
     };
   }, [refresh]);
 
+  useEffect(() => {
+    if (keyboardMode) readerInputRef.current?.focus();
+  }, [keyboardMode]);
+
+  async function submitKeyboardScan(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!keyboardMode || readerBusy) return;
+    const uid = keyboardUid.replace(/[^0-9a-f]/gi, "").toUpperCase();
+    setKeyboardUid("");
+    if (!/^[0-9A-F]{8,20}$/.test(uid)) {
+      setReaderMessage("Ungültige NFC-UID. Der Leser muss eine hexadezimale UID mit Enter senden, keine URL.");
+      readerInputRef.current?.focus();
+      return;
+    }
+    // Ignore a duplicate Enter caused by key repeat. A genuinely new presentation
+    // after lifting the card can still be counted as the next order.
+    const now = Date.now();
+    if (previousScanRef.current?.uid === uid && now - previousScanRef.current.at < 650) {
+      setReaderMessage("Doppelte Tastatureingabe ignoriert. Karte für einen neuen Scan abheben.");
+      readerInputRef.current?.focus();
+      return;
+    }
+    previousScanRef.current = { uid, at: now };
+    setReaderBusy(true);
+    setReaderMessage("NFC-Scan wird an den Server gesendet …");
+    try {
+      const response = await fetch("/api/admin/vip/scan", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ uid, eventId: crypto.randomUUID() }),
+      });
+      const result = await response.json() as { ok?: boolean; error?: string; card_number?: string; stamps?: number };
+      if (response.status === 401) {
+        router.replace("/admin/login");
+        return;
+      }
+      if (!response.ok || !result.ok) {
+        const errors: Record<string, string> = {
+          unauthorized: "Keine Berechtigung. Bitte erneut als Administrator anmelden.",
+          unassigned_card: "Karte nicht zugeordnet: UID zuerst unter Verwaltung einem Kunden zuweisen.",
+          uid_and_event_id_required: "Karten-UID ungültig.",
+          not_configured: "VIP-Datenbank nicht verfügbar.",
+        };
+        setReaderMessage(errors[result.error ?? ""] ?? `Scan nicht gespeichert (${response.status}: ${result.error ?? "Fehler"}).`);
+        return;
+      }
+      setReaderMessage(`${result.card_number ?? "VIP-Karte"}: +1 Bestellung gespeichert (${result.stamps ?? "?"} insgesamt).`);
+      await refresh();
+    } catch {
+      setReaderMessage("Netzwerkfehler: Scan nicht bestätigt. Karte nicht erneut buchen, bevor der Stand geprüft ist.");
+    } finally {
+      setReaderBusy(false);
+      readerInputRef.current?.focus();
+    }
+  }
+
   const hasReward = !!latest && latest.availableRewards > 0;
   const progress = latest ? (latest.progress === 0 && hasReward ? 10 : latest.progress) : 0;
   const isRecent = !!latest && newScan;
@@ -77,11 +141,46 @@ export function AdminVipPosClient() {
           <div className="flex items-center gap-5 text-sm">
             <span className={connected ? "text-emerald-300" : "text-red-300"}>
               <span aria-hidden="true" className={connected ? "mr-2 inline-block h-2 w-2 rounded-full bg-emerald-300" : "mr-2 inline-block h-2 w-2 rounded-full bg-red-300"} />
-              {connected ? "Live verbunden" : "Verbindung prüfen"}
+              {connected ? "Server verbunden" : "Serververbindung prüfen"}
             </span>
             <Link href="/admin/vip" className="text-[#c49746] underline">Verwaltung</Link>
           </div>
         </header>
+
+        <section className="mt-6 rounded-2xl border border-white/15 bg-[#142019] p-5 sm:p-6">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h2 className="text-lg font-semibold">NFC-Lesegerät im Browser</h2>
+              <p className="mt-1 text-sm text-white/60">
+                Ohne Zusatzprogramm: nur für Leser mit USB-Tastaturmodus (HID Keyboard).
+              </p>
+            </div>
+            <button type="button" onClick={() => { setKeyboardMode(x => !x); setReaderMessage(""); }}
+              className="rounded-full border border-[#c49746] px-5 py-2.5 text-sm font-bold text-[#eac987] hover:bg-[#c49746]/10">
+              {keyboardMode ? "Tastaturmodus stoppen" : "USB-Tastaturmodus starten"}
+            </button>
+          </div>
+          {keyboardMode ? (
+            <form className="mt-5 space-y-3" onSubmit={event => void submitKeyboardScan(event)}>
+              <label className="block text-sm text-white/70" htmlFor="vip-keyboard-reader">
+                Karte auflegen – die UID muss automatisch in dieses Feld geschrieben und mit Enter bestätigt werden.
+              </label>
+              <input id="vip-keyboard-reader" ref={readerInputRef} value={keyboardUid}
+                onChange={event => setKeyboardUid(event.target.value)} autoComplete="off" spellCheck={false}
+                placeholder="Warte auf Karten-UID + Enter …" aria-label="NFC-Karten-UID"
+                className="w-full rounded-lg border border-[#c49746]/40 bg-[#090e0b] p-4 font-mono text-white outline-none focus:border-[#c49746]" />
+              <button type="submit" disabled={readerBusy} className="rounded-full bg-[#c49746] px-5 py-2.5 text-sm font-bold text-black disabled:opacity-50">
+                {readerBusy ? "Verarbeitung …" : "UID bestätigen"}
+              </button>
+            </form>
+          ) : null}
+          {readerMessage ? <p role="status" className="mt-4 text-sm text-[#eac987]">{readerMessage}</p> : null}
+          <p className="mt-4 text-xs text-white/45">
+            Ein PC/SC-/CCID-Smartcard-Leser kann nicht direkt über diese Webseite gelesen werden.
+            Dafür ist ein lokaler Treiber-/Bridge-Prozess oder ein Leser mit Tastaturemulation nötig.
+            "Server verbunden" bedeutet nicht, dass der USB-Leser erkannt wurde.
+          </p>
+        </section>
 
         {error && <p role="alert" className="mt-6 rounded-xl border border-red-300/40 p-4 text-red-200">{error}</p>}
 
