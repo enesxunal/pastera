@@ -30,6 +30,11 @@ export function AdminVipPosClient() {
   const [keyboardUid, setKeyboardUid] = useState("");
   const [readerMessage, setReaderMessage] = useState("");
   const [readerBusy, setReaderBusy] = useState(false);
+  const [macReaderEnabled, setMacReaderEnabled] = useState(false);
+  const [macReaderState, setMacReaderState] = useState<"offline" | "connecting" | "ready">("offline");
+  const [macReaderMessage, setMacReaderMessage] = useState("");
+  const macLastSeqRef = useRef<number | null>(null);
+  const macPollingRef = useRef(false);
   const readerInputRef = useRef<HTMLInputElement>(null);
   const previousScanRef = useRef<{ uid: string; at: number } | null>(null);
   const lastEventRef = useRef<string | null>(null);
@@ -127,6 +132,101 @@ export function AdminVipPosClient() {
     }
   }
 
+  // macOS PC/SC/CCID readers are not exposed to websites. A read-only local
+  // bridge publishes card presentation events on loopback. The authenticated
+  // browser submits each event using its existing Pastera admin session.
+  useEffect(() => {
+    if (!macReaderEnabled) {
+      setMacReaderState("offline");
+      macLastSeqRef.current = null;
+      return;
+    }
+    const base = "http://127.0.0.1:8767";
+    let stopped = false;
+    let timer: ReturnType<typeof setInterval> | undefined;
+    setMacReaderState("connecting");
+    setMacReaderMessage("Mac-NFC-Lesegerät wird verbunden …");
+
+    type LocalReaderEvent = { seq: number; uid: string; eventId: string };
+    async function poll() {
+      if (stopped || macPollingRef.current || macLastSeqRef.current === null) return;
+      macPollingRef.current = true;
+      try {
+        const response = await fetch(`${base}/events?after=${macLastSeqRef.current}`, { cache: "no-store", credentials: "omit" });
+        if (!response.ok) throw new Error("local_reader_disconnected");
+        const data = await response.json() as { ok?: boolean; events?: LocalReaderEvent[] };
+        if (!data.ok || !Array.isArray(data.events)) throw new Error("local_reader_unavailable");
+        for (const event of data.events) {
+          if (stopped) break;
+          if (!/^[0-9A-F]{8,20}$/i.test(event.uid) || !/^[0-9a-f-]{36}$/i.test(event.eventId)) {
+            macLastSeqRef.current = event.seq;
+            setMacReaderMessage("Ungültige Karte vom lokalen Leser. Kein Auftrag gebucht.");
+            continue;
+          }
+          try {
+            const res = await fetch("/api/admin/vip/scan", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ uid: event.uid, eventId: event.eventId }),
+            });
+            if (res.status === 401) {
+              router.replace("/admin/login");
+              stopped = true;
+              return;
+            }
+            const result = await res.json() as { ok?: boolean; error?: string; card_number?: string; stamps?: number };
+            if (!res.ok || !result.ok) {
+              setMacReaderMessage(`NFC-Scan nicht gebucht: ${result.error || res.status}.`);
+            } else {
+              setMacReaderMessage(`${result.card_number || "VIP-Karte"}: +1 Bestellung gespeichert (${result.stamps ?? "?"} insgesamt).`);
+              await refresh();
+            }
+            macLastSeqRef.current = event.seq;
+          } catch {
+            // Retry the same event ID after a network error. Server-side RPC
+            // idempotency prevents double-stamping if the first request arrived.
+            setMacReaderMessage("Netzwerkfehler: Serverbestätigung fehlt. Verbindung prüfen.");
+            break;
+          }
+        }
+      } catch {
+        if (!stopped) {
+          setMacReaderState("offline");
+          setMacReaderMessage("Mac-Verbindung unterbrochen. Lokalen NFC-Dienst prüfen und erneut verbinden.");
+          if (timer) clearInterval(timer);
+        }
+      } finally {
+        macPollingRef.current = false;
+      }
+    }
+
+    async function initialize() {
+      try {
+        const res = await fetch(`${base}/status`, { cache: "no-store", credentials: "omit" });
+        if (!res.ok) throw new Error("local_reader_unavailable");
+        const status = await res.json() as { ok?: boolean; sequence?: number; readers?: string[]; error?: string };
+        if (!status.ok || typeof status.sequence !== "number" || !status.readers?.length) {
+          throw new Error(status.error || "reader_not_found");
+        }
+        if (stopped) return;
+        macLastSeqRef.current = status.sequence;
+        setMacReaderState("ready");
+        setMacReaderMessage("Mac-NFC-Lesegerät verbunden. Karte auflegen und für eine neue Buchung wieder abheben.");
+        timer = setInterval(() => void poll(), 650);
+      } catch {
+        if (!stopped) {
+          setMacReaderState("offline");
+          setMacReaderMessage("Mac-Leser nicht erreichbar. NFC-Bridge starten und dem Browser den lokalen Netzwerkzugriff erlauben.");
+        }
+      }
+    }
+    void initialize();
+    return () => {
+      stopped = true;
+      if (timer) clearInterval(timer);
+    };
+  }, [macReaderEnabled, refresh, router]);
+
   const hasReward = !!latest && latest.availableRewards > 0;
   const progress = latest ? (latest.progress === 0 && hasReward ? 10 : latest.progress) : 0;
   const isRecent = !!latest && newScan;
@@ -150,16 +250,37 @@ export function AdminVipPosClient() {
         <section className="mt-6 rounded-2xl border border-white/15 bg-[#142019] p-5 sm:p-6">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
-              <h2 className="text-lg font-semibold">NFC-Lesegerät im Browser</h2>
+              <h2 className="text-lg font-semibold">NFC-Lesegerät an der Kasse</h2>
               <p className="mt-1 text-sm text-white/60">
-                Ohne Zusatzprogramm: nur für Leser mit USB-Tastaturmodus (HID Keyboard).
+                Mac: PC/SC-Leser mit lokaler NFC-Bridge. Alternativ: USB-Tastaturmodus.
               </p>
             </div>
-            <button type="button" onClick={() => { setKeyboardMode(x => !x); setReaderMessage(""); }}
-              className="rounded-full border border-[#c49746] px-5 py-2.5 text-sm font-bold text-[#eac987] hover:bg-[#c49746]/10">
-              {keyboardMode ? "Tastaturmodus stoppen" : "USB-Tastaturmodus starten"}
-            </button>
+            <div className="flex flex-wrap items-center gap-3">
+              <button type="button" onClick={() => {
+                setMacReaderEnabled(x => !x);
+                setKeyboardMode(false);
+                setReaderMessage("");
+              }} className="rounded-full bg-[#c49746] px-5 py-2.5 text-sm font-bold text-black hover:bg-[#d4a956]">
+                {macReaderEnabled ? "Mac-Leser trennen" : "Mac-NFC-Leser verbinden"}
+              </button>
+              <button type="button" onClick={() => {
+                setKeyboardMode(x => !x);
+                setMacReaderEnabled(false);
+                setReaderMessage("");
+              }} className="rounded-full border border-[#c49746] px-5 py-2.5 text-sm font-bold text-[#eac987] hover:bg-[#c49746]/10">
+                {keyboardMode ? "Tastaturmodus stoppen" : "USB-Tastaturmodus"}
+              </button>
+            </div>
           </div>
+          {macReaderEnabled ? (
+            <div className="mt-5 rounded-xl border border-[#c49746]/25 bg-black/20 p-4" aria-live="polite">
+              <p className={macReaderState === "ready" ? "text-emerald-300" : "text-[#eac987]"}>
+                {macReaderState === "ready" ? "● Mac-NFC-Leser bereit" : macReaderState === "connecting" ? "○ Mac-Leser verbindet …" : "○ Mac-Leser nicht verbunden"}
+              </p>
+              <p className="mt-2 text-sm text-white/70">{macReaderMessage}</p>
+              <p className="mt-3 text-xs text-white/50">Lokaler Dienst auf diesem Mac: <code>python3 scripts/vip-nfc-mac-bridge.py</code> (Port 8767).</p>
+            </div>
+          ) : null}
           {keyboardMode ? (
             <form className="mt-5 space-y-3" onSubmit={event => void submitKeyboardScan(event)}>
               <label className="block text-sm text-white/70" htmlFor="vip-keyboard-reader">
@@ -176,9 +297,8 @@ export function AdminVipPosClient() {
           ) : null}
           {readerMessage ? <p role="status" className="mt-4 text-sm text-[#eac987]">{readerMessage}</p> : null}
           <p className="mt-4 text-xs text-white/45">
-            Ein PC/SC-/CCID-Smartcard-Leser kann nicht direkt über diese Webseite gelesen werden.
-            Dafür ist ein lokaler Treiber-/Bridge-Prozess oder ein Leser mit Tastaturemulation nötig.
-            &quot;Server verbunden&quot; bedeutet nicht, dass der USB-Leser erkannt wurde.
+            PC/SC-/CCID-Leser benötigen den lokalen Mac-NFC-Dienst; die Website sendet die Scans über die bestehende Admin-Sitzung.
+            &quot;Server verbunden&quot; bestätigt nur den Pastera-Server. Den Hardwarestatus zeigt &quot;Mac-NFC-Leser bereit&quot;.
           </p>
         </section>
 
