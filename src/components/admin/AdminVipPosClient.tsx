@@ -33,6 +33,8 @@ export function AdminVipPosClient() {
   const [macReaderEnabled, setMacReaderEnabled] = useState(false);
   const [macReaderState, setMacReaderState] = useState<"offline" | "connecting" | "ready">("offline");
   const [macReaderMessage, setMacReaderMessage] = useState("");
+  const [readerOptionsOpen, setReaderOptionsOpen] = useState(false);
+  const [lastReaderBooking, setLastReaderBooking] = useState<{ cardNumber: string; stamps: number } | null>(null);
   const macLastSeqRef = useRef<number | null>(null);
   const macInstanceRef = useRef<string | null>(null);
   const macPollingRef = useRef(false);
@@ -189,6 +191,7 @@ export function AdminVipPosClient() {
               setMacReaderMessage(`NFC-Scan nicht gebucht: ${result.error || res.status}.`);
             } else {
               setMacReaderMessage(`${result.card_number || "VIP-Karte"}: +1 Bestellung gespeichert (${result.stamps ?? "?"} insgesamt).`);
+              setLastReaderBooking({ cardNumber: result.card_number || "VIP-Karte", stamps: result.stamps ?? 0 });
               await refresh();
             }
             macLastSeqRef.current = event.seq;
@@ -244,6 +247,10 @@ export function AdminVipPosClient() {
   const hasReward = !!latest && latest.availableRewards > 0;
   const progress = latest ? (latest.progress === 0 && hasReward ? 10 : latest.progress) : 0;
   const isRecent = !!latest && newScan;
+  const readerIsReady = macReaderEnabled && macReaderState === "ready";
+  const readerIsConnecting = macReaderEnabled && macReaderState === "connecting";
+  const readerNeedsAttention = macReaderEnabled && macReaderState === "offline";
+  const macReaderWarning = /nicht gebucht|Netzwerkfehler|Ungültige Karte|unterbrochen|nicht erreichbar/i.test(macReaderMessage);
   return (
     <main className="min-h-screen bg-[#0a100d] px-4 py-8 text-white sm:px-8 lg:px-12">
       <div className="mx-auto max-w-5xl">
@@ -261,59 +268,126 @@ export function AdminVipPosClient() {
           </div>
         </header>
 
-        <section className="mt-6 rounded-2xl border border-white/15 bg-[#142019] p-5 sm:p-6">
-          <div className="flex flex-wrap items-center justify-between gap-4">
+        <section className="relative mt-6 overflow-hidden rounded-[28px] border border-[#c49746]/20 bg-[#152018] shadow-[0_25px_70px_-45px_rgba(0,0,0,0.85)]">
+          <div aria-hidden="true" className="pointer-events-none absolute -right-24 -top-40 h-[430px] w-[430px] rounded-full bg-[#c49746]/[0.055] blur-3xl" />
+          <div aria-hidden="true" className="pointer-events-none absolute -bottom-40 -left-40 h-[350px] w-[350px] rounded-full bg-[#496347]/[0.13] blur-3xl" />
+
+          <div className="relative grid gap-7 px-6 pb-7 pt-7 sm:px-9 sm:pb-8 sm:pt-9 lg:grid-cols-[minmax(0,1fr)_290px] lg:items-center lg:gap-9">
             <div>
-              <h2 className="text-lg font-semibold">NFC-Lesegerät an der Kasse</h2>
-              <p className="mt-1 text-sm text-white/60">
-                Mac: PC/SC-Leser mit lokaler NFC-Bridge. Alternativ: USB-Tastaturmodus.
+              <div className="mb-5 flex items-center gap-3">
+                <span className="h-px w-8 bg-[#c49746]" />
+                <span className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#cda866]">VIP CLUB · KASSE</span>
+              </div>
+              <h2 className="font-display text-[31px] font-semibold leading-[1.12] tracking-[-0.04em] text-[#f5f3eb] sm:text-[40px]">
+                Karte auflegen.<br />Freude sammeln.
+              </h2>
+              <p className="mt-4 max-w-lg text-[15px] leading-7 text-[#bac3b7] sm:text-base">
+                Halte die VIP-Karte kurz ans Lesegerät. Die Bestellung wird ganz automatisch gutgeschrieben.
               </p>
+              <div className="mt-6 inline-flex max-w-full items-center gap-2.5 rounded-full border border-white/10 bg-[#0d1510]/70 px-3.5 py-2.5" role="status" aria-live="polite">
+                <span className={`h-2 w-2 shrink-0 rounded-full ${readerIsReady ? "bg-[#84b899] shadow-[0_0_0_4px_rgba(132,184,153,0.11)]" : readerIsConnecting ? "animate-pulse bg-[#cda866]" : keyboardMode ? "bg-[#84b899]" : readerNeedsAttention ? "bg-[#d9a080]" : "bg-white/40"}`} />
+                <span className="text-[13px] font-medium text-[#e2e6dc]">
+                  {readerIsReady ? "Lesegerät verbunden · bereit zum Scannen" : readerIsConnecting ? "Verbindung wird hergestellt …" : keyboardMode ? "USB-Leser aktiv" : readerNeedsAttention ? "Lesegerät gerade nicht erreichbar" : "Lesegerät noch nicht verbunden"}
+                </span>
+              </div>
             </div>
-            <div className="flex flex-wrap items-center gap-3">
-              <button type="button" onClick={() => {
-                setMacReaderEnabled(x => !x);
-                setKeyboardMode(false);
-                setReaderMessage("");
-              }} className="rounded-full bg-[#c49746] px-5 py-2.5 text-sm font-bold text-black hover:bg-[#d4a956]">
-                {macReaderEnabled ? "Mac-Leser trennen" : "Mac-NFC-Leser verbinden"}
-              </button>
-              <button type="button" onClick={() => {
-                setKeyboardMode(x => !x);
-                setMacReaderEnabled(false);
-                setReaderMessage("");
-              }} className="rounded-full border border-[#c49746] px-5 py-2.5 text-sm font-bold text-[#eac987] hover:bg-[#c49746]/10">
-                {keyboardMode ? "Tastaturmodus stoppen" : "USB-Tastaturmodus"}
-              </button>
+
+            <div className="relative mx-auto hidden h-[210px] w-full max-w-[290px] items-center justify-center lg:flex" aria-hidden="true">
+              <div className="absolute h-[190px] w-[190px] rounded-full border border-[#c49746]/10" />
+              <div className="absolute h-[155px] w-[155px] rounded-full border border-[#c49746]/10" />
+              <div className="absolute -rotate-[11deg] rounded-[20px] border border-[#d7b67b]/45 bg-gradient-to-br from-[#374633] via-[#223328] to-[#101c16] p-[1px] shadow-[0_22px_35px_-15px_rgba(0,0,0,0.7)]">
+                <div className="flex h-[137px] w-[223px] flex-col justify-between rounded-[19px] bg-gradient-to-br from-[#283b2c] via-[#16271c] to-[#0c170f] p-5">
+                  <div className="flex items-start justify-between">
+                    <span className="font-display text-[13px] font-bold tracking-[0.24em] text-[#e9dbbc]">PASTERA</span>
+                    <svg className="h-7 w-7 text-[#d2ae70]" viewBox="0 0 28 28" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+                      <path d="M8 11a5 5 0 0 1 0 6M12 7a11 11 0 0 1 0 14M16 4a15 15 0 0 1 0 20" />
+                    </svg>
+                  </div>
+                  <div>
+                    <span className="text-[9px] font-medium tracking-[0.32em] text-[#b6a685]">VIP CLUB</span>
+                    <div className="mt-2 h-px w-12 bg-[#d2ae70]/65" />
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-          {macReaderEnabled ? (
-            <div className="mt-5 rounded-xl border border-[#c49746]/25 bg-black/20 p-4" aria-live="polite">
-              <p className={macReaderState === "ready" ? "text-emerald-300" : "text-[#eac987]"}>
-                {macReaderState === "ready" ? "● Mac-NFC-Leser bereit" : macReaderState === "connecting" ? "○ Mac-Leser verbindet …" : "○ Mac-Leser nicht verbunden"}
-              </p>
-              <p className="mt-2 text-sm text-white/70">{macReaderMessage}</p>
-              <p className="mt-3 text-xs text-white/50">Lokaler Dienst auf diesem Mac: <code>python3 scripts/vip-nfc-mac-bridge.py</code> (Port 8767).</p>
+
+          {(readerIsReady && lastReaderBooking) ? (
+            <div className="relative mx-6 mb-6 flex flex-wrap items-center gap-4 rounded-2xl border border-[#96c5a0]/20 bg-[#25382b]/70 px-4 py-4 sm:mx-9 sm:mb-7 sm:px-5" aria-live="polite">
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#95bc9a]/15 text-[#a8d5af]">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6" aria-hidden="true"><path d="M5 12l4.5 4.5L19 7" /></svg>
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.17em] text-[#a8d5af]">Erfolgreich erfasst</p>
+                <p className="mt-1 text-[15px] font-semibold text-white">{lastReaderBooking.cardNumber} <span className="font-normal text-white/65">· Eine weitere Bestellung gesammelt</span></p>
+              </div>
+              <span className="rounded-full border border-[#c49746]/25 bg-[#c49746]/10 px-4 py-2 font-display text-lg font-semibold tabular-nums text-[#e7ca8d]">{lastReaderBooking.stamps} <span className="text-sm font-normal text-[#d7c3a1]/70">gesamt</span></span>
             </div>
           ) : null}
-          {keyboardMode ? (
-            <form className="mt-5 space-y-3" onSubmit={event => void submitKeyboardScan(event)}>
-              <label className="block text-sm text-white/70" htmlFor="vip-keyboard-reader">
-                Karte auflegen – die UID muss automatisch in dieses Feld geschrieben und mit Enter bestätigt werden.
-              </label>
-              <input id="vip-keyboard-reader" ref={readerInputRef} value={keyboardUid}
-                onChange={event => setKeyboardUid(event.target.value)} autoComplete="off" spellCheck={false}
-                placeholder="Warte auf Karten-UID + Enter …" aria-label="NFC-Karten-UID"
-                className="w-full rounded-lg border border-[#c49746]/40 bg-[#090e0b] p-4 font-mono text-white outline-none focus:border-[#c49746]" />
-              <button type="submit" disabled={readerBusy} className="rounded-full bg-[#c49746] px-5 py-2.5 text-sm font-bold text-black disabled:opacity-50">
-                {readerBusy ? "Verarbeitung …" : "UID bestätigen"}
-              </button>
-            </form>
+
+          {readerNeedsAttention || macReaderWarning ? (
+            <div role="alert" className="relative mx-6 mb-6 flex items-start gap-3 rounded-xl border border-[#b58b59]/25 bg-[#a87c48]/[0.08] px-4 py-3 text-sm leading-6 text-[#f0d6b1] sm:mx-9">
+              <span aria-hidden="true" className="font-semibold">!</span>
+              <span>{readerNeedsAttention ? "Lesegerät nicht erreichbar. Bitte USB-Verbindung prüfen – wir versuchen es erneut." : "Die letzte Buchung konnte nicht bestätigt werden. Bitte den Kartenstand prüfen."}</span>
+            </div>
           ) : null}
-          {readerMessage ? <p role="status" className="mt-4 text-sm text-[#eac987]">{readerMessage}</p> : null}
-          <p className="mt-4 text-xs text-white/45">
-            PC/SC-/CCID-Leser benötigen den lokalen Mac-NFC-Dienst; die Website sendet die Scans über die bestehende Admin-Sitzung.
-            &quot;Server verbunden&quot; bestätigt nur den Pastera-Server. Den Hardwarestatus zeigt &quot;Mac-NFC-Leser bereit&quot;.
-          </p>
+
+          <div className="relative border-t border-white/[0.08] bg-[#101911]/55 px-6 py-4 sm:px-9">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <p className="text-[13px] leading-6 text-[#9ea99b]">
+                {readerIsReady ? "Alles bereit. Einfach die nächste Karte auflegen." : keyboardMode ? "Karte scannen oder UID unten eingeben." : "Verbinde einmal den Leser und starte direkt."}
+              </p>
+              <div className="flex flex-wrap items-center gap-4">
+                <button type="button" onClick={() => {
+                  setMacReaderEnabled(x => !x);
+                  setKeyboardMode(false);
+                  setReaderMessage("");
+                  setLastReaderBooking(null);
+                }} className={macReaderEnabled ? "text-[13px] font-medium text-[#c3c9c0] underline-offset-4 hover:text-white hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#c49746]" : "rounded-full bg-[#c49746] px-5 py-2.5 text-[13px] font-semibold text-[#141510] transition hover:bg-[#ddb56e] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#c49746]"}>
+                  {macReaderEnabled ? "Verbindung trennen" : "Lesegerät verbinden"}
+                </button>
+                <button type="button" aria-expanded={readerOptionsOpen} aria-controls="vip-reader-options" onClick={() => setReaderOptionsOpen(x => !x)} className="inline-flex items-center gap-1.5 text-[13px] font-medium text-[#c9ad78] transition hover:text-[#f4d89f] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#c49746]">
+                  {readerOptionsOpen ? "Optionen schließen" : "Weitere Optionen"}
+                  <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" className={`h-4 w-4 transition-transform ${readerOptionsOpen ? "rotate-180" : ""}`} aria-hidden="true"><path d="m5 7 5 5 5-5" /></svg>
+                </button>
+              </div>
+            </div>
+
+            {readerOptionsOpen ? (
+              <div id="vip-reader-options" className="mt-5 border-t border-white/10 pt-5">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <p className="text-sm font-medium text-[#e1e6dc]">Alternative Lesemethode</p>
+                    <p className="mt-1 text-xs leading-5 text-[#9fa99c]">Nur für Kartenleser, die ihre UID wie eine USB-Tastatur eingeben.</p>
+                  </div>
+                  <button type="button" onClick={() => {
+                    setKeyboardMode(x => !x);
+                    setMacReaderEnabled(false);
+                    setReaderMessage("");
+                    setLastReaderBooking(null);
+                  }} className="rounded-full border border-[#c49746]/35 px-4 py-2 text-xs font-semibold text-[#ddbe81] transition hover:bg-[#c49746]/10">
+                    {keyboardMode ? "Tastaturmodus beenden" : "USB-Tastaturmodus aktivieren"}
+                  </button>
+                </div>
+                {keyboardMode ? (
+                  <form className="mt-5 space-y-3" onSubmit={event => void submitKeyboardScan(event)}>
+                    <label className="block text-sm text-white/70" htmlFor="vip-keyboard-reader">Karte auflegen – die UID wird automatisch eingetragen und mit Enter bestätigt.</label>
+                    <div className="flex flex-col gap-3 sm:flex-row">
+                      <input id="vip-keyboard-reader" ref={readerInputRef} value={keyboardUid}
+                        onChange={event => setKeyboardUid(event.target.value)} autoComplete="off" spellCheck={false}
+                        placeholder="Karten-UID" aria-label="NFC-Karten-UID"
+                        className="min-w-0 flex-1 rounded-xl border border-[#c49746]/25 bg-[#090e0b] px-4 py-3 font-mono text-sm text-white outline-none focus:border-[#c49746]" />
+                      <button type="submit" disabled={readerBusy} className="rounded-xl bg-[#c49746] px-5 py-3 text-sm font-semibold text-black disabled:opacity-50">
+                        {readerBusy ? "Wird gespeichert …" : "Bestellung erfassen"}
+                      </button>
+                    </div>
+                  </form>
+                ) : null}
+                {readerMessage ? <p role="status" className="mt-3 text-sm text-[#eac987]">{readerMessage}</p> : null}
+                <p className="mt-5 text-xs leading-5 text-[#718071]">Technik: PC/SC-Leser werden über den lokalen Mac-Dienst verbunden. Bei Problemen zuerst den USB-Anschluss prüfen. Ein verbundener Server allein bedeutet nicht, dass der Kartenleser erkannt wurde.</p>
+              </div>
+            ) : null}
+          </div>
         </section>
 
         {error && <p role="alert" className="mt-6 rounded-xl border border-red-300/40 p-4 text-red-200">{error}</p>}
