@@ -110,24 +110,26 @@ export function AdminVipPosClient() {
           // Runs automatically on page load. Chrome may ask for local-network
           // permission on first use; only the browser can remember that choice.
           const status = await readLocal<LocalReaderStatus>("/status");
-          if (!status.ok || !status.readerReady || typeof status.sequence !== "number" || !status.instanceId) {
-            throw new Error("reader_not_ready");
+          if (typeof status.sequence !== "number" || !status.instanceId) {
+            throw new Error("reader_service_not_running");
           }
           if (disposed) return;
-          // First page load ignores old reader events. A bridge restart while the
-          // page remains open instead starts at zero, preserving new events.
+          // Replay all buffered events on first load and after bridge restarts.
+          // Each eventId is stable, so the live server safely deduplicates
+          // previously delivered events. This prevents losing cards scanned
+          // before the browser finished loading or after a page refresh.
           if (bridgeInstanceRef.current !== status.instanceId) {
-            scanSequenceRef.current = bridgeInstanceRef.current === null ? status.sequence : 0;
+            scanSequenceRef.current = 0;
             bridgeInstanceRef.current = status.instanceId;
           }
           ready = true;
-          setReaderState("ready");
-          setReaderNotice("");
+          setReaderState(status.readerReady ? "ready" : "offline");
+          setReaderNotice(status.readerReady ? "" : "Der NFC-Leser ist am Mac nicht erreichbar. Bitte die USB-Verbindung prüfen.");
         }
 
         const result = await readLocal<LocalReaderEvents>(`/events?after=${scanSequenceRef.current ?? 0}`);
-        if (!result.ok || !result.readerAlive || !Array.isArray(result.events)) {
-          throw new Error("reader_lost");
+        if (!result.ok || !Array.isArray(result.events)) {
+          throw new Error("local_service_unavailable");
         }
         if (disposed) return;
         if (result.instanceId && result.instanceId !== bridgeInstanceRef.current) {
@@ -142,6 +144,7 @@ export function AdminVipPosClient() {
             continue;
           }
           try {
+            setReaderNotice("Karte erkannt. Stempel wird gespeichert …");
             const response = await fetch("/api/admin/vip/scan", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -170,13 +173,16 @@ export function AdminVipPosClient() {
           }
         }
         ready = true;
-        setReaderState("ready");
+        setReaderState(result.readerAlive ? "ready" : "offline");
+        if (!result.readerAlive && !result.events.length) {
+          setReaderNotice("NFC-Leser am Mac nicht verfügbar. USB-Anschluss prüfen – wir verbinden automatisch neu.");
+        }
       } catch {
         if (!disposed) {
           ready = false;
           nextRetryAt = Date.now() + 2200;
           setReaderState("offline");
-          setReaderNotice("Lesegerät nicht erreichbar. USB-Verbindung oder lokale Netzwerkfreigabe prüfen; die Verbindung wird automatisch wiederhergestellt.");
+          setReaderNotice("Verbindung zum Mac-NFC-Dienst fehlt. Wenn Chrome nach lokalem Netzwerkzugriff fragt, einmal erlauben. Die Verbindung wird automatisch erneut versucht.");
         }
       } finally {
         busy = false;
