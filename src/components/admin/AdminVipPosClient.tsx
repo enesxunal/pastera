@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { VipStampCard } from "@/components/vip/VipStampCard";
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 
@@ -34,7 +35,6 @@ export function AdminVipPosClient() {
   const [macReaderState, setMacReaderState] = useState<"offline" | "connecting" | "ready">("offline");
   const [macReaderMessage, setMacReaderMessage] = useState("");
   const [readerOptionsOpen, setReaderOptionsOpen] = useState(false);
-  const [lastReaderBooking, setLastReaderBooking] = useState<{ cardNumber: string; stamps: number } | null>(null);
   const macLastSeqRef = useRef<number | null>(null);
   const macInstanceRef = useRef<string | null>(null);
   const macPollingRef = useRef(false);
@@ -191,7 +191,6 @@ export function AdminVipPosClient() {
               setMacReaderMessage(`NFC-Scan nicht gebucht: ${result.error || res.status}.`);
             } else {
               setMacReaderMessage(`${result.card_number || "VIP-Karte"}: +1 Bestellung gespeichert (${result.stamps ?? "?"} insgesamt).`);
-              setLastReaderBooking({ cardNumber: result.card_number || "VIP-Karte", stamps: result.stamps ?? 0 });
               await refresh();
             }
             macLastSeqRef.current = event.seq;
@@ -244,8 +243,6 @@ export function AdminVipPosClient() {
     };
   }, [macReaderEnabled, refresh, router]);
 
-  const hasReward = !!latest && latest.availableRewards > 0;
-  const progress = latest ? (latest.progress === 0 && hasReward ? 10 : latest.progress) : 0;
   const isRecent = !!latest && newScan;
   const readerIsReady = macReaderEnabled && macReaderState === "ready";
   const readerIsConnecting = macReaderEnabled && macReaderState === "connecting";
@@ -292,38 +289,16 @@ export function AdminVipPosClient() {
               </div>
             </div>
 
-            <div className="relative mx-auto hidden h-[210px] w-full max-w-[290px] items-center justify-center lg:flex" aria-hidden="true">
-              <div className="absolute h-[190px] w-[190px] rounded-full border border-[#c49746]/10" />
-              <div className="absolute h-[155px] w-[155px] rounded-full border border-[#c49746]/10" />
-              <div className="absolute -rotate-[11deg] rounded-[20px] border border-[#d7b67b]/45 bg-gradient-to-br from-[#374633] via-[#223328] to-[#101c16] p-[1px] shadow-[0_22px_35px_-15px_rgba(0,0,0,0.7)]">
-                <div className="flex h-[137px] w-[223px] flex-col justify-between rounded-[19px] bg-gradient-to-br from-[#283b2c] via-[#16271c] to-[#0c170f] p-5">
-                  <div className="flex items-start justify-between">
-                    <span className="font-display text-[13px] font-bold tracking-[0.24em] text-[#e9dbbc]">PASTERA</span>
-                    <svg className="h-7 w-7 text-[#d2ae70]" viewBox="0 0 28 28" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
-                      <path d="M8 11a5 5 0 0 1 0 6M12 7a11 11 0 0 1 0 14M16 4a15 15 0 0 1 0 20" />
-                    </svg>
-                  </div>
-                  <div>
-                    <span className="text-[9px] font-medium tracking-[0.32em] text-[#b6a685]">VIP CLUB</span>
-                    <div className="mt-2 h-px w-12 bg-[#d2ae70]/65" />
-                  </div>
-                </div>
+            <div className="relative mx-auto hidden h-[180px] w-full max-w-[260px] items-center justify-center lg:flex" aria-hidden="true">
+              <div className="absolute h-[174px] w-[174px] rounded-full border border-[#c49746]/10" />
+              <div className="absolute h-[128px] w-[128px] rounded-full border border-[#c49746]/20" />
+              <div className="absolute flex h-[84px] w-[84px] items-center justify-center rounded-full border border-[#d9b67e]/30 bg-[#c49746]/[0.07] text-[#e8c98a]">
+                <svg viewBox="0 0 64 64" className="h-14 w-14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">
+                  <path d="M24 23a13 13 0 0 1 0 18M32 16a22 22 0 0 1 0 32M40 10a30 30 0 0 1 0 44" />
+                </svg>
               </div>
             </div>
           </div>
-
-          {(readerIsReady && lastReaderBooking) ? (
-            <div className="relative mx-6 mb-6 flex flex-wrap items-center gap-4 rounded-2xl border border-[#96c5a0]/20 bg-[#25382b]/70 px-4 py-4 sm:mx-9 sm:mb-7 sm:px-5" aria-live="polite">
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#95bc9a]/15 text-[#a8d5af]">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6" aria-hidden="true"><path d="M5 12l4.5 4.5L19 7" /></svg>
-              </span>
-              <div className="min-w-0 flex-1">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.17em] text-[#a8d5af]">Erfolgreich erfasst</p>
-                <p className="mt-1 text-[15px] font-semibold text-white">{lastReaderBooking.cardNumber} <span className="font-normal text-white/65">· Eine weitere Bestellung gesammelt</span></p>
-              </div>
-              <span className="rounded-full border border-[#c49746]/25 bg-[#c49746]/10 px-4 py-2 font-display text-lg font-semibold tabular-nums text-[#e7ca8d]">{lastReaderBooking.stamps} <span className="text-sm font-normal text-[#d7c3a1]/70">gesamt</span></span>
-            </div>
-          ) : null}
 
           {readerNeedsAttention || macReaderWarning ? (
             <div role="alert" className="relative mx-6 mb-6 flex items-start gap-3 rounded-xl border border-[#b58b59]/25 bg-[#a87c48]/[0.08] px-4 py-3 text-sm leading-6 text-[#f0d6b1] sm:mx-9">
@@ -342,7 +317,6 @@ export function AdminVipPosClient() {
                   setMacReaderEnabled(x => !x);
                   setKeyboardMode(false);
                   setReaderMessage("");
-                  setLastReaderBooking(null);
                 }} className={macReaderEnabled ? "text-[13px] font-medium text-[#c3c9c0] underline-offset-4 hover:text-white hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#c49746]" : "rounded-full bg-[#c49746] px-5 py-2.5 text-[13px] font-semibold text-[#141510] transition hover:bg-[#ddb56e] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#c49746]"}>
                   {macReaderEnabled ? "Verbindung trennen" : "Lesegerät verbinden"}
                 </button>
@@ -364,8 +338,7 @@ export function AdminVipPosClient() {
                     setKeyboardMode(x => !x);
                     setMacReaderEnabled(false);
                     setReaderMessage("");
-                    setLastReaderBooking(null);
-                  }} className="rounded-full border border-[#c49746]/35 px-4 py-2 text-xs font-semibold text-[#ddbe81] transition hover:bg-[#c49746]/10">
+                    }} className="rounded-full border border-[#c49746]/35 px-4 py-2 text-xs font-semibold text-[#ddbe81] transition hover:bg-[#c49746]/10">
                     {keyboardMode ? "Tastaturmodus beenden" : "USB-Tastaturmodus aktivieren"}
                   </button>
                 </div>
@@ -392,66 +365,22 @@ export function AdminVipPosClient() {
 
         {error && <p role="alert" className="mt-6 rounded-xl border border-red-300/40 p-4 text-red-200">{error}</p>}
 
-        <section aria-live="polite" className="mt-8 rounded-3xl border border-[#c49746]/25 bg-gradient-to-br from-[#1b2a21] to-[#111511] p-6 shadow-2xl sm:p-10">
-          {!latest ? (
-            <div className="py-14 text-center">
-              <p className="text-xs uppercase tracking-[0.3em] text-[#c49746]">NFC Reader</p>
-              <h2 className="mt-5 font-display text-3xl font-bold sm:text-5xl">Bereit für deine VIP-Karte</h2>
-              <p className="mt-5 text-lg text-white/60">Karte auf das Lesegerät legen.</p>
-            </div>
-          ) : (
-            <>
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <p className="text-sm uppercase tracking-widest text-[#c49746]">
-                  {latest.delta > 0 ? "Letzte Bestellung" : "Letzte Korrektur"}
-                </p>
-                <span className="rounded-full border border-white/20 px-4 py-2 text-sm text-white/60">{latest.cardNumber}</span>
-              </div>
-              <h2 className="mt-6 font-display text-4xl font-bold sm:text-5xl">{latest.memberName}</h2>
-              {latest.isSimulation && <p className="mt-3 text-sm font-bold text-amber-300">TESTBUCHUNG – KEIN ECHTER VERKAUF</p>}
-              {isRecent && (
-                <p className={latest.delta > 0 ? "mt-5 text-2xl font-bold text-emerald-300" : "mt-5 text-2xl font-bold text-amber-300"}>
-                  {latest.delta > 0 ? "+1 Bestellung erfasst!" : "−1 Bestellung korrigiert"}
-                </p>
-              )}
-              <div className="mt-8 flex items-baseline gap-3">
-                <span className="text-6xl font-bold tabular-nums text-[#c49746]">{progress}</span>
-                <span className="text-2xl text-white/45">/ 10 Bestellungen</span>
-              </div>
-              <div className="mt-6 grid grid-cols-5 gap-3 sm:grid-cols-10">
-                {Array.from({ length: 10 }, (_, i) =>
-                  <span key={i} className={"flex h-12 items-center justify-center rounded-xl border text-xl font-bold " +
-                    (i < progress ? "border-[#c49746] bg-[#c49746] text-black" : "border-white/15 text-white/35")}>
-                    {i < progress ? "✓" : i + 1}
-                  </span>
-                )}
-              </div>
-              {hasReward ? (
-                <div role="status" className="mt-8 rounded-2xl border-2 border-[#c49746] bg-[#c49746]/15 px-6 py-7 text-center">
-                  <p className="text-4xl" aria-hidden="true">★</p>
-                  <h3 className="mt-3 font-display text-3xl font-bold text-[#f4d990] sm:text-4xl">
-                    Herzlichen Glückwunsch!
-                  </h3>
-                  <p className="mt-3 text-xl font-semibold">
-                    Du hast eine Gratis-Pasta verdient!
-                  </p>
-                  <p className="mt-3 text-sm text-white/65">
-                    Verfügbare Gratis-Pasta: {latest.availableRewards} · Prämie in der Verwaltung einlösen.
-                  </p>
-                </div>
-              ) : (
-                <p className="mt-7 text-lg text-white/65">
-                  Noch {latest.remaining} {latest.remaining === 1 ? "Bestellung" : "Bestellungen"} bis zur Gratis-Pasta.
-                </p>
-              )}
-              <div className="mt-8 flex flex-wrap gap-5 border-t border-white/10 pt-5 text-sm text-white/45">
-                <span>Gezählte Bestellungen: {latest.stamps}</span>
-                <span>Eingelöste Prämien: {latest.redemptions}</span>
-                <span>Letzter Vorgang: {new Date(latest.createdAt).toLocaleTimeString("de-DE")}</span>
-              </div>
-            </>
-          )}
-        </section>
+        <div className="mt-6">
+          <VipStampCard
+            memberName={latest?.memberName}
+            cardNumber={latest?.cardNumber}
+            progress={latest?.progress ?? 0}
+            stamps={latest?.stamps ?? 0}
+            remaining={latest?.remaining ?? 10}
+            availableRewards={latest?.availableRewards ?? 0}
+            redemptions={latest?.redemptions ?? 0}
+            lastScanAt={latest?.createdAt}
+            animationKey={isRecent && latest ? latest.id : null}
+            lastDelta={latest?.delta ?? 0}
+            isSimulation={latest?.isSimulation ?? false}
+            waiting={!latest}
+          />
+        </div>
         <p className="mt-6 text-center text-sm text-white/45">
           Jede neue Kartenauflage zählt als eine Bestellung. Eine durchgehend aufgelegte Karte wird nicht mehrfach gezählt.
         </p>
