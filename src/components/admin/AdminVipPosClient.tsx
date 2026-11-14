@@ -178,7 +178,7 @@ export function AdminVipPosClient() {
           <p className="mt-4 text-xs text-white/45">
             Ein PC/SC-/CCID-Smartcard-Leser kann nicht direkt über diese Webseite gelesen werden.
             Dafür ist ein lokaler Treiber-/Bridge-Prozess oder ein Leser mit Tastaturemulation nötig.
-            "Server verbunden" bedeutet nicht, dass der USB-Leser erkannt wurde.
+            &quot;Server verbunden&quot; bedeutet nicht, dass der USB-Leser erkannt wurde.
           </p>
         </section>
 
