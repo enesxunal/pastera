@@ -13,8 +13,8 @@ export async function GET(req: NextRequest) {
   const { data: scans, error } = await svc
     .from("vip_club_scans")
     .select("id,card_id,user_id,delta,operator_label,created_at")
-    .order("created_at", { ascending: false })
-    .limit(1);
+     .order("created_at", { ascending: false })
+    .limit(30);
   if (error) return NextResponse.json({ ok: false, error: "scan_lookup_failed" }, { status: 503 });
   if (!scans?.length) return NextResponse.json({ ok: true, latest: null }, { headers: { "Cache-Control": "no-store" } });
 

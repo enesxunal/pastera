@@ -10,10 +10,10 @@ import importlib.util
 import json
 import os
 import pathlib
+import sqlite3
 import threading
 import time
 import uuid
-from collections import deque
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlsplit
 
@@ -25,7 +25,7 @@ spec.loader.exec_module(reader)
 ALLOWED_ORIGINS = {'https://www.pastera.de', 'https://pastera.de'}
 PORT = 8767
 lock = threading.Lock()
-events = deque(maxlen=80)
+PENDING_DB = pathlib.Path.home() / 'Library/Application Support/Pastera-NFC/pending-events.sqlite3'
 sequence = 0
 reader_names = []
 reader_error = ''
@@ -33,6 +33,57 @@ boot_id = str(uuid.uuid4())
 reader_states = {}
 last_poll_at = 0.0
 last_card_at = 0.0
+
+
+def event_database():
+    # Durable event spool. It survives reader-driver crashes and launchd restarts.
+    PENDING_DB.parent.mkdir(parents=True, exist_ok=True)
+    conn = sqlite3.connect(str(PENDING_DB), timeout=5)
+    conn.execute('CREATE TABLE IF NOT EXISTS pending (seq INTEGER PRIMARY KEY AUTOINCREMENT, event_id TEXT NOT NULL UNIQUE, uid TEXT NOT NULL, created_at REAL NOT NULL)')
+    conn.commit()
+    try:
+        PENDING_DB.chmod(0o600)
+    except OSError:
+        pass
+    return conn
+
+
+def enqueue_card(uid):
+    event_id = str(uuid.uuid4())
+    conn = event_database()
+    try:
+        cur = conn.execute('INSERT INTO pending (event_id, uid, created_at) VALUES (?, ?, ?)', (event_id, uid, time.time()))
+        conn.commit()
+        return {'seq': cur.lastrowid, 'eventId': event_id, 'uid': uid}
+    finally:
+        conn.close()
+
+
+def pending_events(after):
+    conn = event_database()
+    try:
+        rows = conn.execute('SELECT seq, event_id, uid FROM pending WHERE seq > ? ORDER BY seq LIMIT 100', (after,)).fetchall()
+        return [{'seq': seq, 'eventId': event_id, 'uid': uid} for seq, event_id, uid in rows]
+    finally:
+        conn.close()
+
+
+def acknowledge_event(event_id):
+    conn = event_database()
+    try:
+        conn.execute('DELETE FROM pending WHERE event_id = ?', (event_id,))
+        conn.commit()
+    finally:
+        conn.close()
+
+
+def current_sequence():
+    conn = event_database()
+    try:
+        row = conn.execute('SELECT seq FROM sqlite_sequence WHERE name = ?', ('pending',)).fetchone()
+        return int(row[0]) if row else 0
+    finally:
+        conn.close()
 
 
 def diagnostic_read(ctx, device):
@@ -132,11 +183,10 @@ def listen_for_cards():
                         print('Card present but UID unsupported.', flush=True)
                     else:
                         with lock:
-                            sequence += 1
+                            event = enqueue_card(uid)
+                            sequence = event['seq']
                             last_card_at = time.time()
-                            event = {'seq': sequence, 'eventId': str(uuid.uuid4()), 'uid': uid}
-                            events.append(event)
-                        print('Card scanned on %s; event #%d' % (selected.decode(errors='replace'), sequence), flush=True)
+                        print('Card scanned on %s; event #%d persisted' % (selected.decode(errors='replace'), sequence), flush=True)
             time.sleep(0.28)
     except Exception as exc:
         reader_error = str(exc)
@@ -190,7 +240,7 @@ class Handler(BaseHTTPRequestHandler):
         if origin:
             self.send_header('Access-Control-Allow-Origin', origin)
             self.send_header('Vary', 'Origin')
-        self.send_header('Access-Control-Allow-Methods', 'GET, OPTIONS')
+        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
         self.send_header('Access-Control-Allow-Headers', 'Content-Type')
         self.send_header('Access-Control-Allow-Private-Network', 'true')
         self.send_header('Access-Control-Max-Age', '120')
@@ -201,9 +251,7 @@ class Handler(BaseHTTPRequestHandler):
             self.send_json(403, {'ok': False, 'error': 'origin_not_allowed'})
             return
         parts = urlsplit(self.path)
-        with lock:
-            seq = sequence
-            copied_events = list(events)
+        seq = current_sequence()
         if parts.path == '/status':
             alive = (bool(last_poll_at) and time.time() - last_poll_at < 7
                      and any(state in ('no_card', 'uid_ok') for state in reader_states.values()))
@@ -221,9 +269,32 @@ class Handler(BaseHTTPRequestHandler):
             self.send_json(200, {'ok': True, 'sequence': seq, 'instanceId': boot_id,
                                  'readerAlive': (bool(last_poll_at) and time.time() - last_poll_at < 7
                                      and any(state in ('no_card', 'uid_ok') for state in reader_states.values())),
-                                 'events': [e for e in copied_events if e['seq'] > since]})
+                                 'events': pending_events(since)})
         else:
             self.send_json(404, {'ok': False, 'error': 'not_found'})
+
+
+    def do_POST(self):
+        # Only the signed-in Pastera origin may confirm completed server writes.
+        origin = self.headers.get('Origin')
+        if origin not in ALLOWED_ORIGINS or not self.allowed():
+            self.send_json(403, {'ok': False, 'error': 'origin_not_allowed'})
+            return
+        if urlsplit(self.path).path != '/ack':
+            self.send_json(404, {'ok': False, 'error': 'not_found'})
+            return
+        try:
+            length = int(self.headers.get('Content-Length', '0'))
+            if not 0 < length < 1024:
+                raise ValueError('invalid_length')
+            payload = json.loads(self.rfile.read(length).decode('utf-8'))
+            event_id = payload.get('eventId', '')
+            uuid.UUID(event_id)
+        except (ValueError, TypeError, UnicodeDecodeError, json.JSONDecodeError, AttributeError):
+            self.send_json(400, {'ok': False, 'error': 'invalid_event_id'})
+            return
+        acknowledge_event(event_id)
+        self.send_json(200, {'ok': True})
 
 
 def main():
@@ -232,6 +303,8 @@ def main():
     args = parser.parse_args()
     global PORT
     PORT = args.port
+    # Create the spool before starting the reader so no card can be lost.
+    event_database().close()
     threading.Thread(target=listen_for_cards, name='nfc-pcsc', daemon=True).start()
     threading.Thread(target=watchdog, name='nfc-watchdog', daemon=True).start()
     server = ThreadingHTTPServer(('127.0.0.1', PORT), Handler)

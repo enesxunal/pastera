@@ -136,11 +136,25 @@ export function AdminVipPosClient() {
           scanSequenceRef.current = 0;
           bridgeInstanceRef.current = result.instanceId;
         }
+        async function acknowledge(eventId: string) {
+          const ack = await fetch(`${base}/ack`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ eventId }),
+            credentials: "omit",
+          });
+          if (!ack.ok) throw new Error("reader_ack_failed");
+        }
         for (const event of result.events) {
           if (disposed) break;
           if (!/^[a-f0-9]{8,20}$/i.test(event.uid) || !/^[a-f0-9-]{36}$/i.test(event.eventId)) {
-            scanSequenceRef.current = event.seq;
             setReaderNotice("Die Karte konnte nicht erkannt werden. Bitte erneut auflegen.");
+            // A malformed local event has no valid server credential or UID.
+            // It must not block every subsequent legitimate card scan.
+            if (/^[a-f0-9-]{36}$/i.test(event.eventId)) {
+              await acknowledge(event.eventId);
+            }
+            scanSequenceRef.current = event.seq;
             continue;
           }
           try {
@@ -157,18 +171,26 @@ export function AdminVipPosClient() {
             }
             const result = await response.json() as { ok?: boolean; error?: string };
             if (!response.ok || !result.ok) {
+              if (response.status !== 400 && response.status !== 404) {
+                // Transient failures stay queued locally with their original
+                // UUID and are retried without ever granting an extra stamp.
+                throw new Error("server_temporary_failure");
+              }
               setReaderNotice(result.error === "unassigned_card"
                 ? "Diese Karte ist noch keinem VIP-Mitglied zugeordnet."
-                : "Die Buchung wurde nicht bestätigt. Bitte in der Verwaltung prüfen.");
+                : "Die Karte wurde nicht erkannt. Bitte in der Verwaltung prüfen.");
             } else {
               setReaderNotice("");
               await refresh();
             }
+            // Remove from durable local outbox ONLY after the live server
+            // acknowledges or deterministically rejects the scan.
+            await acknowledge(event.eventId);
             scanSequenceRef.current = event.seq;
           } catch {
             // Retry exactly the same eventId. The server is idempotent, so
             // an uncertain response cannot double-credit the customer's card.
-            setReaderNotice("Keine Serverbestätigung. Die Buchung wird erneut geprüft.");
+            setReaderNotice("Der Scan bleibt sicher vorgemerkt und wird automatisch erneut übertragen.");
             break;
           }
         }
