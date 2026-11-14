@@ -86,6 +86,7 @@ def listen_for_cards():
     active_card = False
     absent_polls = 0
     reader_armed = False  # A card already present at service startup must not get another stamp.
+    unhealthy_polls = 0
     try:
         while True:
             outcome = None
@@ -104,6 +105,16 @@ def listen_for_cards():
                     break
                 if found is not None and outcome is None:
                     outcome, selected = found, name
+            # A reader name may remain registered after the physical USB device
+            # disappears. Do not report that stale PC/SC reader as ready.
+            healthy = any(state in ('no_card', 'uid_ok', 'invalid_apdu_6A81') for state in reader_states.values())
+            if not healthy:
+                unhealthy_polls += 1
+                if unhealthy_polls >= 8:
+                    print('PCSC readers are all unavailable; refreshing USB reader list.', flush=True)
+                    os._exit(76)
+            else:
+                unhealthy_polls = 0
             if outcome is None:
                 absent_polls += 1
                 if absent_polls >= 3:
@@ -194,11 +205,12 @@ class Handler(BaseHTTPRequestHandler):
             seq = sequence
             copied_events = list(events)
         if parts.path == '/status':
-            alive = bool(last_poll_at) and time.time() - last_poll_at < 7
+            alive = (bool(last_poll_at) and time.time() - last_poll_at < 7
+                     and any(state in ('no_card', 'uid_ok') for state in reader_states.values()))
             self.send_json(200, {'ok': not bool(reader_error) and alive, 'readers': reader_names,
                                  'sequence': seq, 'instanceId': boot_id, 'error': reader_error,
                                  'readerStates': dict(reader_states),
-                                 'lastPollAt': last_poll_at,
+                                 'readerReady': alive, 'lastPollAt': last_poll_at,
                                  'lastCardAt': last_card_at})
         elif parts.path == '/events':
             try:
@@ -207,7 +219,8 @@ class Handler(BaseHTTPRequestHandler):
                 self.send_json(400, {'ok': False, 'error': 'invalid_sequence'})
                 return
             self.send_json(200, {'ok': True, 'sequence': seq, 'instanceId': boot_id,
-                                 'readerAlive': bool(last_poll_at) and time.time() - last_poll_at < 7,
+                                 'readerAlive': (bool(last_poll_at) and time.time() - last_poll_at < 7
+                                     and any(state in ('no_card', 'uid_ok') for state in reader_states.values())),
                                  'events': [e for e in copied_events if e['seq'] > since]})
         else:
             self.send_json(404, {'ok': False, 'error': 'not_found'})

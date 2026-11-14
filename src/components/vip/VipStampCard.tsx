@@ -14,6 +14,8 @@ type VipStampCardProps = {
   lastDelta?: number;
   isSimulation?: boolean;
   waiting?: boolean;
+  scannerState?: "connecting" | "ready" | "offline";
+  scannerMessage?: string;
 };
 
 export function VipStampCard({
@@ -29,6 +31,8 @@ export function VipStampCard({
   lastDelta = 0,
   isSimulation = false,
   waiting = false,
+  scannerState,
+  scannerMessage,
 }: VipStampCardProps) {
   const filled = Math.max(0, Math.min(10, availableRewards > 0 && progress === 0 ? 10 : progress));
   const newStamp = Boolean(animationKey && lastDelta === 1 && filled > 0);
@@ -52,18 +56,34 @@ export function VipStampCard({
               <p className="mt-0.5 font-display text-[17px] font-semibold tracking-tight text-[#f1e9d9]">Deine Stempelkarte</p>
             </div>
           </div>
-          <div className="rounded-full border border-[#c49746]/25 bg-[#c49746]/[0.08] px-3.5 py-2 text-[11px] font-medium tracking-[0.04em] text-[#e3c896]">
-            10 Stempel = 1 Gratis-Pasta
-          </div>
+          {scannerState ? (
+            <div role="status" className="flex items-center gap-2 rounded-full border border-white/10 bg-[#0c160f]/70 px-3.5 py-2 text-[12px] font-medium text-[#e3e7dd]" aria-live="polite">
+              <span aria-hidden="true" className={`h-2 w-2 shrink-0 rounded-full ${scannerState === "ready" ? "bg-[#91cea1]" : scannerState === "connecting" ? "animate-pulse bg-[#e7be76]" : "bg-[#d69b7a]"}`} />
+              {scannerState === "ready" ? "Bereit zum Scannen" : scannerState === "connecting" ? "Lesegerät wird verbunden …" : "Lesegerät nicht verbunden"}
+            </div>
+          ) : (
+            <div className="rounded-full border border-[#c49746]/25 bg-[#c49746]/[0.08] px-3.5 py-2 text-[11px] font-medium tracking-[0.04em] text-[#e3c896]">
+              10 Stempel = 1 Gratis-Pasta
+            </div>
+          )}
         </div>
+
+        {scannerState && scannerState !== "ready" ? (
+          <div role="status" className="mt-5 rounded-xl border border-[#c49746]/20 bg-black/15 px-4 py-3 text-sm leading-6 text-[#e4d2b4]">
+            {scannerState === "connecting" ? "Einen Moment – der NFC-Leser wird automatisch verbunden. Falls Chrome nach Zugriff auf Geräte im lokalen Netzwerk fragt, bitte einmal erlauben." : scannerMessage || "Verbindung wird automatisch erneut versucht."}
+          </div>
+        ) : null}
+        {scannerState === "ready" && scannerMessage ? (
+          <p role="status" className="mt-5 text-sm text-[#e8ca8b]">{scannerMessage}</p>
+        ) : null}
 
         <div className="mt-6 flex flex-wrap items-end justify-between gap-4">
           <div className="min-w-0">
             <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-[#a9b5a7]">
-              {waiting ? "Karte noch nicht gescannt" : "VIP-Mitglied"}
+              {waiting ? "10 Stempel · 1 Gratis-Pasta" : "VIP-Mitglied"}
             </p>
             <h2 className="mt-2 max-w-[530px] truncate font-display text-[26px] font-semibold leading-tight tracking-tight text-[#faf7ed] sm:text-[32px]">
-              {waiting ? "Bereit für deine VIP-Karte" : memberName || "VIP-Mitglied"}
+              {waiting ? "Karte auflegen. Stempel sammeln." : memberName || "VIP-Mitglied"}
             </h2>
             {cardNumber ? <p className="mt-1.5 text-sm text-[#ddc38f]">Kartennummer {cardNumber}</p> : null}
           </div>
