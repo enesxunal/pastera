@@ -75,9 +75,13 @@ def listen_for_cards():
     names = sorted(reader.readers(ctx), key=lambda name: (not name.endswith(b' 01'), name))
     reader_names = [name.decode(errors='replace') for name in names]
     if not names:
-        reader_error = 'No PC/SC NFC reader found.'
-        print(reader_error, flush=True)
-        return
+        reader_error = 'Kein USB-NFC-Lesegerät erkannt. USB-Verbindung prüfen.'
+        print(reader_error + ' Will retry automatically when plugged in.', flush=True)
+        reader.PCSC.SCardReleaseContext(ctx)
+        # launchd KeepAlive restarts this process after the reader has been
+        # reconnected; no terminal command or browser refresh is required.
+        time.sleep(5)
+        os._exit(75)
     print('NFC reader ready:', ', '.join(reader_names), flush=True)
     active_card = False
     absent_polls = 0
