@@ -136,7 +136,7 @@ export function AdminVipPosClient() {
           scanSequenceRef.current = 0;
           bridgeInstanceRef.current = result.instanceId;
         }
-        async function acknowledge(eventId: string) {
+        const acknowledge = async (eventId: string) => {
           const ack = await fetch(`${base}/ack`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -144,7 +144,7 @@ export function AdminVipPosClient() {
             credentials: "omit",
           });
           if (!ack.ok) throw new Error("reader_ack_failed");
-        }
+        };
         for (const event of result.events) {
           if (disposed) break;
           if (!/^[a-f0-9]{8,20}$/i.test(event.uid) || !/^[a-f0-9-]{36}$/i.test(event.eventId)) {
